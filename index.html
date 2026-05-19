@@ -53,18 +53,18 @@ img{display:block;max-width:100%;object-fit:cover}
 }
 .nav-logo{font-family:var(--fd);font-size:21px;font-weight:500;letter-spacing:.22em;color:var(--ink);cursor:pointer;white-space:nowrap;flex-shrink:0;border:none;background:none}
 .nav-logo span{color:var(--gold)}
-.nav-links{display:flex;gap:clamp(16px,2.5vw,36px);align-items:center}
+.nav-links{display:none;gap:clamp(16px,2.5vw,36px);align-items:center}
 .nl{font-size:12px;font-weight:400;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);cursor:pointer;transition:color .3s;border:none;background:none;padding:0;white-space:nowrap}
 .nl:hover,.nl.active{color:var(--gold)}
 .nav-r{display:flex;align-items:center;gap:8px;flex-shrink:0}
 .nav-icon{position:relative;width:38px;height:38px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:18px;transition:color .3s}
 .nav-icon:hover{color:var(--gold)}
 .nav-badge{position:absolute;top:4px;right:4px;width:15px;height:15px;background:var(--gold);border-radius:50%;font-size:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600}
-.lang-g{display:flex;border:1px solid var(--stone);border-radius:2px;overflow:hidden}
+.lang-g{display:none;border:1px solid var(--stone);border-radius:2px;overflow:hidden}
 .lb{padding:5px 9px;font-size:11px;letter-spacing:.08em;background:none;border:none;cursor:pointer;color:var(--ink3);transition:all 150ms}
 .lb.active{background:var(--ink);color:var(--cream)}
 .lb:not(.active):hover{background:var(--stone)}
-.ham{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;background:none;border:none}
+.ham{display:flex;flex-direction:column;gap:5px;cursor:pointer;padding:6px;background:none;border:none}
 .ham span{display:block;width:22px;height:1.5px;background:var(--ink);transition:all .3s;border-radius:1px}
 .ham span{display:block;width:22px;height:1.5px;background:var(--ink);transition:all .3s;border-radius:1px}
 .drawer{position:fixed;top:var(--nav-h);left:0;right:0;bottom:0;z-index:190;background:var(--cream);transform:translateX(-100%);transition:transform .32s var(--eout);padding:24px;overflow-y:auto;display:flex;flex-direction:column;gap:4px}
@@ -399,6 +399,12 @@ img{display:block;max-width:100%;object-fit:cover}
 .search-bar-ico{position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:20px;color:var(--ink3);background:none;border:none;cursor:pointer}
 
 /* ═══════ RESPONSIVE ═══════ */
+@media(min-width:769px){
+  .nav-links{display:flex !important}
+  .lang-g{display:flex !important}
+  .ham{display:none !important}
+  .login-btn{display:inline-flex !important}
+}
 @media(max-width:1100px){
   .fg-grid{grid-template-columns:1fr 1fr;gap:28px}
   .g4{grid-template-columns:repeat(2,1fr)}
@@ -486,7 +492,7 @@ img{display:block;max-width:100%;object-fit:cover}
       <button class="lb" onclick="setLang('en',this)">EN</button>
       <button class="lb" onclick="setLang('ar',this)">AR</button>
     </div>
-    <button class="nav-icon" onclick="go('account')" title="Hesabım">
+    <button class="nav-icon" id="nav-user-icon" onclick="go('account')" title="Hesabım">
       <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     </button>
     <button class="nav-icon" onclick="go('favorites')" title="Favoriler">
@@ -495,6 +501,11 @@ img{display:block;max-width:100%;object-fit:cover}
     <button class="nav-icon" onclick="go('cart')" title="Sepet" style="position:relative">
       <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
       <span class="nav-badge">2</span>
+    </button>
+    <button id="nav-login-btn" onclick="go('login')" style="padding:7px 14px;border:1px solid var(--warm);background:none;cursor:pointer;font-size:11px;letter-spacing:.08em;color:var(--ink2);white-space:nowrap">GİRİŞ</button>
+    <button id="nav-account-btn" onclick="go('account')" style="display:none;align-items:center;gap:6px;padding:7px 14px;border:1px solid var(--gold);background:none;cursor:pointer;font-size:11px;letter-spacing:.08em;color:var(--gold)">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span id="nav-account-name">Hesabım</span>
     </button>
     <button class="ham" onclick="toggleDrawer()" id="ham">
       <span></span><span></span><span></span>
@@ -1241,7 +1252,7 @@ img{display:block;max-width:100%;object-fit:cover}
       <aside class="acc-sb">
         <div class="acc-sb-user">
           <div class="acc-av">A</div>
-          <div><div style="font-size:14px;font-weight:500">Ayşe Hanım</div><div style="font-size:12px;color:var(--ink3)">Üye · 2024</div></div>
+          <div><div style="font-size:14px;font-weight:500" id="acc-user-name">Kullanıcı</div><div style="font-size:12px;color:var(--ink3)" id="acc-user-email">Üye</div></div>
         </div>
         <div>
           <button class="acc-ni active" onclick="showAccTab('acc-orders',this)">📦 Siparişlerim</button>
@@ -1251,7 +1262,7 @@ img{display:block;max-width:100%;object-fit:cover}
           <button class="acc-ni" onclick="go('track')">🔍 Sipariş Takip</button>
           <button class="acc-ni" onclick="showAccTab('acc-notifs',this)">🔔 Bildirimler</button>
           <div style="height:1px;background:var(--stone);margin:8px 20px"></div>
-          <button class="acc-ni" style="color:var(--ink3)" onclick="toast('Çıkış yapıldı')">↩ Çıkış Yap</button>
+          <button class="acc-ni" style="color:var(--ink3)" onclick="doLogout()">↩ Çıkış Yap</button>
         </div>
       </aside>
 
@@ -1386,6 +1397,8 @@ const Store = {
     cart:[],          // [{id,name,price,img,color,size,qty}]
     favorites:[],     // [productId]
     lang:'tr',
+    isLoggedIn:false,
+    user:{name:'',email:''},
     currentProductId:1,
     activeAccTab:'acc-orders',
     filters:{cats:[],sizes:[],maxPrice:12000,sort:'Önerilen'},
@@ -1393,7 +1406,7 @@ const Store = {
     appliedPromo:null,
     pdState:{colorIdx:0,colorName:'Krem Bej',size:'',qty:1},
   },
-  _persist:['cart','favorites','lang','appliedPromo'],
+  _persist:['cart','favorites','lang','appliedPromo','isLoggedIn','user'],
   _bus:{},
 
   load(){
@@ -1410,6 +1423,20 @@ const Store = {
   emit(ev){(this._bus[ev]||[]).forEach(fn=>fn());},
 
   t(k){return(I18N[this._d.lang]||I18N.tr)[k]||k;},
+  get isLoggedIn(){return this._d.isLoggedIn;},
+  get user(){return this._d.user;},
+  login(name,email){
+    this._d.isLoggedIn=true;
+    this._d.user={name,email};
+    this.save('isLoggedIn','user');
+    this.emit('auth');
+  },
+  logout(){
+    this._d.isLoggedIn=false;
+    this._d.user={name:'',email:''};
+    this.save('isLoggedIn','user');
+    this.emit('auth');
+  },
   get lang(){return this._d.lang;},
   get cart(){return this._d.cart;},
   get favorites(){return this._d.favorites;},
@@ -1632,6 +1659,22 @@ function renderNavBadge(){
   if(b){b.textContent=cnt;b.style.display=cnt>0?'flex':'none';}
 }
 
+function renderAuth(){
+  const loginBtn   = document.getElementById('nav-login-btn');
+  const accountBtn = document.getElementById('nav-account-btn');
+  const nameSpan   = document.getElementById('nav-account-name');
+  const userIcon   = document.getElementById('nav-user-icon');
+  const loggedIn   = Store.isLoggedIn;
+
+  if(loginBtn)   loginBtn.style.display   = loggedIn ? 'none' : '';
+  if(accountBtn) accountBtn.style.display = loggedIn ? 'flex' : 'none';
+  if(nameSpan)   nameSpan.textContent     = loggedIn ? Store.user.name.split(' ')[0] : 'Hesabım';
+  if(userIcon){
+    userIcon.style.color = loggedIn ? 'var(--gold)' : '';
+    userIcon.title       = loggedIn ? Store.user.name : 'Giriş Yap';
+  }
+}
+
 function renderPdDetail(){
   const p=PRODUCTS.find(x=>x.id===Store.currentProductId);
   if(!p) return;
@@ -1710,6 +1753,7 @@ function renderAll(){
   renderNavBadge();
   renderCartSummary();
   renderLang();
+  renderAuth();
 }
 
 /* ─── PAGE NAV ─── */
@@ -1724,7 +1768,10 @@ function go(name){
   if(name==='cart'){renderCart();renderCartSummary();}
   if(name==='favorites') renderFavorites();
   if(name==='product') renderPdDetail();
-  if(name==='account') renderAccTab();
+  if(name==='account'){
+    if(!Store.isLoggedIn){ go('login'); return; }
+    renderAccTab();
+  }
   if(name==='checkout'){renderCartSummary();renderCheckoutItems();}
   renderNavBadge();
 }
@@ -1918,6 +1965,7 @@ function toast(msg){
 
 /* ─── REACTIVE SUBSCRIPTIONS ─── */
 Store.on('cart',()=>{renderNavBadge();renderCartSummary();});
+Store.on('auth',()=>{renderAuth();updateAccUser();});
 Store.on('favorites',()=>{}); // card-level updates handled in place
 Store.on('lang',()=>{renderLang();});
 Store.on('filters',()=>{renderCatGrid();});
@@ -1971,6 +2019,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   renderAll();
   renderGrids();
   renderAccTab();
+  renderAuth();
+  updateAccUser();
 });
 </script>
 
@@ -2029,7 +2079,7 @@ document.addEventListener('DOMContentLoaded',()=>{
           <button class="soc-btn" onclick="toast('Apple ile giriş')"><span>🍎</span> Apple</button>
         </div>
         <div class="divider"><span>veya e-posta ile</span></div>
-        <div class="fg"><label class="fl">E-posta</label><input class="fi" placeholder="ornek@email.com" type="email" autocomplete="email"></div>
+        <div class="fg"><label class="fl">E-posta</label><input class="fi" id="login-email" placeholder="ornek@email.com" type="email" autocomplete="email"></div>
         <div class="fg">
           <label class="fl" style="display:flex;justify-content:space-between">
             <span>Şifre</span>
@@ -2040,7 +2090,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);cursor:pointer;margin-bottom:20px">
           <input type="checkbox" style="accent-color:var(--gold)"> Beni hatırla
         </label>
-        <button class="btn btn-p btn-full btn-lg" onclick="toast('Giriş yapıldı ✓');go('home')">Giriş Yap</button>
+        <button class="btn btn-p btn-full btn-lg" onclick="doLogin()">Giriş Yap</button>
         <p style="text-align:center;font-size:13px;color:var(--ink3);margin-top:16px">Hesabınız yok mu? <button onclick="switchAuthTabByName('register-form')" style="color:var(--gold);background:none;border:none;cursor:pointer;font-size:13px">Kayıt olun</button></p>
       </div>
 
@@ -2062,7 +2112,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);cursor:pointer;margin-bottom:20px">
           <input type="checkbox" style="accent-color:var(--gold)"> Kampanya ve indirim bildirimlerini almak istiyorum.
         </label>
-        <button class="btn btn-g btn-full btn-lg" onclick="toast('Hesap oluşturuldu ✓');go('home')">Hesap Oluştur</button>
+        <button class="btn btn-g btn-full btn-lg" onclick="doRegister()">Hesap Oluştur</button>
         <p style="text-align:center;font-size:13px;color:var(--ink3);margin-top:16px">Zaten hesabınız var mı? <button onclick="switchAuthTabByName('login-form')" style="color:var(--gold);background:none;border:none;cursor:pointer;font-size:13px">Giriş yapın</button></p>
       </div>
     </div>
@@ -2401,6 +2451,50 @@ function goSearchTag(val){
   if(hi) hi.value = val;
   handleSearch(val);
   go('search');
+}
+
+
+/* ── AUTH FONKSİYONLARI ── */
+function doLogin(){
+  const email = document.getElementById('login-email')?.value?.trim() ||
+                document.querySelector('#login-form input[type=email]')?.value?.trim();
+  const pass  = document.querySelector('#login-form input[type=password]')?.value;
+  if(!email){ toast('Lütfen e-posta adresinizi girin'); return; }
+  if(!pass)  { toast('Lütfen şifrenizi girin'); return; }
+  // Demo: herhangi bir email/şifre kabul et
+  const name = email.split('@')[0];
+  Store.login(name, email);
+  renderAuth();
+  updateAccUser();
+  toast('Hoş geldiniz, '+name+' ✓');
+  go('account');
+}
+
+function doRegister(){
+  const inputs = document.querySelectorAll('#register-form input');
+  const fname = inputs[0]?.value?.trim();
+  const lname = inputs[1]?.value?.trim();
+  const email = inputs[2]?.value?.trim();
+  if(!fname || !email){ toast('Lütfen ad ve e-posta alanlarını doldurun'); return; }
+  Store.login(fname+' '+lname, email);
+  renderAuth();
+  updateAccUser();
+  toast('Hesabınız oluşturuldu, hoş geldiniz ✓');
+  go('account');
+}
+
+function doLogout(){
+  Store.logout();
+  renderAuth();
+  toast('Çıkış yapıldı');
+  go('home');
+}
+
+function updateAccUser(){
+  const nameEl  = document.getElementById('acc-user-name');
+  const emailEl = document.getElementById('acc-user-email');
+  if(nameEl)  nameEl.textContent  = Store.user.name  || 'Kullanıcı';
+  if(emailEl) emailEl.textContent = Store.user.email || '';
 }
 
 /* ── filterByCat: kategori grid kartlarından filtre uygula ── */
