@@ -56,7 +56,7 @@ img{display:block;max-width:100%;object-fit:cover}
 .nav-links{display:none;gap:clamp(16px,2.5vw,36px);align-items:center}
 .nl{font-size:12px;font-weight:400;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);cursor:pointer;transition:color .3s;border:none;background:none;padding:0;white-space:nowrap}
 .nl:hover,.nl.active{color:var(--gold)}
-.nav-r{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.nav-r{display:flex;align-items:center;gap:8px;flex-shrink:0;overflow:visible}
 .nav-icon{position:relative;width:38px;height:38px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:18px;transition:color .3s}
 .nav-icon:hover{color:var(--gold)}
 .nav-badge{position:absolute;top:4px;right:4px;width:15px;height:15px;background:var(--gold);border-radius:50%;font-size:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600}
@@ -403,7 +403,6 @@ img{display:block;max-width:100%;object-fit:cover}
   .nav-links{display:flex !important}
   .lang-g{display:flex !important}
   .ham{display:none !important}
-  .login-btn{display:inline-flex !important}
 }
 @media(max-width:1100px){
   .fg-grid{grid-template-columns:1fr 1fr;gap:28px}
@@ -437,7 +436,6 @@ img{display:block;max-width:100%;object-fit:cover}
   :root{--nav-h:60px}
   .nav-links{display:none}
   .lang-g{display:none}
-  .login-btn{display:none !important}
   .ham{display:flex !important}
   .cart-item{grid-template-columns:72px 1fr}
   .ci-price{display:none}
@@ -609,7 +607,7 @@ img{display:block;max-width:100%;object-fit:cover}
 
   <section class="about-band">
     <div class="ab-img">
-      <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&q=80&auto=format&fit=crop" alt="Hikayemiz" loading="lazy">
+      <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=800&q=80&auto=format&fit=crop" alt="Hikayemiz" loading="lazy">
     </div>
     <div class="ab-text">
       <div class="eyebrow">Hikayemiz</div>
@@ -629,7 +627,7 @@ img{display:block;max-width:100%;object-fit:cover}
           <div class="cat-info"><div class="cat-name">Abayalar</div><div class="cat-count">48 ürün</div></div>
         </div>
         <div class="cat-card" onclick="go('categories')">
-          <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80&auto=format&fit=crop" alt="Tunikler" loading="lazy">
+          <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=600&q=80&auto=format&fit=crop" alt="Tunikler" loading="lazy">
           <div class="cat-ov"></div>
           <div class="cat-info"><div class="cat-name">Tunik & Bluzlar</div><div class="cat-count">62 ürün</div></div>
         </div>
@@ -803,8 +801,8 @@ img{display:block;max-width:100%;object-fit:cover}
         <div class="pd-thumb" onclick="changePdImg(this,'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=800&q=85')">
           <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=200&q=70" alt="Görsel 2">
         </div>
-        <div class="pd-thumb" onclick="changePdImg(this,'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&q=85')">
-          <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=200&q=70" alt="Görsel 3">
+        <div class="pd-thumb" onclick="changePdImg(this,'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=800&q=85')">
+          <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=200&q=70" alt="Görsel 3">
         </div>
         <div class="pd-thumb" onclick="changePdImg(this,'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=800&q=85')">
           <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=200&q=70" alt="Görsel 4">
@@ -948,7 +946,7 @@ img{display:block;max-width:100%;object-fit:cover}
           <div class="cat-info"><div class="cat-name">Abayalar</div><div class="cat-count">48 ürün</div></div>
         </div>
         <div class="cat-card" onclick="filterByCat('Tunikler')">
-          <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=700&q=85&auto=format&fit=crop" alt="Tunik & Bluzlar" loading="lazy">
+          <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop" alt="Tunik & Bluzlar" loading="lazy">
           <div class="cat-ov"></div>
           <div class="cat-info"><div class="cat-name">Tunik &amp; Bluzlar</div><div class="cat-count">62 ürün</div></div>
         </div>
@@ -958,7 +956,7 @@ img{display:block;max-width:100%;object-fit:cover}
           <div class="cat-info"><div class="cat-name">Tesettür Elbiseler</div><div class="cat-count">35 ürün</div></div>
         </div>
         <div class="cat-card" onclick="filterByCat('Paltolar')">
-          <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=700&q=85&auto=format&fit=crop" alt="Paltolar" loading="lazy">
+          <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop" alt="Paltolar" loading="lazy">
           <div class="cat-ov"></div>
           <div class="cat-info"><div class="cat-name">Paltolar</div><div class="cat-count">21 ürün</div></div>
         </div>
@@ -968,7 +966,7 @@ img{display:block;max-width:100%;object-fit:cover}
           <div class="cat-info"><div class="cat-name">Özel Setler</div><div class="cat-count">18 ürün</div></div>
         </div>
         <div class="cat-card" onclick="filterByCat('')">
-          <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=700&q=85&auto=format&fit=crop&grayscale" alt="Tüm Ürünler" loading="lazy">
+          <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop&grayscale" alt="Tüm Ürünler" loading="lazy">
           <div class="cat-ov"></div>
           <div class="cat-info"><div class="cat-name">Tüm Ürünler</div><div class="cat-count">184 ürün</div></div>
         </div>
@@ -1133,7 +1131,7 @@ img{display:block;max-width:100%;object-fit:cover}
 ══════════════════════════════════ -->
 <main id="page-about" class="page">
   <section class="about-hero">
-    <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1200&q=80&auto=format&fit=crop" alt="HAYAZEEM atölye" loading="lazy">
+    <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=1200&q=80&auto=format&fit=crop" alt="HAYAZEEM atölye" loading="lazy">
     <div class="about-hero-ov"></div>
     <div class="about-hero-c">
       <div class="eyebrow">Hikayemiz</div>
@@ -1229,7 +1227,7 @@ img{display:block;max-width:100%;object-fit:cover}
             <div class="d" style="font-size:18px">₺4.850</div>
           </div>
           <div class="track-item">
-            <div class="ti-img"><img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=200&q=70" alt=""></div>
+            <div class="ti-img"><img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=200&q=70" alt=""></div>
             <div style="flex:1"><div style="font-size:14px">Nour Keten Elbise</div><div style="font-size:12px;color:var(--ink3)">Nude / L · x1</div></div>
             <div class="d" style="font-size:18px">₺3.200</div>
           </div>
@@ -1375,7 +1373,7 @@ img{display:block;max-width:100%;object-fit:cover}
 /* ─── ÜRÜN VERİSİ ─── */
 const PRODUCTS = [
   {id:1,name:'Medine İpek Abaya',sub:'HYZ-001 · 5 Renk',cat:'Abayalar',fabric:'İpek',price:4850,was:6200,badge:'Yeni',b_cls:'b-lim',img:'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=400&q=80',colors:['#FAF7F2','#2C2420','#8B8670','#D4C5B0','#C9A96E'],colorNames:['Krem Bej','Koyu Kahve','Zeytin','Nude','Altın'],sale:true},
-  {id:2,name:'Nour Keten Elbise',sub:'HYZ-002 · 3 Renk',cat:'Elbiseler',fabric:'Keten',price:3200,was:null,badge:null,img:'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&q=80',colors:['#FAF7F2','#D4C5B0','#8B8670'],colorNames:['Krem','Nude','Zeytin']},
+  {id:2,name:'Nour Keten Elbise',sub:'HYZ-002 · 3 Renk',cat:'Elbiseler',fabric:'Keten',price:3200,was:null,badge:null,img:'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=400&q=80',colors:['#FAF7F2','#D4C5B0','#8B8670'],colorNames:['Krem','Nude','Zeytin']},
   {id:3,name:'Serenity Şifon Tunik',sub:'HYZ-003 · 6 Renk',cat:'Tunikler',fabric:'Şifon',price:1890,was:2650,badge:'%29',b_cls:'b-sale',img:'https://images.unsplash.com/photo-1512374382149-233c42b6a83b?w=400&q=80',colors:['#FAF7F2','#E8E0D5','#D4C5B0','#C9A96E'],colorNames:['Krem','Taş','Nude','Altın'],sale:true},
   {id:4,name:'Rahel Palto',sub:'HYZ-004 · 2 Renk',cat:'Paltolar',fabric:'Triko',price:8950,was:null,badge:null,img:'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&q=80',colors:['#E8E0D5','#2C2420'],colorNames:['Taş','Koyu Kahve']},
   {id:5,name:'Safir Şifon Bluz',sub:'HYZ-005 · 4 Renk',cat:'Tunikler',fabric:'Şifon',price:2150,was:null,badge:null,img:'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=400&q=80',colors:['#FAF7F2','#D4C5B0','#C9A96E','#8B8670'],colorNames:['Krem','Nude','Altın','Zeytin']},
@@ -2218,7 +2216,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         <div style="font-family:var(--fd);font-size:22px">₺4.850</div>
       </div>
       <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
-        <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=200&q=80" alt="" style="width:72px;height:90px">
+        <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=200&q=80" alt="" style="width:72px;height:90px">
         <div style="flex:1">
           <div style="font-size:15px;font-weight:500;margin-bottom:3px">Nour Keten Elbise</div>
           <div style="font-size:13px;color:var(--ink3);margin-bottom:8px">Nude / L · x1</div>
@@ -2565,24 +2563,8 @@ function showResetStep2(){
 
 /* Update navbar to add search & login buttons */
 (function(){
-  const nl = document.querySelector('.nav-links');
-  if(nl){
-    const searchBtn = document.createElement('button');
-    searchBtn.className='nl';
-    searchBtn.textContent='Arama';
-    searchBtn.onclick = ()=>go('search');
-    nl.appendChild(searchBtn);
-  }
-  // Add search icon to nav-r before ham
-  const navR = document.querySelector('.nav-r');
-  if(navR){
-    const loginBtn = document.createElement('button');
-    loginBtn.className='nl';
-    loginBtn.style.cssText='font-size:11px;padding:7px 14px;border:1px solid var(--warm);color:var(--ink2)';
-    loginBtn.textContent='GİRİŞ';
-    loginBtn.onclick = ()=>go('login');
-    navR.insertBefore(loginBtn, navR.querySelector('.ham'));
-  }
+  // search btn removed from nav
+  // nav-r login btn already in HTML
   // Add order detail link in account orders
   const ordRows = document.querySelectorAll('.ord-row');
   ordRows.forEach(row=>{
