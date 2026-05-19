@@ -57,8 +57,11 @@ img{display:block;max-width:100%;object-fit:cover}
 .nl{font-size:12px;font-weight:400;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);cursor:pointer;transition:color .3s;border:none;background:none;padding:0;white-space:nowrap}
 .nl:hover,.nl.active{color:var(--gold)}
 .nav-r{display:flex;align-items:center;gap:8px;flex-shrink:0;overflow:visible}
-.ham{display:flex;flex-direction:column;justify-content:center;gap:5px;cursor:pointer;padding:8px;background:none;border:none;width:40px;height:40px;flex-shrink:0}
-.ham span{display:block;width:22px;height:2px;background:var(--ink);border-radius:1px}
+.ham{display:flex;flex-direction:column;justify-content:center;gap:5px;cursor:pointer;padding:8px;background:none;border:none;width:40px;height:40px;flex-shrink:0;z-index:210;position:relative}
+.ham span{display:block;width:22px;height:2px;background:var(--ink);border-radius:1px;transition:all .3s var(--ease)}
+.ham.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.ham.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+.ham.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
 
 .nav-icon{position:relative;width:38px;height:38px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:18px;transition:color .3s}
 .nav-icon:hover{color:var(--gold)}
@@ -69,6 +72,8 @@ img{display:block;max-width:100%;object-fit:cover}
 .lb:not(.active):hover{background:var(--stone)}
 .drawer{position:fixed;top:var(--nav-h);left:0;right:0;bottom:0;z-index:190;background:var(--cream);transform:translateX(-100%);transition:transform .32s var(--eout);padding:24px;overflow-y:auto;display:flex;flex-direction:column;gap:4px}
 .drawer.open{transform:translateX(0)}
+.drawer-overlay{position:fixed;inset:0;top:var(--nav-h);z-index:189;background:rgba(44,36,32,.35);opacity:0;pointer-events:none;transition:opacity .32s}
+.drawer.open~.drawer-overlay,.drawer-overlay.show{opacity:1;pointer-events:auto}
 .drawer-link{display:flex;align-items:center;justify-content:space-between;padding:14px 8px;border-bottom:1px solid var(--stone);font-size:16px;cursor:pointer;color:var(--ink2);background:none;border-left:none;border-right:none;border-top:none;width:100%;text-align:left}
 .drawer-link:hover{color:var(--gold)}
 
@@ -460,6 +465,13 @@ img{display:block;max-width:100%;object-fit:cover}
   .g4{grid-template-columns:1fr}
   .nav-logo{font-size:17px}
 }
+/* Mobile navbar: hide login/account text buttons, keep icons + ham */
+@media(max-width:640px){
+  .nav-r{gap:4px}
+  #nav-login-btn{display:none !important}
+  #nav-account-btn{display:none !important}
+  .ham{display:flex !important}
+}
 /* RTL */
 [dir=rtl] .nav-links{flex-direction:row-reverse}
 [dir=rtl] .hero-l::after{right:auto;left:0}
@@ -525,6 +537,7 @@ img{display:block;max-width:100%;object-fit:cover}
     <button class="lb" style="border:1px solid var(--stone);padding:8px 14px;font-size:13px;border-radius:2px" onclick="setLang('ar',this)">AR</button>
   </div>
 </div>
+<div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer()"></div>
 
 <!-- ══════════════════════════════════
      HOME
@@ -1760,7 +1773,13 @@ function go(name){
   if(!el) return;
   el.classList.add('active');
   window.scrollTo(0,0);
-  document.getElementById('drawer')?.classList.remove('open');
+  const drawer=document.getElementById('drawer');
+  if(drawer?.classList.contains('open')){
+    drawer.classList.remove('open');
+    document.getElementById('ham')?.classList.remove('open');
+    document.getElementById('drawer-overlay')?.classList.remove('show');
+    document.body.style.overflow='';
+  }
   if(name==='home'||name==='categories'||name==='product') renderGrids();
   if(name==='cart'){renderCart();renderCartSummary();}
   if(name==='favorites') renderFavorites();
@@ -1781,9 +1800,17 @@ function openProduct(id){
 /* ─── MOBILE DRAWER ─── */
 function toggleDrawer(){
   const d=document.getElementById('drawer');
+  const h=document.getElementById('ham');
+  const ov=document.getElementById('drawer-overlay');
   d.classList.toggle('open');
-  document.getElementById('ham')?.setAttribute('aria-expanded',d.classList.contains('open'));
+  const isOpen=d.classList.contains('open');
+  if(h) h.classList.toggle('open', isOpen);
+  if(ov) ov.classList.toggle('show', isOpen);
+  h?.setAttribute('aria-expanded', isOpen);
+  document.body.style.overflow = isOpen ? 'hidden' : '';
 }
+// Close drawer on escape
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ const d=document.getElementById('drawer'); if(d?.classList.contains('open')) toggleDrawer(); }});
 
 /* ─── FILTER CONTROLS ─── */
 function toggleFilter(){
