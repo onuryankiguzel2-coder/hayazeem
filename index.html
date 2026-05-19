@@ -1,0 +1,2509 @@
+<!DOCTYPE html>
+<html lang="tr" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HAYAZEEM — Premium Tesettür Moda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════ TOKENS ═══════ */
+:root{
+  --cream:#FAF7F2;--bone:#F2EDE4;--stone:#E8E0D5;
+  --warm:#D4C5B0;--taupe:#B8A898;--olive:#8B8670;
+  --gold:#C9A96E;--gold-lt:#E8D5A3;--gold-dk:#A8845A;
+  --ink:#2C2420;--ink2:#6B5E54;--ink3:#9E9188;--ink4:#C4B8B0;
+  --ok:#7aaa7a;--err:#cc7777;--warn:#d4963a;
+  --nav-h:68px;--max-w:1320px;
+  --fd:'Cormorant Garamond',Georgia,serif;
+  --fb:'Jost',system-ui,sans-serif;
+  --ease:cubic-bezier(.25,.1,.25,1);
+  --eout:cubic-bezier(0,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--cream);color:var(--ink);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button,input,select,textarea{font-family:inherit}
+img{display:block;max-width:100%;object-fit:cover}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--warm);border-radius:2px}
+
+/* ═══════ UTILS ═══════ */
+.d{font-family:var(--fd);font-weight:300}
+.container{max-width:var(--max-w);margin:0 auto;padding:0 clamp(16px,4vw,48px)}
+.eyebrow{font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:12px}
+.eyebrow::before{content:'';display:block;width:28px;height:1px;background:var(--gold);flex-shrink:0}
+[dir=rtl] .eyebrow::before{display:none}
+[dir=rtl] .eyebrow::after{content:'';display:block;width:28px;height:1px;background:var(--gold);flex-shrink:0}
+.section-h{margin-bottom:clamp(20px,4vw,36px)}
+.section-h h2{font-family:var(--fd);font-size:clamp(24px,3vw,36px);font-weight:300;margin-top:8px}
+.sh-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+
+/* ═══════ PAGES ═══════ */
+.page{display:none;min-height:calc(100vh - var(--nav-h));padding-top:var(--nav-h)}
+.page.active{display:block}
+
+/* ═══════ NAVBAR ═══════ */
+.navbar{
+  position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nav-h);
+  background:rgba(250,247,242,.94);backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(201,169,110,.18);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 clamp(16px,4vw,48px);gap:16px;
+}
+.nav-logo{font-family:var(--fd);font-size:21px;font-weight:500;letter-spacing:.22em;color:var(--ink);cursor:pointer;white-space:nowrap;flex-shrink:0;border:none;background:none}
+.nav-logo span{color:var(--gold)}
+.nav-links{display:flex;gap:clamp(16px,2.5vw,36px);align-items:center}
+.nl{font-size:12px;font-weight:400;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);cursor:pointer;transition:color .3s;border:none;background:none;padding:0;white-space:nowrap}
+.nl:hover,.nl.active{color:var(--gold)}
+.nav-r{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.nav-icon{position:relative;width:38px;height:38px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:18px;transition:color .3s}
+.nav-icon:hover{color:var(--gold)}
+.nav-badge{position:absolute;top:4px;right:4px;width:15px;height:15px;background:var(--gold);border-radius:50%;font-size:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600}
+.lang-g{display:flex;border:1px solid var(--stone);border-radius:2px;overflow:hidden}
+.lb{padding:5px 9px;font-size:11px;letter-spacing:.08em;background:none;border:none;cursor:pointer;color:var(--ink3);transition:all 150ms}
+.lb.active{background:var(--ink);color:var(--cream)}
+.lb:not(.active):hover{background:var(--stone)}
+.ham{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;background:none;border:none}
+.ham span{display:block;width:22px;height:1.5px;background:var(--ink);transition:all .3s;border-radius:1px}
+.drawer{position:fixed;top:var(--nav-h);left:0;right:0;bottom:0;z-index:190;background:var(--cream);transform:translateX(-100%);transition:transform .32s var(--eout);padding:24px;overflow-y:auto;display:flex;flex-direction:column;gap:4px}
+.drawer.open{transform:translateX(0)}
+.drawer-link{display:flex;align-items:center;justify-content:space-between;padding:14px 8px;border-bottom:1px solid var(--stone);font-size:16px;cursor:pointer;color:var(--ink2);background:none;border-left:none;border-right:none;border-top:none;width:100%;text-align:left}
+.drawer-link:hover{color:var(--gold)}
+
+/* ═══════ BUTTONS ═══════ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;font-family:var(--fb);font-weight:400;letter-spacing:.12em;text-transform:uppercase;transition:all .3s;white-space:nowrap}
+.btn-p{background:var(--ink);color:var(--cream);padding:13px 28px;font-size:12px}
+.btn-p:hover{background:var(--gold)}
+.btn-o{background:none;color:var(--ink2);border:1px solid var(--warm);padding:12px 28px;font-size:12px}
+.btn-o:hover{border-color:var(--gold);color:var(--gold)}
+.btn-g{background:var(--gold);color:#fff;padding:13px 28px;font-size:12px}
+.btn-g:hover{background:var(--gold-dk)}
+.btn-sm{padding:9px 18px;font-size:11px}
+.btn-lg{padding:16px 36px;font-size:13px}
+.btn-full{width:100%}
+
+/* ═══════ FORM ═══════ */
+.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.fl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
+.fi{padding:12px 14px;border:1px solid var(--stone);background:var(--cream);color:var(--ink);font-size:14px;outline:none;transition:border-color 180ms;width:100%}
+.fi:focus{border-color:var(--gold)}
+.fi::placeholder{color:var(--ink4)}
+.fs{padding:12px 14px;border:1px solid var(--stone);background:var(--cream);color:var(--ink);font-size:14px;outline:none;cursor:pointer;appearance:none;width:100%;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239E9188' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+.fs:focus{border-color:var(--gold)}
+.fta{padding:12px 14px;border:1px solid var(--stone);background:var(--cream);color:var(--ink);font-size:14px;outline:none;resize:vertical;min-height:100px;width:100%}
+.fta:focus{border-color:var(--gold)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* ═══════ BADGES ═══════ */
+.badge{display:inline-flex;align-items:center;padding:3px 10px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:500;border-radius:2px;white-space:nowrap}
+.b-new{background:#e8f0e8;color:#2d7a2d}
+.b-prep{background:#fef3e2;color:#9a6a00}
+.b-ship{background:#e6f1fb;color:#1a5faa}
+.b-done{background:#e8f0e8;color:#2d7a2d}
+.b-low{background:#fde8e8;color:#c44}
+.b-sale{background:rgba(201,169,110,.15);color:var(--gold-dk)}
+.b-lim{background:var(--ink);color:var(--cream)}
+
+/* ═══════ PRODUCT CARD ═══════ */
+.pc{cursor:pointer;position:relative}
+.pc-img{position:relative;overflow:hidden;background:var(--bone);aspect-ratio:3/4}
+.pc-img img{width:100%;height:100%;object-fit:cover;transition:transform .55s var(--ease)}
+.pc:hover .pc-img img{transform:scale(1.04)}
+.pc-badge{position:absolute;top:12px;left:12px;z-index:1}
+.pc-fav{position:absolute;top:10px;right:10px;width:34px;height:34px;border:none;background:rgba(250,247,242,.88);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all 150ms;color:var(--ink3);z-index:1}
+.pc-fav:hover,.pc-fav.liked{background:var(--gold);color:#fff}
+.pc-info{padding:12px 0 0}
+.pc-name{font-size:14px;font-weight:400;margin-bottom:3px}
+.pc-sub{font-size:12px;color:var(--ink3);margin-bottom:7px}
+.pc-price{font-family:var(--fd);font-size:19px}
+.pc-was{font-size:13px;color:var(--ink4);text-decoration:line-through;margin-left:6px}
+.pc-sale{color:var(--gold-dk)}
+.pc-dots{display:flex;gap:5px;margin-top:7px}
+.cdot{width:14px;height:14px;border-radius:50%;border:1.5px solid rgba(0,0,0,.08);cursor:pointer;transition:transform 150ms}
+.cdot:hover,.cdot.active{transform:scale(1.25);border-color:var(--gold)}
+
+/* ═══════ TOAST ═══════ */
+.toast{position:fixed;bottom:clamp(16px,3vw,28px);right:clamp(16px,3vw,28px);z-index:9999;background:var(--ink);color:var(--cream);padding:13px 20px;font-size:13px;display:flex;align-items:center;gap:10px;transform:translateY(16px);opacity:0;pointer-events:none;transition:all .3s var(--eout);max-width:320px;box-shadow:0 8px 32px rgba(44,36,32,.18)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast-ic{width:20px;height:20px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+
+/* ═══════ ANIMATIONS ═══════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes scrollPulse{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+.fu{animation:fadeUp .55s var(--eout) both}
+.fu1{animation-delay:.1s}.fu2{animation-delay:.22s}.fu3{animation-delay:.34s}.fu4{animation-delay:.46s}
+
+/* ═══════ FOOTER ═══════ */
+.footer{background:var(--ink);color:rgba(250,247,242,.7);padding:clamp(40px,6vw,72px) clamp(16px,4vw,48px) 28px}
+.fg-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:clamp(20px,4vw,48px);margin-bottom:40px}
+.f-brand{font-family:var(--fd);font-size:24px;font-weight:400;letter-spacing:.2em;color:var(--cream);margin-bottom:12px}
+.f-desc{font-size:13px;line-height:1.85;color:rgba(250,247,242,.42)}
+.f-soc{display:flex;gap:8px;margin-top:20px}
+.f-soc-btn{width:34px;height:34px;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:rgba(255,255,255,.45);transition:all 150ms}
+.f-soc-btn:hover{border-color:var(--gold);color:var(--gold)}
+.f-col-title{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.f-link{display:block;font-size:13px;color:rgba(250,247,242,.48);margin-bottom:9px;cursor:pointer;transition:color 150ms;background:none;border:none;text-align:left;width:auto}
+.f-link:hover{color:var(--cream)}
+.f-bottom{border-top:1px solid rgba(255,255,255,.07);padding-top:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:11px;color:rgba(250,247,242,.25)}
+.f-italic{color:var(--gold);font-style:italic;font-family:var(--fd);font-size:14px}
+
+/* ═══════ HOME ═══════ */
+.hero{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - var(--nav-h));overflow:hidden}
+.hero-l{display:flex;align-items:center;justify-content:center;padding:clamp(32px,5vw,80px);background:var(--bone);position:relative}
+.hero-l::after{content:'';position:absolute;right:0;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,rgba(201,169,110,.35),transparent)}
+.hero-content{max-width:440px;width:100%}
+.hero-title{font-family:var(--fd);font-size:clamp(44px,5vw,68px);font-weight:300;line-height:1.05;margin:16px 0 20px}
+.hero-title em{font-style:italic;color:var(--gold)}
+.hero-sub{font-size:15px;line-height:1.85;color:var(--ink2);font-weight:300;max-width:340px;margin-bottom:18px}
+.hero-story{font-family:var(--fd);font-size:17px;font-style:italic;line-height:1.75;color:var(--ink3);border-left:1px solid rgba(201,169,110,.5);padding-left:16px;margin-bottom:28px}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap}
+.hero-r{position:relative;overflow:hidden;background:linear-gradient(145deg,var(--stone) 0%,var(--warm) 60%,var(--bone) 100%)}
+.hero-r img{width:100%;height:100%;object-fit:cover;object-position:top center}
+.hero-r-ov{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 60%,rgba(44,36,32,.25))}
+.hero-num{position:absolute;bottom:24px;right:24px;background:rgba(250,247,242,.92);padding:14px 18px;text-align:center;backdrop-filter:blur(8px)}
+.hero-num-val{font-family:var(--fd);font-size:30px;display:block}
+.hero-num-lbl{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3)}
+.scroll-hint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px}
+.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,var(--gold),transparent);animation:scrollPulse 2.2s infinite}
+.scroll-txt{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink4)}
+.feat-strip{padding:clamp(48px,6vw,96px) 0}
+.about-band{display:grid;grid-template-columns:1fr 1fr;min-height:480px}
+.ab-img{position:relative;overflow:hidden;background:linear-gradient(145deg,var(--warm),var(--taupe))}
+.ab-img img{width:100%;height:100%;object-fit:cover;object-position:center top}
+.ab-text{background:var(--bone);padding:clamp(40px,5vw,80px) clamp(32px,4vw,64px);display:flex;flex-direction:column;justify-content:center}
+.ab-quote{font-family:var(--fd);font-size:clamp(22px,2.5vw,30px);font-weight:300;font-style:italic;line-height:1.5;margin:16px 0 20px}
+.ab-body{font-size:15px;line-height:1.9;color:var(--ink2);font-weight:300;margin-bottom:24px}
+.ab-sig{font-family:var(--fd);font-size:22px;color:var(--gold);font-style:italic}
+.cat-sec{padding:clamp(32px,4vw,64px) 0}
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.cat-card{position:relative;overflow:hidden;cursor:pointer;aspect-ratio:4/3}
+.cat-card img{width:100%;height:100%;object-fit:cover;transition:transform .55s var(--ease)}
+.cat-card:hover img{transform:scale(1.04)}
+.cat-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(44,36,32,.65) 0%,transparent 55%)}
+.cat-info{position:absolute;bottom:0;left:0;right:0;padding:20px}
+.cat-name{font-family:var(--fd);font-size:22px;color:#fff;margin-bottom:2px}
+.cat-count{font-size:11px;color:rgba(255,255,255,.65);letter-spacing:.1em}
+.promise-strip{background:var(--bone);padding:clamp(32px,4vw,56px) 0;border-top:1px solid var(--stone);border-bottom:1px solid var(--stone)}
+.promise-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;text-align:center}
+.p-icon{font-size:26px;margin-bottom:10px;display:block}
+.p-title{font-family:var(--fd);font-size:17px;margin-bottom:4px}
+.p-desc{font-size:12px;color:var(--ink3);line-height:1.7}
+
+/* ═══════ CATEGORIES ═══════ */
+.cat-page{padding:clamp(24px,4vw,48px) 0}
+.cat-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:clamp(20px,3vw,32px);flex-wrap:wrap;gap:12px}
+.cat-layout{display:flex;gap:clamp(20px,3vw,40px);align-items:flex-start}
+.filter-sb{width:220px;flex-shrink:0;position:sticky;top:calc(var(--nav-h) + 20px)}
+.f-sec{margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--stone)}
+.f-sec:last-child{border-bottom:none}
+.f-title{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);margin-bottom:12px;font-weight:500}
+.f-check{display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer;font-size:13px;color:var(--ink2)}
+.f-check input{accent-color:var(--gold);width:14px;height:14px}
+.sz-filt{display:flex;flex-wrap:wrap;gap:6px}
+.sf-btn{padding:6px 12px;border:1px solid var(--stone);background:none;font-size:12px;cursor:pointer;color:var(--ink3);transition:all 150ms}
+.sf-btn:hover,.sf-btn.active{border-color:var(--ink);background:var(--ink);color:var(--cream)}
+.prods-area{flex:1;min-width:0}
+.prods-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:clamp(12px,2vw,24px)}
+.pag{display:flex;gap:6px;justify-content:center;margin-top:clamp(24px,4vw,48px)}
+.pb{width:40px;height:40px;border:1px solid var(--stone);background:none;cursor:pointer;font-size:14px;color:var(--ink3);transition:all 150ms;display:flex;align-items:center;justify-content:center}
+.pb.active,.pb:hover{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+.filt-toggle{display:none;width:100%;margin-bottom:12px}
+
+/* ═══════ PRODUCT DETAIL ═══════ */
+.pd-layout{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - var(--nav-h))}
+.pd-gal{position:sticky;top:var(--nav-h);height:calc(100vh - var(--nav-h));overflow:hidden;display:flex;flex-direction:column;gap:6px;padding:20px;background:var(--bone)}
+.pd-main{flex:1;overflow:hidden;position:relative;background:var(--stone);cursor:zoom-in}
+.pd-main img{width:100%;height:100%;object-fit:cover;object-position:top center;transition:transform .4s var(--ease)}
+.pd-main:hover img{transform:scale(1.03)}
+.pd-thumbs{display:flex;gap:6px;height:88px}
+.pd-thumb{flex:1;overflow:hidden;cursor:pointer;opacity:.6;transition:opacity 150ms;background:var(--warm);border:2px solid transparent}
+.pd-thumb img{width:100%;height:100%;object-fit:cover}
+.pd-thumb.active,.pd-thumb:hover{opacity:1;border-color:var(--gold)}
+.pd-info{padding:clamp(24px,3vw,48px);overflow-y:auto;max-height:calc(100vh - var(--nav-h))}
+.pd-bc{font-size:12px;color:var(--ink3);margin-bottom:16px}
+.pd-brand{font-size:10px;letter-spacing:.28em;color:var(--gold);text-transform:uppercase;margin-bottom:6px}
+.pd-title{font-family:var(--fd);font-size:clamp(26px,3vw,38px);font-weight:400;line-height:1.15;margin-bottom:4px}
+.pd-sku{font-size:12px;color:var(--ink3);letter-spacing:.08em;margin-bottom:20px}
+.pd-price-row{display:flex;align-items:baseline;gap:12px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--stone)}
+.pd-price{font-family:var(--fd);font-size:32px;font-weight:400}
+.pd-was{font-size:18px;color:var(--ink4);text-decoration:line-through}
+.pd-save{background:rgba(201,169,110,.15);color:var(--gold-dk);font-size:12px;padding:3px 9px}
+.v-lbl{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink2);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.sz-gl{color:var(--gold);cursor:pointer;font-size:11px;text-decoration:underline;background:none;border:none}
+.sz-row{display:flex;gap:7px;flex-wrap:wrap}
+.sz-btn{padding:9px 15px;border:1px solid var(--stone);background:none;font-size:13px;color:var(--ink2);cursor:pointer;transition:all 150ms;min-width:48px;text-align:center}
+.sz-btn:hover{border-color:var(--gold);color:var(--gold)}
+.sz-btn.active{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+.sz-btn.out{opacity:.3;cursor:not-allowed;text-decoration:line-through}
+.col-row{display:flex;gap:10px;flex-wrap:wrap}
+.col-sw{width:34px;height:34px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all 150ms}
+.col-sw.active{box-shadow:0 0 0 3px var(--cream),0 0 0 4.5px var(--gold)}
+.col-sw:hover{transform:scale(1.1)}
+.stock-row{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ink2);margin:14px 0 18px}
+.stock-dot{width:7px;height:7px;border-radius:50%}
+.qty-wrap{display:flex;align-items:center;border:1px solid var(--stone);width:fit-content;margin-bottom:16px}
+.qty-btn{width:42px;height:42px;border:none;background:none;cursor:pointer;font-size:18px;color:var(--ink3);transition:all 150ms;display:flex;align-items:center;justify-content:center}
+.qty-btn:hover{background:var(--bone);color:var(--gold)}
+.qty-num{width:46px;text-align:center;font-size:15px;border:none;background:none;pointer-events:none}
+.pd-acts{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.pd-tabs{display:flex;gap:0;border-bottom:1px solid var(--stone);margin-bottom:16px}
+.pd-tab{padding:11px 0;margin-right:24px;font-size:12px;letter-spacing:.08em;color:var(--ink3);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all 150ms;text-transform:uppercase}
+.pd-tab.active{color:var(--ink);border-bottom-color:var(--gold)}
+.pd-tab-body{font-size:14px;line-height:1.9;color:var(--ink2)}
+.care-row{display:flex;gap:20px;flex-wrap:wrap;margin-top:12px}
+.care-item{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px;color:var(--ink3);letter-spacing:.05em;text-align:center}
+.care-item span:first-child{font-size:22px}
+.related-sec{padding:clamp(32px,4vw,64px) 0;background:var(--bone)}
+
+/* ═══════ CART ═══════ */
+.cart-page{padding:clamp(24px,4vw,48px) 0}
+.cart-layout{display:grid;grid-template-columns:1fr 380px;gap:clamp(20px,3vw,40px);align-items:start}
+.cart-title{font-family:var(--fd);font-size:clamp(26px,3vw,36px);font-weight:300;margin-bottom:4px}
+.cart-sub{font-size:13px;color:var(--ink3);margin-bottom:28px}
+.cart-item{display:grid;grid-template-columns:96px 1fr auto;gap:16px;padding:20px 0;border-bottom:1px solid var(--stone);align-items:start}
+.ci-img{height:120px;overflow:hidden;background:var(--stone)}
+.ci-img img{width:100%;height:100%;object-fit:cover}
+.ci-name{font-size:15px;margin-bottom:4px}
+.ci-var{font-size:12px;color:var(--ink3);margin-bottom:12px}
+.ci-price{font-family:var(--fd);font-size:22px}
+.ci-rm{font-size:12px;color:var(--ink3);cursor:pointer;background:none;border:none;text-decoration:underline;transition:color 150ms;margin-top:4px;display:block}
+.ci-rm:hover{color:var(--err)}
+.cart-sum{background:var(--bone);padding:clamp(20px,3vw,32px);position:sticky;top:calc(var(--nav-h)+20px)}
+.cs-title{font-family:var(--fd);font-size:22px;font-weight:400;margin-bottom:20px}
+.cs-row{display:flex;justify-content:space-between;font-size:14px;color:var(--ink2);margin-bottom:12px}
+.cs-row.tot{font-size:17px;color:var(--ink);font-weight:500;padding-top:14px;border-top:1px solid var(--stone);margin-top:4px}
+.promo-row{display:flex;margin:18px 0}
+.promo-fi{flex:1;padding:12px;border:1px solid var(--stone);background:var(--cream);font-size:13px;outline:none;transition:border-color 180ms}
+.promo-fi:focus{border-color:var(--gold)}
+.promo-btn{padding:12px 16px;background:var(--ink);color:var(--cream);border:none;font-size:12px;letter-spacing:.1em;cursor:pointer;transition:background .3s}
+.promo-btn:hover{background:var(--gold)}
+.trust-row{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:16px}
+.trust-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink3)}
+
+/* ═══════ CHECKOUT ═══════ */
+.ck-page{padding:clamp(24px,4vw,48px) 0}
+.ck-layout{display:grid;grid-template-columns:1fr 360px;gap:clamp(20px,3vw,40px);align-items:start}
+.ck-steps{display:flex;border-bottom:1px solid var(--stone);margin-bottom:28px;overflow-x:auto}
+.ck-step{display:flex;align-items:center;gap:8px;padding:12px 16px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;transition:all 150ms;background:none;border-left:none;border-right:none;border-top:none}
+.ck-step.active{color:var(--ink);border-bottom-color:var(--gold)}
+.ck-step.done{color:var(--gold)}
+.ck-num{width:22px;height:22px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.fst{font-family:var(--fd);font-size:22px;font-weight:400;margin:24px 0 16px}
+.ship-opt{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--stone);cursor:pointer;margin-bottom:10px;transition:border-color 150ms}
+.ship-opt.sel{border-color:var(--gold);background:rgba(201,169,110,.04)}
+.ship-price{font-family:var(--fd);font-size:18px;margin-left:auto}
+.om-box{background:var(--bone);padding:clamp(20px,3vw,28px);position:sticky;top:calc(var(--nav-h)+20px)}
+.om-title{font-family:var(--fd);font-size:18px;margin-bottom:16px}
+.om-item{display:flex;gap:12px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--stone)}
+.om-img{width:54px;height:70px;overflow:hidden;flex-shrink:0;background:var(--stone)}
+.om-img img{width:100%;height:100%;object-fit:cover}
+.om-price{font-family:var(--fd);font-size:16px;white-space:nowrap}
+.pay-methods{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.pay-m{flex:1;min-width:80px;padding:12px;border:1px solid var(--stone);display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:border-color 150ms;font-size:12px;color:var(--ink3)}
+.pay-m.active{border-color:var(--gold);color:var(--gold)}
+.card-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.confirm-box{text-align:center;padding:clamp(32px,5vw,64px) 20px}
+
+/* ═══════ ABOUT ═══════ */
+.about-hero{min-height:clamp(360px,55vh,580px);position:relative;overflow:hidden;display:flex;align-items:flex-end}
+.about-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top}
+.about-hero-ov{position:absolute;inset:0;background:linear-gradient(to right,rgba(250,247,242,.92) 45%,transparent)}
+.about-hero-c{position:relative;z-index:1;padding:clamp(48px,6vw,96px) clamp(24px,4vw,80px);max-width:600px}
+.ah-title{font-family:var(--fd);font-size:clamp(36px,5vw,58px);font-weight:300;line-height:1.1;margin:16px 0 20px}
+.ah-body{font-size:16px;line-height:1.9;color:var(--ink2);font-weight:300;max-width:480px}
+.memorial{background:var(--ink);padding:clamp(48px,6vw,88px) clamp(24px,4vw,80px);text-align:center;position:relative;overflow:hidden}
+.memorial::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(201,169,110,.08) 0%,transparent 70%)}
+.mem-quote{font-family:var(--fd);font-size:clamp(16px,2vw,22px);font-style:italic;color:rgba(250,247,242,.65);line-height:1.9;max-width:640px;margin:0 auto 28px;position:relative}
+.mem-names{font-family:var(--fd);font-size:clamp(32px,5vw,52px);font-weight:300;color:var(--gold);letter-spacing:.12em;margin-bottom:12px;position:relative}
+.mem-date{font-size:11px;letter-spacing:.22em;color:rgba(250,247,242,.28);text-transform:uppercase;position:relative}
+.vals-sec{padding:clamp(48px,6vw,88px) 0}
+.vals-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(20px,3vw,40px)}
+.val-card{text-align:center;padding:clamp(24px,3vw,40px)}
+.val-icon{font-size:36px;margin-bottom:16px;display:block}
+.val-title{font-family:var(--fd);font-size:22px;margin-bottom:10px}
+.val-desc{font-size:14px;color:var(--ink3);line-height:1.8}
+.timeline{padding:clamp(40px,5vw,72px) 0;max-width:700px;margin:0 auto}
+.tl-item{display:grid;grid-template-columns:80px 1fr;gap:20px;margin-bottom:32px;padding-bottom:32px;border-bottom:1px solid var(--stone)}
+.tl-item:last-child{border-bottom:none}
+.tl-year{font-family:var(--fd);font-size:28px;color:var(--gold);padding-top:3px}
+.tl-body h4{font-size:15px;font-weight:500;margin-bottom:6px}
+.tl-body p{font-size:14px;color:var(--ink2);line-height:1.8}
+
+/* ═══════ TRACK ═══════ */
+.track-page{padding:clamp(24px,4vw,64px) 0}
+.track-cont{max-width:680px;margin:0 auto}
+.track-sr{display:flex;gap:0;margin-bottom:28px}
+.track-fi{flex:1;padding:14px 16px;border:1px solid var(--stone);background:var(--cream);font-size:14px;outline:none;border-right:none;transition:border-color 180ms}
+.track-fi:focus{border-color:var(--gold)}
+.track-btn{padding:14px 24px;background:var(--ink);color:var(--cream);border:none;font-size:13px;letter-spacing:.1em;cursor:pointer;transition:background .3s;white-space:nowrap}
+.track-btn:hover{background:var(--gold)}
+.track-card{background:var(--bone);padding:clamp(20px,3vw,32px)}
+.track-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.track-onum{font-family:var(--fd);font-size:22px}
+.track-steps{position:relative;display:flex;justify-content:space-between;margin:28px 0}
+.track-steps::before{content:'';position:absolute;top:15px;left:8%;right:8%;height:1px;background:var(--stone);z-index:0}
+.ts{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;position:relative;z-index:1}
+.ts-c{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--stone);background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink3)}
+.ts-c.done{border-color:var(--gold);background:var(--gold);color:#fff}
+.ts-c.active{border-color:var(--gold);background:var(--cream);color:var(--gold)}
+.ts-n{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:center;line-height:1.4}
+.ts-n.active{color:var(--ink);font-weight:500}
+.track-del{background:#fff;border:1px solid rgba(184,168,152,.2);padding:16px 20px;margin-top:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.track-del-lbl{font-size:12px;color:var(--ink3);margin-bottom:4px}
+.track-del-val{font-family:var(--fd);font-size:18px}
+.track-item{display:flex;gap:14px;padding:14px;background:#fff;border:1px solid rgba(184,168,152,.15);margin-bottom:8px;align-items:center}
+.ti-img{width:52px;height:66px;overflow:hidden;flex-shrink:0;background:var(--stone)}
+.ti-img img{width:100%;height:100%;object-fit:cover}
+
+/* ═══════ ACCOUNT ═══════ */
+.acc-page{padding:clamp(24px,4vw,48px) 0}
+.acc-layout{display:grid;grid-template-columns:220px 1fr;gap:clamp(20px,3vw,40px);align-items:start}
+.acc-sb{background:var(--bone);position:sticky;top:calc(var(--nav-h)+16px)}
+.acc-sb-user{padding:20px;border-bottom:1px solid var(--stone);display:flex;align-items:center;gap:12px}
+.acc-av{width:44px;height:44px;border-radius:50%;background:var(--warm);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--ink);font-weight:500;flex-shrink:0}
+.acc-ni{display:flex;align-items:center;gap:10px;padding:12px 20px;font-size:13px;color:var(--ink2);cursor:pointer;transition:all 150ms;border-left:2px solid transparent;border:none;background:none;width:100%;text-align:left}
+[dir=rtl] .acc-ni{border-left:none;border-right:2px solid transparent}
+.acc-ni:hover{color:var(--ink);background:var(--stone)}
+.acc-ni.active{color:var(--ink);border-left-color:var(--gold);background:rgba(201,169,110,.06)}
+[dir=rtl] .acc-ni.active{border-left-color:transparent;border-right-color:var(--gold)}
+.acc-title{font-family:var(--fd);font-size:clamp(24px,3vw,30px);font-weight:300;margin-bottom:4px}
+.acc-sub{font-size:13px;color:var(--ink3);margin-bottom:24px}
+.ord-row{background:#fff;border:1px solid rgba(184,168,152,.2);padding:16px 20px;margin-bottom:10px;display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center}
+.ord-id{font-size:12px;color:var(--ink3);letter-spacing:.06em;margin-bottom:4px}
+.ord-name{font-size:14px;margin-bottom:3px}
+.ord-date{font-size:12px;color:var(--ink3)}
+.ord-price{font-family:var(--fd);font-size:20px}
+.acc-frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.addr-card{background:#fff;border:1px solid rgba(184,168,152,.2);padding:20px;position:relative;margin-bottom:12px}
+.addr-card.def{border-color:var(--gold)}
+.addr-def-tag{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.addr-acts{position:absolute;top:16px;right:16px;display:flex;gap:6px}
+.fav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px}
+
+/* ═══════ GRIDS ═══════ */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+
+
+/* ── Search bar (global — home + search page) ── */
+.search-bar{width:100%;padding:16px 56px 16px 20px;border:1px solid var(--warm);background:#fff;font-size:16px;outline:none;transition:border-color .2s;font-family:var(--fb)}
+.search-bar:focus{border-color:var(--gold)}
+.search-tag{padding:6px 16px;border:1px solid var(--stone);background:none;font-size:12px;letter-spacing:.08em;cursor:pointer;color:var(--ink3);transition:all 150ms}
+.search-tag:hover{border-color:var(--gold);color:var(--gold)}
+.search-results-header{display:flex;align-items:center;justify-content:space-between;padding:clamp(16px,3vw,28px) 0;border-bottom:1px solid var(--stone);margin-bottom:24px;flex-wrap:wrap;gap:10px}
+.search-hero{background:var(--bone);padding:clamp(32px,5vw,64px) 0;border-bottom:1px solid var(--stone)}
+.search-bar-wrap{max-width:680px;margin:0 auto;position:relative}
+.search-bar-ico{position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:20px;color:var(--ink3);background:none;border:none;cursor:pointer}
+
+/* ═══════ RESPONSIVE ═══════ */
+@media(max-width:1100px){
+  .fg-grid{grid-template-columns:1fr 1fr;gap:28px}
+  .g4{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:960px){
+  .hero{grid-template-columns:1fr}
+  .hero-r{display:none}
+  .hero-l{min-height:clamp(500px,70vh,700px)}
+  .about-band{grid-template-columns:1fr}
+  .ab-img{height:320px}
+  .pd-layout{grid-template-columns:1fr;display:block}
+  .pd-gal{position:relative;height:auto;max-height:520px;top:0}
+  .pd-info{max-height:none;overflow:visible}
+  .cart-layout{grid-template-columns:1fr}
+  .ck-layout{grid-template-columns:1fr}
+  .om-box{display:none}
+  .acc-layout{grid-template-columns:1fr}
+  .acc-sb{position:relative;top:0}
+  .cat-layout{flex-direction:column}
+  .filter-sb{width:100%;position:relative;top:0;display:none}
+  .filter-sb.open{display:block}
+  .filt-toggle{display:flex}
+  .g4{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:repeat(2,1fr)}
+  .promise-grid{grid-template-columns:repeat(2,1fr)}
+  .vals-grid{grid-template-columns:1fr}
+  .cat-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:640px){
+  :root{--nav-h:60px}
+  .nav-links{display:none}
+  .lang-g{display:none}
+  .ham{display:flex}
+  .cart-item{grid-template-columns:72px 1fr}
+  .ci-price{display:none}
+  .pd-thumbs{height:64px}
+  .frow{grid-template-columns:1fr}
+  .g4{grid-template-columns:repeat(2,1fr);gap:10px}
+  .fg-grid{grid-template-columns:1fr}
+  .cat-grid{grid-template-columns:1fr}
+  .hero-cta{flex-direction:column}
+  .hero-cta .btn{width:100%;justify-content:center}
+  .ck-steps{gap:0}
+  .ck-step{padding:10px 8px;font-size:10px;gap:5px}
+  .ord-row{grid-template-columns:1fr auto}
+  .prods-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .fav-grid{grid-template-columns:repeat(2,1fr)}
+  .timeline{padding:24px 16px}
+  .tl-item{grid-template-columns:60px 1fr}
+  .acc-frow{grid-template-columns:1fr}
+  .g2{grid-template-columns:1fr}
+  .g3{grid-template-columns:1fr}
+}
+@media(max-width:380px){
+  .g4{grid-template-columns:1fr}
+  .nav-logo{font-size:17px}
+}
+/* RTL */
+[dir=rtl] .nav-links{flex-direction:row-reverse}
+[dir=rtl] .hero-l::after{right:auto;left:0}
+[dir=rtl] .hero-story{border-left:none;border-right:1px solid rgba(201,169,110,.5);padding-left:0;padding-right:16px}
+[dir=rtl] .fs{background-position:left 14px center;padding-right:14px;padding-left:36px}
+[dir=rtl] .f-link{text-align:right}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><div class="toast-ic">✓</div><span id="toast-msg">İşlem tamamlandı</span></div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <button class="nav-logo" onclick="go('home')">H<span>A</span>YAZEEM</button>
+  <div class="nav-links">
+    <button class="nl" onclick="go('home')">Ana Sayfa</button>
+    <button class="nl" onclick="go('categories')">Ürünler</button>
+    <button class="nl" onclick="go('collections')">Koleksiyonlar</button>
+    <button class="nl" onclick="go('about')">Hakkımızda</button>
+    <button class="nl" onclick="go('track')">Sipariş Takip</button>
+  </div>
+  <div class="nav-r">
+    <div class="lang-g">
+      <button class="lb active" onclick="setLang('tr',this)">TR</button>
+      <button class="lb" onclick="setLang('en',this)">EN</button>
+      <button class="lb" onclick="setLang('ar',this)">AR</button>
+    </div>
+    <button class="nav-icon" onclick="go('account')" title="Hesabım">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </button>
+    <button class="nav-icon" onclick="go('favorites')" title="Favoriler">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    </button>
+    <button class="nav-icon" onclick="go('cart')" title="Sepet" style="position:relative">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <span class="nav-badge">2</span>
+    </button>
+    <button class="ham" onclick="toggleDrawer()" id="ham">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- MOBILE DRAWER -->
+<div class="drawer" id="drawer">
+  <button class="drawer-link" onclick="go('home')">Ana Sayfa <span>›</span></button>
+  <button class="drawer-link" onclick="go('categories')">Ürünler <span>›</span></button>
+  <button class="drawer-link" onclick="go('collections')">Koleksiyonlar <span>›</span></button>
+  <button class="drawer-link" onclick="go('about')">Hakkımızda <span>›</span></button>
+  <button class="drawer-link" onclick="go('track')">Sipariş Takip <span>›</span></button>
+  <button class="drawer-link" onclick="go('account')">Hesabım <span>›</span></button>
+  <button class="drawer-link" onclick="go('cart')">Sepetim (2) <span>›</span></button>
+  <div style="padding:20px 8px 0;display:flex;gap:8px">
+    <button class="lb active" style="border:1px solid var(--stone);padding:8px 14px;font-size:13px;border-radius:2px" onclick="setLang('tr',this)">TR</button>
+    <button class="lb" style="border:1px solid var(--stone);padding:8px 14px;font-size:13px;border-radius:2px" onclick="setLang('en',this)">EN</button>
+    <button class="lb" style="border:1px solid var(--stone);padding:8px 14px;font-size:13px;border-radius:2px" onclick="setLang('ar',this)">AR</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     HOME
+══════════════════════════════════ -->
+<main id="page-home" class="page active">
+  <section class="hero">
+    <div class="hero-l">
+      <div class="hero-content">
+        <div class="eyebrow fu">Bahar — Yaz Koleksiyonu 2025</div>
+        <h1 class="hero-title fu fu1">Zarafetin<br>En <em>Saf</em><br>Hali</h1>
+        <p class="hero-sub fu fu2">Her dikiş bir anın hatırası. Her kumaş bir duygunun dokunuşu. HAYAZEEM; sizi hem içten hem dıştan güzel hissettirmek için var.</p>
+        <blockquote class="hero-story fu fu3">"Hatıra, sevgi ve zarafet… Kaybedemeyeceğimiz tek şeyler."</blockquote>
+        <div class="hero-cta fu fu4">
+          <button class="btn btn-p btn-lg" onclick="go('categories')">Koleksiyonu Keşfet</button>
+          <button class="btn btn-o btn-lg" onclick="go('about')">Hikayemiz</button>
+        </div>
+      </div>
+    </div>
+    <div class="hero-r">
+      <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=900&q=80&auto=format&fit=crop" alt="HAYAZEEM koleksiyon">
+      <div class="hero-r-ov"></div>
+      <div class="hero-num"><span class="hero-num-val">200+</span><span class="hero-num-lbl">Premium Ürün</span></div>
+      <div class="scroll-hint"><div class="scroll-line"></div><span class="scroll-txt">Keşfet</span></div>
+    </div>
+  </section>
+
+  <!-- ── ANA SAYFA ARAMA ŞERİDİ ── -->
+  <div style="background:#fff;border-bottom:1px solid var(--stone);padding:0">
+    <div class="container" style="padding-top:0;padding-bottom:0">
+      <div style="max-width:720px;margin:0 auto;padding:20px 0;display:flex;flex-direction:column;gap:12px">
+        <div style="position:relative">
+          <input
+            class="search-bar"
+            placeholder="Ürün adı, kategori veya renk… (ör. Abaya, İpek, Keten)"
+            type="search"
+            id="home-search-input"
+            oninput="homeSearch(this.value)"
+            onfocus="document.getElementById('home-search-drop').style.display='block'"
+            onblur="setTimeout(()=>document.getElementById('home-search-drop').style.display='none',200)"
+            style="width:100%;padding:14px 52px 14px 18px;border:1px solid var(--stone);background:var(--cream);font-size:15px;outline:none;transition:border-color .2s;font-family:var(--fb)"
+          >
+          <button
+            onclick="submitHomeSearch()"
+            style="position:absolute;right:0;top:0;bottom:0;width:52px;border:none;background:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s"
+            onmouseover="this.style.background='var(--gold)'"
+            onmouseout="this.style.background='var(--ink)'"
+          >
+            <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          </button>
+          <!-- Dropdown öneriler -->
+          <div id="home-search-drop" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--stone);border-top:none;z-index:100;max-height:280px;overflow-y:auto;box-shadow:0 8px 24px rgba(44,36,32,.1)">
+            <div id="home-search-drop-items"></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;align-items:center">
+          <span style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-right:4px">Popüler:</span>
+          <button class="search-tag" onclick="goSearchTag('Abaya')">Abaya</button>
+          <button class="search-tag" onclick="goSearchTag('İpek')">İpek</button>
+          <button class="search-tag" onclick="goSearchTag('Keten')">Keten</button>
+          <button class="search-tag" onclick="goSearchTag('Tunik')">Tunik</button>
+          <button class="search-tag" onclick="goSearchTag('Palto')">Palto</button>
+          <button class="search-tag" onclick="goSearchTag('Krem')">Krem</button>
+          <button class="search-tag" onclick="goSearchTag('Yeni')">Yeni Gelenler</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <section class="feat-strip">
+    <div class="container">
+      <div class="sh-row section-h">
+        <div class="section-h"><div class="eyebrow">Öne Çıkanlar</div><h2>Sezon Favorileri</h2></div>
+        <button class="btn btn-o btn-sm" onclick="go('categories')">Tümünü Gör</button>
+      </div>
+      <div class="g4" id="home-prods"></div>
+    </div>
+  </section>
+
+  <section class="about-band">
+    <div class="ab-img">
+      <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&q=80&auto=format&fit=crop" alt="Hikayemiz" loading="lazy">
+    </div>
+    <div class="ab-text">
+      <div class="eyebrow">Hikayemiz</div>
+      <blockquote class="ab-quote">"Bazı isimler unutulmaz. Onları taşıyoruz — dikişlerimize, kumaşlarımıza, kalbimize..."</blockquote>
+      <div class="ab-sig">— Kurucular, HAYAZEEM</div>
+      <button class="btn btn-p" style="margin-top:32px" onclick="go('about')">Hikayemizi Okuyun →</button>
+    </div>
+  </section>
+
+  <section class="cat-sec">
+    <div class="container">
+      <div class="section-h"><div class="eyebrow">Kategoriler</div><h2>Koleksiyonlarımız</h2></div>
+      <div class="cat-grid">
+        <div class="cat-card" onclick="go('categories')">
+          <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=600&q=80&auto=format&fit=crop" alt="Abayalar" loading="lazy">
+          <div class="cat-ov"></div>
+          <div class="cat-info"><div class="cat-name">Abayalar</div><div class="cat-count">48 ürün</div></div>
+        </div>
+        <div class="cat-card" onclick="go('categories')">
+          <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80&auto=format&fit=crop" alt="Tunikler" loading="lazy">
+          <div class="cat-ov"></div>
+          <div class="cat-info"><div class="cat-name">Tunik & Bluzlar</div><div class="cat-count">62 ürün</div></div>
+        </div>
+        <div class="cat-card" onclick="go('categories')">
+          <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=600&q=80&auto=format&fit=crop" alt="Elbiseler" loading="lazy">
+          <div class="cat-ov"></div>
+          <div class="cat-info"><div class="cat-name">Tesettür Elbiseler</div><div class="cat-count">35 ürün</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="promise-strip">
+    <div class="container">
+      <div class="promise-grid">
+        <div><span class="p-icon">🚚</span><div class="p-title">Ücretsiz Kargo</div><p class="p-desc">500₺ ve üzeri siparişlerde ücretsiz</p></div>
+        <div><span class="p-icon">↩</span><div class="p-title">14 Gün İade</div><p class="p-desc">Koşulsuz iade ve değişim hakkı</p></div>
+        <div><span class="p-icon">🔒</span><div class="p-title">Güvenli Ödeme</div><p class="p-desc">256-bit SSL şifreleme</p></div>
+        <div><span class="p-icon">✦</span><div class="p-title">Premium Kalite</div><p class="p-desc">El yapımı özenle hazırlanır</p></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="fg-grid">
+      <div>
+        <div class="f-brand">HAYAZEEM</div>
+        <p class="f-desc">Zarafet, huzur ve manevi bağlılıkla tasarlanmış premium tesettür giyim markası. Hatay'dan dünyaya.</p>
+        <div class="f-soc">
+          <div class="f-soc-btn">◎</div><div class="f-soc-btn">f</div>
+          <div class="f-soc-btn">P</div><div class="f-soc-btn">♪</div>
+        </div>
+      </div>
+      <div>
+        <div class="f-col-title">Koleksiyonlar</div>
+        <button class="f-link" onclick="go('categories')">Abayalar</button>
+        <button class="f-link" onclick="go('categories')">Tunikler</button>
+        <button class="f-link" onclick="go('categories')">Elbiseler</button>
+        <button class="f-link" onclick="go('categories')">Paltolar</button>
+        <button class="f-link" onclick="go('categories')">Aksesuar</button>
+      </div>
+      <div>
+        <div class="f-col-title">Yardım</div>
+        <button class="f-link" onclick="go('track')">Sipariş Takip</button>
+        <button class="f-link">İade & Değişim</button>
+        <button class="f-link" onclick="go('product')">Beden Rehberi</button>
+        <button class="f-link">Kargo Bilgisi</button>
+        <button class="f-link">İletişim</button>
+      </div>
+      <div>
+        <div class="f-col-title">E-Bülten</div>
+        <p style="font-size:12px;color:rgba(250,247,242,.38);line-height:1.8;margin-bottom:14px">Yeni koleksiyonlar için abone olun.</p>
+        <div style="display:flex">
+          <input type="email" placeholder="E-posta adresiniz" style="flex:1;padding:11px 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--cream);font-size:13px;outline:none;min-width:0">
+          <button class="btn btn-g" style="padding:11px 16px;font-size:11px" onclick="toast('Bültene abone oldunuz ✓')">Abone Ol</button>
+        </div>
+      </div>
+    </div>
+    <div class="f-bottom">
+      <span>© 2025 HAYAZEEM. Tüm hakları saklıdır.</span>
+      <span class="f-italic">Zarafetle tasarlandı.</span>
+      <div style="display:flex;gap:16px">
+        <button class="f-link" style="margin:0;font-size:11px">Gizlilik</button>
+        <button class="f-link" style="margin:0;font-size:11px">Kullanım Koşulları</button>
+        <button class="f-link" style="margin:0;font-size:11px">KVKK</button>
+      </div>
+    </div>
+  </footer>
+</main>
+
+<!-- ══════════════════════════════════
+     CATEGORIES
+══════════════════════════════════ -->
+<main id="page-categories" class="page">
+
+  <div class="container cat-page">
+    <div class="cat-toolbar">
+      <div>
+        <nav style="font-size:12px;color:var(--ink3);margin-bottom:6px">
+          <button onclick="go('home')" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--ink3)">Ana Sayfa</button>
+          <span style="margin:0 6px">/</span><span style="color:var(--ink)">Koleksiyonlar</span>
+        </nav>
+        <h1 class="d" style="font-size:clamp(22px,3vw,32px)">Tüm Ürünler</h1>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <select class="fs" style="width:auto;min-width:160px;margin:0;padding:10px 36px 10px 14px" onchange="">
+          <option>Önerilen</option><option>Fiyat: Artan</option><option>Fiyat: Azalan</option><option>Yeni Gelenler</option>
+        </select>
+        <select class="fs" style="width:auto;min-width:160px;margin:0;padding:10px 36px 10px 14px">
+          <option>Tüm Kategoriler</option><option>Abayalar</option><option>Tunikler</option><option>Elbiseler</option><option>Paltolar</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn btn-o btn-full filt-toggle" onclick="toggleFilter()" id="filt-btn">⚙ Filtreleri Göster</button>
+
+    <div class="cat-layout">
+      <aside class="filter-sb" id="filter-sb">
+        <div class="f-sec">
+          <div class="f-title">Kategori</div>
+          <label class="f-check"><input type="checkbox" checked style="accent-color:var(--gold)"> Abayalar (48)</label>
+          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Tunikler (62)</label>
+          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Elbiseler (35)</label>
+          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Paltolar (21)</label>
+          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Aksesuar (18)</label>
+        </div>
+        <div class="f-sec">
+          <div class="f-title">Beden</div>
+          <div class="sz-filt">
+            <button class="sf-btn" onclick="this.classList.toggle('active')">XS</button>
+            <button class="sf-btn" onclick="this.classList.toggle('active')">S</button>
+            <button class="sf-btn active" onclick="this.classList.toggle('active')">M</button>
+            <button class="sf-btn" onclick="this.classList.toggle('active')">L</button>
+            <button class="sf-btn" onclick="this.classList.toggle('active')">XL</button>
+            <button class="sf-btn" onclick="this.classList.toggle('active')">2XL</button>
+            <button class="sf-btn" onclick="this.classList.toggle('active')">3XL</button>
+          </div>
+        </div>
+        <div class="f-sec">
+          <div class="f-title">Renk</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <div class="cdot active" style="width:22px;height:22px;background:#FAF7F2;cursor:pointer" title="Krem" onclick="this.classList.toggle('active')"></div>
+            <div class="cdot" style="width:22px;height:22px;background:#2C2420;cursor:pointer" title="Koyu Kahve" onclick="this.classList.toggle('active')"></div>
+            <div class="cdot" style="width:22px;height:22px;background:#8B8670;cursor:pointer" title="Zeytin" onclick="this.classList.toggle('active')"></div>
+            <div class="cdot" style="width:22px;height:22px;background:#D4C5B0;cursor:pointer" title="Nude" onclick="this.classList.toggle('active')"></div>
+            <div class="cdot" style="width:22px;height:22px;background:#C9A96E;cursor:pointer" title="Altın" onclick="this.classList.toggle('active')"></div>
+          </div>
+        </div>
+        <div class="f-sec">
+          <div class="f-title">Fiyat Aralığı</div>
+          <div style="font-size:13px;color:var(--ink2);margin-bottom:8px" id="pr-txt">₺500 — ₺12.000</div>
+          <input type="range" min="500" max="12000" value="12000" style="width:100%;accent-color:var(--gold)" oninput="document.getElementById('pr-txt').textContent='₺500 — ₺'+parseInt(this.value).toLocaleString()">
+        </div>
+        <div class="f-sec">
+          <div class="f-title">Kumaş</div>
+          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> İpek (24)</label>
+          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Keten (18)</label>
+          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Şifon (31)</label>
+          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Triko (15)</label>
+        </div>
+        <button class="btn btn-o btn-full btn-sm" onclick="toast('Filtreler temizlendi')">Filtreleri Temizle</button>
+      </aside>
+
+      <div class="prods-area">
+        <p style="font-size:13px;color:var(--ink3);margin-bottom:16px">184 ürün gösteriliyor</p>
+        <div class="prods-grid" id="cat-prods"></div>
+        <div class="pag">
+          <button class="pb active">1</button>
+          <button class="pb">2</button>
+          <button class="pb">3</button>
+          <button class="pb">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ══════════════════════════════════
+     PRODUCT DETAIL
+══════════════════════════════════ -->
+<main id="page-product" class="page">
+  <div class="pd-layout">
+    <div class="pd-gal">
+      <div class="pd-main" id="pd-main">
+        <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=800&q=85&auto=format&fit=crop" alt="Medine İpek Abaya" id="pd-main-img">
+      </div>
+      <div class="pd-thumbs">
+        <div class="pd-thumb active" onclick="changePdImg(this,'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=800&q=85')">
+          <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=200&q=70" alt="Görsel 1">
+        </div>
+        <div class="pd-thumb" onclick="changePdImg(this,'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=800&q=85')">
+          <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=200&q=70" alt="Görsel 2">
+        </div>
+        <div class="pd-thumb" onclick="changePdImg(this,'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&q=85')">
+          <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=200&q=70" alt="Görsel 3">
+        </div>
+        <div class="pd-thumb" onclick="changePdImg(this,'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=800&q=85')">
+          <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=200&q=70" alt="Görsel 4">
+        </div>
+      </div>
+    </div>
+
+    <div class="pd-info">
+      <nav class="pd-bc">
+        <button onclick="go('home')" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--ink3)">Ana Sayfa</button>
+        <span style="margin:0 6px">/</span>
+        <button onclick="go('categories')" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--ink3)">Abayalar</button>
+        <span style="margin:0 6px">/</span>
+        <span style="color:var(--ink)">Medine İpek Abaya</span>
+      </nav>
+
+      <div class="pd-brand">HAYAZEEM</div>
+      <h1 class="pd-title">Medine İpek Abaya</h1>
+      <div class="pd-sku">Ürün Kodu: HYZ-001 · 5 Renk, 7 Beden</div>
+
+      <div class="pd-price-row">
+        <span class="pd-price">₺4.850</span>
+        <span class="pd-was">₺6.200</span>
+        <span class="pd-save">%22 Tasarruf</span>
+      </div>
+
+      <div style="margin-bottom:18px">
+        <div class="v-lbl">Renk: <strong id="sel-color" style="font-weight:500">Krem Bej</strong></div>
+        <div class="col-row">
+          <div class="col-sw active" style="background:#FAF7F2;border:1px solid #ddd" title="Krem Bej" onclick="selCol(this,'Krem Bej')"></div>
+          <div class="col-sw" style="background:#2C2420" title="Koyu Kahve" onclick="selCol(this,'Koyu Kahve')"></div>
+          <div class="col-sw" style="background:#8B8670" title="Zeytin" onclick="selCol(this,'Zeytin')"></div>
+          <div class="col-sw" style="background:#D4C5B0" title="Nude" onclick="selCol(this,'Nude')"></div>
+          <div class="col-sw" style="background:#C9A96E" title="Altın" onclick="selCol(this,'Altın')"></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:18px">
+        <div class="v-lbl">
+          <span>Beden: <strong id="sel-size" style="font-weight:500">M</strong></span>
+          <button class="sz-gl" onclick="toast('Beden rehberi yakında')">Beden Rehberi</button>
+        </div>
+        <div class="sz-row">
+          <button class="sz-btn out" disabled title="Stokta yok">XS</button>
+          <button class="sz-btn" onclick="selSz(this,'S')">S</button>
+          <button class="sz-btn active" onclick="selSz(this,'M')">M</button>
+          <button class="sz-btn" onclick="selSz(this,'L')">L</button>
+          <button class="sz-btn" onclick="selSz(this,'XL')">XL</button>
+          <button class="sz-btn" onclick="selSz(this,'2XL')">2XL</button>
+          <button class="sz-btn" onclick="selSz(this,'3XL')">3XL</button>
+        </div>
+      </div>
+
+      <div class="stock-row">
+        <span class="stock-dot" style="background:var(--warn)"></span>
+        <span>Son <strong>3 ürün</strong> kaldı — Hemen al!</span>
+      </div>
+
+      <div class="qty-wrap">
+        <button class="qty-btn" onclick="changeQty(-1)">−</button>
+        <span class="qty-num" id="qty">1</span>
+        <button class="qty-btn" onclick="changeQty(1)">+</button>
+      </div>
+
+      <div class="pd-acts">
+        <button class="btn btn-p btn-full btn-lg" onclick="addToCart()">Sepete Ekle</button>
+        <button class="btn btn-o btn-full btn-lg" onclick="go('checkout')">Hemen Satın Al</button>
+        <button class="btn btn-o btn-full" onclick="addFav(this)" style="gap:8px;padding:12px;font-size:12px">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          FAVORİLERE EKLE
+        </button>
+      </div>
+
+      <div class="pd-tabs">
+        <button class="pd-tab active" onclick="switchTab(this,'pd-desc')">Açıklama</button>
+        <button class="pd-tab" onclick="switchTab(this,'pd-fabric')">Kumaş</button>
+        <button class="pd-tab" onclick="switchTab(this,'pd-care')">Bakım</button>
+        <button class="pd-tab" onclick="switchTab(this,'pd-ship')">Kargo</button>
+      </div>
+
+      <div id="pd-desc" class="pd-tab-body">
+        <p>Medine İpek Abaya, en özel anlarınız için özenle tasarlandı. Kadın siluetine nazikçe dökülen kesimi ve nefes alan Medine ipeği ile hem namaz vakitlerinde hem de özel davetlerde zarafetle kullanılabilir.</p>
+        <ul style="list-style:none;margin-top:12px;display:flex;flex-direction:column;gap:6px">
+          <li style="display:flex;gap:8px"><span style="color:var(--gold);flex-shrink:0">—</span> Boy: 148 cm (42 bedende ölçüm)</li>
+          <li style="display:flex;gap:8px"><span style="color:var(--gold);flex-shrink:0">—</span> Kemer dahildir</li>
+          <li style="display:flex;gap:8px"><span style="color:var(--gold);flex-shrink:0">—</span> El yapımı detaylar</li>
+          <li style="display:flex;gap:8px"><span style="color:var(--gold);flex-shrink:0">—</span> Sınırlı üretim</li>
+        </ul>
+      </div>
+      <div id="pd-fabric" class="pd-tab-body" style="display:none">
+        <p>%80 Medine İpeği, %20 Elastan</p>
+        <ul style="list-style:none;margin-top:12px;display:flex;flex-direction:column;gap:6px">
+          <li style="display:flex;gap:8px"><span style="color:var(--gold);flex-shrink:0">—</span> Kumaş ağırlığı: 85 gr/m²</li>
+          <li style="display:flex;gap:8px"><span style="color:var(--gold);flex-shrink:0">—</span> Döküm: Akışkan ve hafif</li>
+          <li style="display:flex;gap:8px"><span style="color:var(--gold);flex-shrink:0">—</span> Menşei: Türkiye, Bursa</li>
+          <li style="display:flex;gap:8px"><span style="color:var(--gold);flex-shrink:0">—</span> OEKO-TEX® Sertifikalı</li>
+        </ul>
+      </div>
+      <div id="pd-care" class="pd-tab-body" style="display:none">
+        <div class="care-row">
+          <div class="care-item"><span>🫧</span><span>30°C Yıkama</span></div>
+          <div class="care-item"><span>🚫</span><span>Çamaşır Suyu Yok</span></div>
+          <div class="care-item"><span>👔</span><span>Düşük Ütü</span></div>
+          <div class="care-item"><span>🧺</span><span>Kuru Temizleme</span></div>
+          <div class="care-item"><span>⚡</span><span>Kurutucu Yok</span></div>
+        </div>
+      </div>
+      <div id="pd-ship" class="pd-tab-body" style="display:none">
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:8px">
+          <li style="display:flex;gap:8px"><span style="color:var(--gold);flex-shrink:0">—</span> Standart kargo: 2-4 iş günü, ücretsiz (500₺ üzeri)</li>
+          <li style="display:flex;gap:8px"><span style="color:var(--gold);flex-shrink:0">—</span> Ekspres kargo: 1 iş günü, 49₺</li>
+          <li style="display:flex;gap:8px"><span style="color:var(--gold);flex-shrink:0">—</span> Uluslararası: 7-14 iş günü</li>
+          <li style="display:flex;gap:8px"><span style="color:var(--gold);flex-shrink:0">—</span> Sipariş kesme saati: 14:00 (hafta içi)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <section class="related-sec">
+    <div class="container">
+      <div class="section-h"><div class="eyebrow">Bunları da Sevebilirsiniz</div><h2>Benzer Ürünler</h2></div>
+      <div class="g4" id="related-prods"></div>
+    </div>
+  </section>
+</main>
+
+
+<!-- COLLECTIONS PAGE -->
+<main id="page-collections" class="page">
+  <div style="padding-top:clamp(32px,4vw,56px);padding-bottom:clamp(48px,6vw,80px)">
+    <div class="container">
+      <div class="section-h">
+        <div class="eyebrow">Koleksiyonlar</div>
+        <h1 class="d" style="font-size:clamp(28px,4vw,44px);margin-top:10px">Koleksiyonlarımız</h1>
+        <p style="font-size:15px;color:var(--ink2);margin-top:10px;line-height:1.8;max-width:540px">Her koleksiyon, bir duygunun kumaşa yansımasıdır. Zarafetle tasarlanmış, özenle üretilmiştir.</p>
+      </div>
+      <div class="cat-grid" style="margin-top:clamp(20px,3vw,36px)">
+        <div class="cat-card" onclick="filterByCat('Abayalar')">
+          <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop" alt="Abayalar" loading="lazy">
+          <div class="cat-ov"></div>
+          <div class="cat-info"><div class="cat-name">Abayalar</div><div class="cat-count">48 ürün</div></div>
+        </div>
+        <div class="cat-card" onclick="filterByCat('Tunikler')">
+          <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=700&q=85&auto=format&fit=crop" alt="Tunik & Bluzlar" loading="lazy">
+          <div class="cat-ov"></div>
+          <div class="cat-info"><div class="cat-name">Tunik &amp; Bluzlar</div><div class="cat-count">62 ürün</div></div>
+        </div>
+        <div class="cat-card" onclick="filterByCat('Elbiseler')">
+          <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop" alt="Elbiseler" loading="lazy">
+          <div class="cat-ov"></div>
+          <div class="cat-info"><div class="cat-name">Tesettür Elbiseler</div><div class="cat-count">35 ürün</div></div>
+        </div>
+        <div class="cat-card" onclick="filterByCat('Paltolar')">
+          <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=700&q=85&auto=format&fit=crop" alt="Paltolar" loading="lazy">
+          <div class="cat-ov"></div>
+          <div class="cat-info"><div class="cat-name">Paltolar</div><div class="cat-count">21 ürün</div></div>
+        </div>
+        <div class="cat-card" onclick="filterByCat('Abayalar')">
+          <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop" alt="Setler" loading="lazy">
+          <div class="cat-ov"></div>
+          <div class="cat-info"><div class="cat-name">Özel Setler</div><div class="cat-count">18 ürün</div></div>
+        </div>
+        <div class="cat-card" onclick="filterByCat('')">
+          <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=700&q=85&auto=format&fit=crop&grayscale" alt="Tüm Ürünler" loading="lazy">
+          <div class="cat-ov"></div>
+          <div class="cat-info"><div class="cat-name">Tüm Ürünler</div><div class="cat-count">184 ürün</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ══════════════════════════════════
+     CART
+══════════════════════════════════ -->
+<main id="page-cart" class="page">
+  <div class="container cart-page">
+    <div class="cart-layout">
+      <div>
+        <h1 class="cart-title">Sepetim</h1>
+        <p class="cart-sub">2 ürün · ₺8.050</p>
+
+        <div id="cart-items-container">
+          <!-- rendered by renderCart() -->
+        </div>
+
+        <div style="padding:20px 0">
+          <button class="btn btn-o" onclick="go('categories')">← Alışverişe Devam Et</button>
+        </div>
+      </div>
+
+      <aside class="cart-sum">
+        <div class="cs-title">Sipariş Özeti</div>
+        <div class="cs-row"><span>Ara Toplam</span><span id="cs-subtotal">₺0</span></div>
+        <div class="cs-row" id="cs-disc-row" style="display:none"><span>İndirim</span><span id="cs-disc" style="color:var(--gold)">−₺0</span></div>
+        <div class="cs-row"><span>Kargo</span><span id="cs-shipping"><span style="color:var(--ok)">Ücretsiz</span></span></div>
+        <div class="cs-row tot"><span>Toplam</span><span id="cs-total" style="font-family:var(--fd);font-size:22px">₺0</span></div>
+        <div class="promo-row">
+          <input class="promo-fi" placeholder="İndirim kodu" id="promo-in">
+          <button class="promo-btn" onclick="applyPromo()">Uygula</button>
+        </div>
+        <button class="btn btn-g btn-full btn-lg" onclick="go('checkout')" id="cs-proceed">Ödemeye Geç →</button>
+        <div class="trust-row">
+          <div class="trust-item">🔒 SSL</div>
+          <div class="trust-item">📦 Ücretsiz Kargo</div>
+          <div class="trust-item">↩ 14 Gün İade</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<!-- ══════════════════════════════════
+     CHECKOUT
+══════════════════════════════════ -->
+<main id="page-checkout" class="page">
+  <div class="container ck-page">
+    <div class="ck-layout">
+      <div>
+        <div class="ck-steps">
+          <button class="ck-step done"><span class="ck-num">✓</span> Sepet</button>
+          <button class="ck-step active" id="ck-s2"><span class="ck-num">2</span> Teslimat</button>
+          <button class="ck-step" id="ck-s3"><span class="ck-num">3</span> Ödeme</button>
+          <button class="ck-step" id="ck-s4"><span class="ck-num">4</span> Onay</button>
+        </div>
+
+        <!-- STEP 2: Delivery -->
+        <div id="ck-delivery">
+          <h2 class="fst">Teslimat Bilgileri</h2>
+          <div class="frow">
+            <div class="fg"><label class="fl">Ad</label><input class="fi" placeholder="Adınız" type="text" autocomplete="given-name"></div>
+            <div class="fg"><label class="fl">Soyad</label><input class="fi" placeholder="Soyadınız" type="text" autocomplete="family-name"></div>
+          </div>
+          <div class="fg"><label class="fl">Telefon</label><input class="fi" placeholder="+90 5__ ___ __ __" type="tel" autocomplete="tel"></div>
+          <div class="fg"><label class="fl">E-posta</label><input class="fi" placeholder="ornek@email.com" type="email" autocomplete="email"></div>
+          <div class="fg"><label class="fl">Adres</label><input class="fi" placeholder="Sokak, mahalle, numara" type="text" autocomplete="street-address"></div>
+          <div class="frow">
+            <div class="fg"><label class="fl">İl</label>
+              <select class="fs" autocomplete="address-level1">
+                <option value="">İl seçiniz</option>
+                <option>İstanbul</option><option>Ankara</option><option>İzmir</option><option>Bursa</option><option>Hatay</option>
+              </select>
+            </div>
+            <div class="fg"><label class="fl">Posta Kodu</label><input class="fi" placeholder="31000" type="text" maxlength="5"></div>
+          </div>
+
+          <h2 class="fst">Kargo Seçimi</h2>
+          <label class="ship-opt sel">
+            <input type="radio" name="ship" checked style="accent-color:var(--gold)">
+            <div style="flex:1"><div style="font-size:14px;font-weight:500">Standart Kargo</div><div style="font-size:12px;color:var(--ink3)">2-4 İş Günü · MNG Kargo</div></div>
+            <div class="ship-price" style="color:var(--ok)">Ücretsiz</div>
+          </label>
+          <label class="ship-opt">
+            <input type="radio" name="ship" style="accent-color:var(--gold)">
+            <div style="flex:1"><div style="font-size:14px;font-weight:500">Ekspres Kargo</div><div style="font-size:12px;color:var(--ink3)">Aynı/Ertesi Gün</div></div>
+            <div class="ship-price">₺49</div>
+          </label>
+          <label class="ship-opt">
+            <input type="radio" name="ship" style="accent-color:var(--gold)">
+            <div style="flex:1"><div style="font-size:14px;font-weight:500">Uluslararası · DHL</div><div style="font-size:12px;color:var(--ink3)">7-14 İş Günü</div></div>
+            <div class="ship-price">₺180</div>
+          </label>
+
+          <button class="btn btn-p btn-full btn-lg" style="margin-top:24px" onclick="goPayment()">Ödemeye Devam Et →</button>
+        </div>
+
+        <!-- STEP 3: Payment -->
+        <div id="ck-payment" style="display:none">
+          <h2 class="fst">Ödeme Yöntemi</h2>
+          <div class="pay-methods">
+            <div class="pay-m active" onclick="selPay(this)"><span style="font-size:22px">💳</span><span>Kredi/Banka Kartı</span></div>
+            <div class="pay-m" onclick="selPay(this)"><span style="font-size:22px">🏦</span><span>Havale/EFT</span></div>
+            <div class="pay-m" onclick="selPay(this)"><span style="font-size:22px">📱</span><span>Kapıda Ödeme</span></div>
+          </div>
+          <div class="fg"><label class="fl">Kart Numarası</label><input class="fi" placeholder="•••• •••• •••• ••••" type="tel" maxlength="19" autocomplete="cc-number"></div>
+          <div class="card-row">
+            <div class="fg"><label class="fl">Son Kullanma</label><input class="fi" placeholder="AA / YY" type="tel" maxlength="7" autocomplete="cc-exp"></div>
+            <div class="fg"><label class="fl">CVC</label><input class="fi" placeholder="•••" type="tel" maxlength="3" autocomplete="cc-csc"></div>
+          </div>
+          <div class="fg"><label class="fl">Kart İsmi</label><input class="fi" placeholder="Ad Soyad" type="text" autocomplete="cc-name"></div>
+          <div style="margin-bottom:20px">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);cursor:pointer">
+              <input type="checkbox" style="accent-color:var(--gold)"> Taksit seçeneği istiyorum (3-6-9-12 taksit)
+            </label>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(122,170,122,.08);border:1px solid rgba(122,170,122,.2);margin-bottom:20px">
+            <span style="color:var(--ok);font-size:18px">🔒</span>
+            <span style="font-size:13px;color:var(--ink2)">256-bit SSL şifreleme ile güvenli ödeme</span>
+          </div>
+          <button class="btn btn-g btn-full btn-lg" id="ck-pay-btn" onclick="confirmOrder()">Siparişi Tamamla — ₺6.700</button>
+        </div>
+
+        <!-- STEP 4: Confirm -->
+        <div id="ck-confirm" style="display:none" class="confirm-box">
+          <div style="font-size:56px;margin-bottom:20px">✦</div>
+          <h2 class="d" style="font-size:32px;margin-bottom:12px">Siparişiniz Alındı</h2>
+          <p style="font-size:15px;color:var(--ink2);margin-bottom:8px">Sipariş: <strong>#HYZ-2025-0852</strong></p>
+          <p style="font-size:14px;color:var(--ink3);margin-bottom:28px">Onay e-postası adresinize gönderildi.</p>
+          <div style="background:var(--bone);padding:20px;max-width:380px;margin:0 auto 28px">
+            <div style="font-size:12px;color:var(--ink3);margin-bottom:6px">Tahmini Teslimat</div>
+            <div class="d" style="font-size:22px">19-21 Mayıs 2025</div>
+          </div>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+            <button class="btn btn-p" onclick="go('track')">Siparişi Takip Et</button>
+            <button class="btn btn-o" onclick="go('home')">Alışverişe Dön</button>
+          </div>
+        </div>
+      </div>
+
+      <aside class="om-box">
+        <div class="om-title">Siparişiniz</div>
+        <div id="om-items"><!-- rendered dynamically --></div>
+        <div style="border-top:1px solid var(--stone);padding-top:14px;margin-top:4px">
+          <div class="cs-row"><span>Ara Toplam</span><span id="om-subtotal">₺0</span></div>
+          <div class="cs-row"><span>Kargo</span><span id="om-shipping"><span style="color:var(--ok)">Ücretsiz</span></span></div>
+          <div class="cs-row"><span>İndirim</span><span id="om-disc" style="color:var(--gold)">−₺0</span></div>
+          <div class="cs-row tot"><span>Toplam</span><span id="om-total" class="d" style="font-size:21px">₺0</span></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<!-- ══════════════════════════════════
+     ABOUT
+══════════════════════════════════ -->
+<main id="page-about" class="page">
+  <section class="about-hero">
+    <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1200&q=80&auto=format&fit=crop" alt="HAYAZEEM atölye" loading="lazy">
+    <div class="about-hero-ov"></div>
+    <div class="about-hero-c">
+      <div class="eyebrow">Hikayemiz</div>
+      <h1 class="ah-title">Bir İsimden<br>Bir Markaya,<br><em style="color:var(--gold)">Kalpten Kalbe</em></h1>
+    </div>
+  </section>
+
+  <section class="memorial">
+    <blockquote class="mem-quote">"Kaybedemeyeceğimiz şeyler vardır — onları sevdiğimizi bilmelerini sağladığımız anlar, zarafetle geçirdiğimiz saatler, birlikte anlam kazanan dakikalar..."</blockquote>
+    <div class="mem-names">H A Y A Z E E M</div>
+    <div class="mem-date">6 Şubat 2023 · Hatay, Türkiye</div>
+  </section>
+
+  <section class="vals-sec">
+    <div class="container">
+      <div class="section-h" style="text-align:center;max-width:500px;margin:0 auto clamp(32px,4vw,56px)">
+        <div class="eyebrow" style="justify-content:center">Değerlerimiz</div>
+        <h2>Bizi Biz Yapan</h2>
+      </div>
+      <div class="vals-grid">
+        <div class="val-card"><span class="val-icon">✦</span><div class="val-title">Zarafet</div><p class="val-desc">Her parçada görünmez bir zerafet gizlidir — hem tasarımda hem kumaşta.</p></div>
+        <div class="val-card"><span class="val-icon">◇</span><div class="val-title">Huzur</div><p class="val-desc">Giydiğinizde sakinlik hissetmenizi istiyoruz. İçten dışa bir dinginlik.</p></div>
+        <div class="val-card"><span class="val-icon">◉</span><div class="val-title">Anlam</div><p class="val-desc">Moda geçici, anlam kalıcıdır. Sevdiklerimizin hatırası ebedidir.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:clamp(40px,5vw,72px) 0;background:var(--bone)">
+    <div class="container">
+      <div class="section-h" style="text-align:center;max-width:500px;margin:0 auto clamp(28px,3vw,48px)">
+        <div class="eyebrow" style="justify-content:center">Yolculuğumuz</div>
+        <h2>Zaman Tüneli</h2>
+      </div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-year">2023</div>
+          <div class="tl-body"><h4>Bir Hayalin Doğuşu</h4><p>Deprem acısının ardından, sevdiklerimizin anısını yaşatmak için HAYAZEEM'in temelleri atıldı.</p></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2024</div>
+          <div class="tl-body"><h4>İlk Koleksiyon</h4><p>7 parçadan oluşan "Nefes" koleksiyonu ile satışa başladık. İlk 24 saatte tükendi.</p></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2025</div>
+          <div class="tl-body"><h4>Büyüme & Uluslararasılaşma</h4><p>200+ ürün, 3 dil, uluslararası kargo ile Körfez ve Avrupa'ya açıldık.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="fg-grid">
+      <div><div class="f-brand">HAYAZEEM</div><p class="f-desc">Zarafet ve manevi bağlılıkla tasarlanmış premium tesettür giyim markası.</p></div>
+      <div><div class="f-col-title">Koleksiyonlar</div><button class="f-link" onclick="go('categories')">Abayalar</button><button class="f-link" onclick="go('categories')">Tunikler</button><button class="f-link" onclick="go('categories')">Elbiseler</button></div>
+      <div><div class="f-col-title">Yardım</div><button class="f-link" onclick="go('track')">Sipariş Takip</button><button class="f-link">İade</button><button class="f-link">İletişim</button></div>
+      <div><div class="f-col-title">Bülten</div><p style="font-size:12px;color:rgba(250,247,242,.38);line-height:1.8;margin-bottom:14px">Yeni koleksiyonlar için abone olun.</p><input type="email" placeholder="E-posta" style="width:100%;padding:10px 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--cream);font-size:13px;outline:none;margin-bottom:8px"><button class="btn btn-g btn-full" style="padding:10px" onclick="toast('Bültene abone oldunuz ✓')">Abone Ol</button></div>
+    </div>
+    <div class="f-bottom"><span>© 2025 HAYAZEEM.</span><span class="f-italic">Zarafetle tasarlandı.</span></div>
+  </footer>
+</main>
+
+<!-- ══════════════════════════════════
+     ORDER TRACKING
+══════════════════════════════════ -->
+<main id="page-track" class="page">
+  <div class="container track-page">
+    <div class="track-cont">
+      <div class="section-h"><div class="eyebrow">Sipariş Durumu</div><h1 class="d" style="font-size:clamp(26px,3vw,34px);margin-top:8px">Siparişimi Takip Et</h1></div>
+      <div class="track-sr">
+        <input class="track-fi" placeholder="Sipariş numarası veya e-posta adresi" id="track-in">
+        <button class="track-btn" onclick="toast('Sipariş bulundu ✓')">Sorgula</button>
+      </div>
+      <div class="track-card">
+        <div class="track-hdr">
+          <div><div style="font-size:12px;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Sipariş No</div><div class="track-onum">#HYZ-2025-0847</div></div>
+          <span class="badge b-ship">Kargoda</span>
+        </div>
+        <div class="track-steps">
+          <div class="ts"><div class="ts-c done">✓</div><div class="ts-n">Sipariş<br>Alındı</div></div>
+          <div class="ts"><div class="ts-c done">✓</div><div class="ts-n">Hazırlandı</div></div>
+          <div class="ts"><div class="ts-c active">◎</div><div class="ts-n active">Kargoya<br>Verildi</div></div>
+          <div class="ts"><div class="ts-c">4</div><div class="ts-n">Teslim<br>Edildi</div></div>
+        </div>
+        <div class="track-del">
+          <div><div class="track-del-lbl">Tahmini Teslimat</div><div class="track-del-val">17 Mayıs 2025, Cumartesi</div></div>
+          <div style="text-align:right"><div class="track-del-lbl">Kargo</div><div style="font-size:13px;color:var(--ink2)">MNG Kargo · #4782934</div></div>
+        </div>
+        <div style="margin-top:20px">
+          <div style="font-size:11px;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px">Sipariş İçeriği</div>
+          <div class="track-item">
+            <div class="ti-img"><img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=200&q=70" alt=""></div>
+            <div style="flex:1"><div style="font-size:14px">Medine İpek Abaya</div><div style="font-size:12px;color:var(--ink3)">Krem Bej / M · x1</div></div>
+            <div class="d" style="font-size:18px">₺4.850</div>
+          </div>
+          <div class="track-item">
+            <div class="ti-img"><img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=200&q=70" alt=""></div>
+            <div style="flex:1"><div style="font-size:14px">Nour Keten Elbise</div><div style="font-size:12px;color:var(--ink3)">Nude / L · x1</div></div>
+            <div class="d" style="font-size:18px">₺3.200</div>
+          </div>
+        </div>
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--stone);display:flex;gap:12px;flex-wrap:wrap">
+          <button class="btn btn-o btn-sm" onclick="toast('İade talebi oluşturuldu')">İade/Değişim Talep Et</button>
+          <button class="btn btn-p btn-sm" onclick="go('account')">Hesabıma Git</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ══════════════════════════════════
+     ACCOUNT
+══════════════════════════════════ -->
+<main id="page-account" class="page">
+  <div class="container acc-page">
+    <div class="acc-layout">
+      <aside class="acc-sb">
+        <div class="acc-sb-user">
+          <div class="acc-av">A</div>
+          <div><div style="font-size:14px;font-weight:500">Ayşe Hanım</div><div style="font-size:12px;color:var(--ink3)">Üye · 2024</div></div>
+        </div>
+        <div>
+          <button class="acc-ni active" onclick="showAccTab('acc-orders',this)">📦 Siparişlerim</button>
+          <button class="acc-ni" onclick="go('favorites')">♡ Favorilerim</button>
+          <button class="acc-ni" onclick="showAccTab('acc-profile',this)">👤 Profilim</button>
+          <button class="acc-ni" onclick="showAccTab('acc-addr',this)">📍 Adreslerim</button>
+          <button class="acc-ni" onclick="go('track')">🔍 Sipariş Takip</button>
+          <button class="acc-ni" onclick="showAccTab('acc-notifs',this)">🔔 Bildirimler</button>
+          <div style="height:1px;background:var(--stone);margin:8px 20px"></div>
+          <button class="acc-ni" style="color:var(--ink3)" onclick="toast('Çıkış yapıldı')">↩ Çıkış Yap</button>
+        </div>
+      </aside>
+
+      <div>
+        <!-- Orders -->
+        <div id="acc-orders">
+          <h1 class="acc-title">Siparişlerim</h1>
+          <p class="acc-sub">3 sipariş</p>
+          <div class="ord-row">
+            <div><div class="ord-id">#HYZ-2025-0847</div><div class="ord-name">Medine İpek Abaya + 1 ürün</div><div class="ord-date">12 Mayıs 2025</div></div>
+            <span class="badge b-ship">Kargoda</span>
+            <div style="text-align:right"><div class="ord-price">₺6.700</div><button class="btn btn-o btn-sm" style="margin-top:8px" onclick="go('track')">Takip Et</button></div>
+          </div>
+          <div class="ord-row">
+            <div><div class="ord-id">#HYZ-2025-0621</div><div class="ord-name">Serenity Şifon Tunik</div><div class="ord-date">28 Nisan 2025</div></div>
+            <span class="badge b-done">Teslim Edildi</span>
+            <div style="text-align:right"><div class="ord-price">₺1.890</div><button class="btn btn-o btn-sm" style="margin-top:8px" onclick="addToCart()">Tekrar Al</button></div>
+          </div>
+          <div class="ord-row">
+            <div><div class="ord-id">#HYZ-2025-0388</div><div class="ord-name">Rahel Jacquard Palto</div><div class="ord-date">3 Mart 2025</div></div>
+            <span class="badge b-done">Teslim Edildi</span>
+            <div style="text-align:right"><div class="ord-price">₺8.950</div><button class="btn btn-o btn-sm" style="margin-top:8px">İade Et</button></div>
+          </div>
+        </div>
+
+        <!-- Profile -->
+        <div id="acc-profile" style="display:none">
+          <h1 class="acc-title">Profilim</h1>
+          <p class="acc-sub">Kişisel bilgilerinizi güncelleyin</p>
+          <div class="acc-frow">
+            <div class="fg"><label class="fl">Ad</label><input class="fi" value="Ayşe" type="text"></div>
+            <div class="fg"><label class="fl">Soyad</label><input class="fi" value="Yıldız" type="text"></div>
+          </div>
+          <div class="fg"><label class="fl">E-posta</label><input class="fi" value="ayse@email.com" type="email"></div>
+          <div class="fg"><label class="fl">Telefon</label><input class="fi" value="+90 532 000 0000" type="tel"></div>
+          <div class="fg"><label class="fl">Doğum Tarihi</label><input class="fi" value="1990-05-15" type="date"></div>
+          <button class="btn btn-p" onclick="toast('Profil güncellendi ✓')">Kaydet</button>
+        </div>
+
+        <!-- Addresses -->
+        <div id="acc-addr" style="display:none">
+          <h1 class="acc-title">Adreslerim</h1>
+          <p class="acc-sub">Kayıtlı teslimat adresleriniz</p>
+          <div class="addr-card def">
+            <div class="addr-def-tag">✓ Varsayılan Adres</div>
+            <div class="addr-acts">
+              <button class="btn btn-o btn-sm" onclick="toast('Düzenleme modu')">✎</button>
+              <button class="btn btn-o btn-sm" onclick="toast('Adres silindi')">✕</button>
+            </div>
+            <div style="font-size:15px;font-weight:500;margin-bottom:4px">Ev Adresi</div>
+            <div style="font-size:14px;color:var(--ink2);line-height:1.7">Örnek Mah. Güzel Sok. No:5/3<br>Kadıköy / İstanbul 34710</div>
+            <div style="font-size:13px;color:var(--ink3);margin-top:6px">+90 532 000 0000</div>
+          </div>
+          <div class="addr-card">
+            <div class="addr-acts">
+              <button class="btn btn-o btn-sm" onclick="toast('Düzenleme modu')">✎</button>
+              <button class="btn btn-o btn-sm" onclick="toast('Adres silindi')">✕</button>
+            </div>
+            <div style="font-size:15px;font-weight:500;margin-bottom:4px">İş Adresi</div>
+            <div style="font-size:14px;color:var(--ink2);line-height:1.7">Levent İş Merkezi, Kat:4<br>Beşiktaş / İstanbul 34330</div>
+          </div>
+          <button class="btn btn-o" onclick="toast('Yeni adres formu')">+ Yeni Adres Ekle</button>
+        </div>
+
+        <!-- Notifications -->
+        <div id="acc-notifs" style="display:none">
+          <h1 class="acc-title">Bildirimler</h1>
+          <p class="acc-sub">Bildirim tercihlerinizi yönetin</p>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <label style="display:flex;align-items:center;justify-content:space-between;padding:16px;background:#fff;border:1px solid rgba(184,168,152,.2);cursor:pointer">
+              <div><div style="font-size:14px;font-weight:500;margin-bottom:3px">Sipariş Güncellemeleri</div><div style="font-size:12px;color:var(--ink3)">Sipariş durumu değiştiğinde bildirim al</div></div>
+              <input type="checkbox" checked style="accent-color:var(--gold);width:18px;height:18px">
+            </label>
+            <label style="display:flex;align-items:center;justify-content:space-between;padding:16px;background:#fff;border:1px solid rgba(184,168,152,.2);cursor:pointer">
+              <div><div style="font-size:14px;font-weight:500;margin-bottom:3px">Kampanya & İndirimler</div><div style="font-size:12px;color:var(--ink3)">Özel fırsatlar için bildirim</div></div>
+              <input type="checkbox" checked style="accent-color:var(--gold);width:18px;height:18px">
+            </label>
+            <label style="display:flex;align-items:center;justify-content:space-between;padding:16px;background:#fff;border:1px solid rgba(184,168,152,.2);cursor:pointer">
+              <div><div style="font-size:14px;font-weight:500;margin-bottom:3px">Yeni Koleksiyonlar</div><div style="font-size:12px;color:var(--ink3)">Yeni ürün haberleri</div></div>
+              <input type="checkbox" style="accent-color:var(--gold);width:18px;height:18px">
+            </label>
+            <label style="display:flex;align-items:center;justify-content:space-between;padding:16px;background:#fff;border:1px solid rgba(184,168,152,.2);cursor:pointer">
+              <div><div style="font-size:14px;font-weight:500;margin-bottom:3px">SMS Bildirimleri</div><div style="font-size:12px;color:var(--ink3)">Telefona SMS bildirim</div></div>
+              <input type="checkbox" checked style="accent-color:var(--gold);width:18px;height:18px">
+            </label>
+          </div>
+          <button class="btn btn-p" style="margin-top:20px" onclick="toast('Tercihler kaydedildi ✓')">Kaydet</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ══════════════════════════════════
+     FAVORITES
+══════════════════════════════════ -->
+<main id="page-favorites" class="page">
+  <div class="container" style="padding-top:clamp(24px,4vw,48px);padding-bottom:clamp(24px,4vw,48px)">
+    <div class="section-h"><div class="eyebrow">Listem</div><h1 class="d" style="font-size:clamp(24px,3vw,34px);margin-top:8px">Favorilerim</h1><p style="font-size:13px;color:var(--ink3);margin-top:4px">4 ürün favorinizde</p></div>
+    <div class="fav-grid" id="fav-grid"></div>
+  </div>
+</main>
+
+<script>
+/* ══════════════════════════════════════════
+   HAYAZEEM — Global State Management v2
+   localStorage kalıcı + reaktif event bus
+══════════════════════════════════════════ */
+
+/* ─── ÜRÜN VERİSİ ─── */
+const PRODUCTS = [
+  {id:1,name:'Medine İpek Abaya',sub:'HYZ-001 · 5 Renk',cat:'Abayalar',fabric:'İpek',price:4850,was:6200,badge:'Yeni',b_cls:'b-lim',img:'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=400&q=80',colors:['#FAF7F2','#2C2420','#8B8670','#D4C5B0','#C9A96E'],colorNames:['Krem Bej','Koyu Kahve','Zeytin','Nude','Altın'],sale:true},
+  {id:2,name:'Nour Keten Elbise',sub:'HYZ-002 · 3 Renk',cat:'Elbiseler',fabric:'Keten',price:3200,was:null,badge:null,img:'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&q=80',colors:['#FAF7F2','#D4C5B0','#8B8670'],colorNames:['Krem','Nude','Zeytin']},
+  {id:3,name:'Serenity Şifon Tunik',sub:'HYZ-003 · 6 Renk',cat:'Tunikler',fabric:'Şifon',price:1890,was:2650,badge:'%29',b_cls:'b-sale',img:'https://images.unsplash.com/photo-1512374382149-233c42b6a83b?w=400&q=80',colors:['#FAF7F2','#E8E0D5','#D4C5B0','#C9A96E'],colorNames:['Krem','Taş','Nude','Altın'],sale:true},
+  {id:4,name:'Rahel Palto',sub:'HYZ-004 · 2 Renk',cat:'Paltolar',fabric:'Triko',price:8950,was:null,badge:null,img:'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&q=80',colors:['#E8E0D5','#2C2420'],colorNames:['Taş','Koyu Kahve']},
+  {id:5,name:'Safir Şifon Bluz',sub:'HYZ-005 · 4 Renk',cat:'Tunikler',fabric:'Şifon',price:2150,was:null,badge:null,img:'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=400&q=80',colors:['#FAF7F2','#D4C5B0','#C9A96E','#8B8670'],colorNames:['Krem','Nude','Altın','Zeytin']},
+  {id:6,name:'Zeynep Kaban',sub:'HYZ-006 · 3 Renk',cat:'Paltolar',fabric:'Triko',price:12500,was:null,badge:'Sınırlı',b_cls:'b-lim',img:'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80&grayscale',colors:['#8B8670','#2C2420','#D4C5B0'],colorNames:['Zeytin','Koyu Kahve','Nude']},
+  {id:7,name:'Hira Jakarlı Set',sub:'HYZ-007 · 2 Renk',cat:'Abayalar',fabric:'İpek',price:6750,was:null,badge:null,img:'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&q=80&blur=1',colors:['#E8D5A3','#2C2420'],colorNames:['Altın Krem','Koyu Kahve']},
+  {id:8,name:'Leyla Triko Elbise',sub:'HYZ-008 · 5 Renk',cat:'Elbiseler',fabric:'Triko',price:3850,was:null,badge:null,img:'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&q=80&grayscale',colors:['#FAF7F2','#D4C5B0','#C9A96E','#8B8670','#2C2420'],colorNames:['Krem','Nude','Altın','Zeytin','Koyu Kahve']},
+];
+
+/* ─── I18N ─── */
+const I18N = {
+  tr:{nav_home:'Ana Sayfa',nav_collections:'Ürünler',nav_products:'Koleksiyonlar',nav_about:'Hakkımızda',nav_track:'Sipariş Takip',nav_search:'Arama',nav_login:'GİRİŞ',add_to_cart:'Sepete Ekle',add_to_fav:'Favorilere Ekle',buy_now:'Hemen Satın Al',cart_title:'Sepetim',cart_empty:'Sepetiniz boş',fav_added:'Favorilere eklendi ♥',fav_removed:'Favorilerden kaldırıldı',cart_added:'Sepete eklendi ✓',cart_removed:'Ürün sepetten kaldırıldı',size_guide:'Beden Rehberi',total:'Toplam',subtotal:'Ara Toplam',shipping:'Kargo',free:'Ücretsiz',promo_apply:'Uygula',promo_ok:'İndirim kodu uygulandı ✓',promo_err:'Geçersiz kod',proceed:'Ödemeye Geç →',fav_count:'ürün favorinizde',filter_show:'⚙ Filtreleri Göster',filter_hide:'✕ Filtreleri Gizle',clear_filter:'Filtreler temizlendi',showing:'ürün gösteriliyor',select_size:'Seçiniz',no_size_warn:'Lütfen önce beden seçin'},
+  en:{nav_home:'Home',nav_collections:'Products',nav_products:'Collections',nav_about:'About',nav_track:'Track Order',nav_search:'Search',nav_login:'LOGIN',add_to_cart:'Add to Cart',add_to_fav:'Add to Favourites',buy_now:'Buy Now',cart_title:'My Cart',cart_empty:'Your cart is empty',fav_added:'Added to favourites ♥',fav_removed:'Removed from favourites',cart_added:'Added to cart ✓',cart_removed:'Item removed from cart',size_guide:'Size Guide',total:'Total',subtotal:'Subtotal',shipping:'Shipping',free:'Free',promo_apply:'Apply',promo_ok:'Discount applied ✓',promo_err:'Invalid code',proceed:'Proceed to Checkout →',fav_count:'items in your wishlist',filter_show:'⚙ Show Filters',filter_hide:'✕ Hide Filters',clear_filter:'Filters cleared',showing:'products shown',select_size:'Select',no_size_warn:'Please select a size first'},
+  ar:{nav_home:'الرئيسية',nav_collections:'المنتجات',nav_products:'المجموعات',nav_about:'من نحن',nav_track:'تتبع الطلب',nav_search:'بحث',nav_login:'دخول',add_to_cart:'أضف إلى السلة',add_to_fav:'أضف إلى المفضلة',buy_now:'اشتري الآن',cart_title:'سلتي',cart_empty:'سلتك فارغة',fav_added:'أضيف إلى المفضلة ♥',fav_removed:'أزيل من المفضلة',cart_added:'أضيف إلى السلة ✓',cart_removed:'أزيل المنتج من السلة',size_guide:'دليل المقاسات',total:'المجموع',subtotal:'المجموع الفرعي',shipping:'الشحن',free:'مجاني',promo_apply:'تطبيق',promo_ok:'تم تطبيق الخصم ✓',promo_err:'كود غير صالح',proceed:'المتابعة للدفع →',fav_count:'منتج في المفضلة',filter_show:'⚙ عرض الفلاتر',filter_hide:'✕ إخفاء الفلاتر',clear_filter:'مسح الفلاتر',showing:'منتج معروض',select_size:'اختر',no_size_warn:'الرجاء اختيار المقاس أولاً'},
+};
+
+/* ─── GLOBAL STORE ─── */
+const Store = {
+  _d: {
+    cart:[],          // [{id,name,price,img,color,size,qty}]
+    favorites:[],     // [productId]
+    lang:'tr',
+    currentProductId:1,
+    activeAccTab:'acc-orders',
+    filters:{cats:[],sizes:[],maxPrice:12000,sort:'Önerilen'},
+    promos:{ANNE25:25,WELCOME10:10,RAMAZAN30:30},
+    appliedPromo:null,
+    pdState:{colorIdx:0,colorName:'Krem Bej',size:'',qty:1},
+  },
+  _persist:['cart','favorites','lang','appliedPromo'],
+  _bus:{},
+
+  load(){
+    this._persist.forEach(k=>{
+      try{const v=localStorage.getItem('hyz_'+k);if(v!==null)this._d[k]=JSON.parse(v);}catch(e){}
+    });
+  },
+  save(...keys){
+    (keys.length?keys:this._persist).forEach(k=>{
+      try{localStorage.setItem('hyz_'+k,JSON.stringify(this._d[k]));}catch(e){}
+    });
+  },
+  on(ev,fn){(this._bus[ev]||(this._bus[ev]=[])).push(fn);},
+  emit(ev){(this._bus[ev]||[]).forEach(fn=>fn());},
+
+  t(k){return(I18N[this._d.lang]||I18N.tr)[k]||k;},
+  get lang(){return this._d.lang;},
+  get cart(){return this._d.cart;},
+  get favorites(){return this._d.favorites;},
+  get currentProductId(){return this._d.currentProductId;},
+  get pdState(){return this._d.pdState;},
+  get filters(){return this._d.filters;},
+  get appliedPromo(){return this._d.appliedPromo;},
+
+  /* Cart */
+  cartAdd(p,color,size,qty=1){
+    const ex=this._d.cart.find(i=>i.id===p.id&&i.color===color&&i.size===size);
+    if(ex){ex.qty=Math.min(ex.qty+qty,99);}
+    else{this._d.cart.push({id:p.id,name:p.name,price:p.price,img:p.img,color,size,qty});}
+    this.save('cart'); this.emit('cart');
+  },
+  cartRemove(id,color,size){
+    this._d.cart=this._d.cart.filter(i=>!(i.id===id&&i.color===color&&i.size===size));
+    this.save('cart'); this.emit('cart');
+  },
+  cartUpdateQty(id,color,size,delta){
+    const it=this._d.cart.find(i=>i.id===id&&i.color===color&&i.size===size);
+    if(!it)return;
+    it.qty=Math.max(1,Math.min(99,it.qty+delta));
+    this.save('cart'); this.emit('cart');
+  },
+  cartClear(){this._d.cart=[];this.save('cart');this.emit('cart');},
+  cartCount(){return this._d.cart.reduce((s,i)=>s+i.qty,0);},
+  cartTotals(){
+    const sub=this._d.cart.reduce((s,i)=>s+i.price*i.qty,0);
+    const pct=this._d.appliedPromo?(this._d.promos[this._d.appliedPromo]||0):0;
+    const disc=Math.round(sub*pct/100);
+    const ship=sub>=500?0:49;
+    return{sub,disc,ship,total:sub-disc+ship};
+  },
+
+  /* Favorites */
+  favToggle(id){
+    const i=this._d.favorites.indexOf(id);
+    const added=i===-1;
+    if(added)this._d.favorites.push(id);else this._d.favorites.splice(i,1);
+    this.save('favorites'); this.emit('favorites'); return added;
+  },
+  favHas(id){return this._d.favorites.includes(id);},
+  favProducts(){return PRODUCTS.filter(p=>this._d.favorites.includes(p.id));},
+
+  /* Promo */
+  applyPromo(code){
+    const pct=this._d.promos[code.toUpperCase()];
+    if(pct){this._d.appliedPromo=code.toUpperCase();this.save('appliedPromo');this.emit('cart');return pct;}
+    return null;
+  },
+
+  /* Lang */
+  setLang(lang){this._d.lang=lang;this.save('lang');this.emit('lang');},
+
+  /* Product detail */
+  openProduct(id){
+    this._d.currentProductId=id;
+    const p=PRODUCTS.find(x=>x.id===id);
+    this._d.pdState={colorIdx:0,colorName:p?.colorNames?.[0]||'',size:'',qty:1};
+  },
+  setPdColor(idx,name){this._d.pdState.colorIdx=idx;this._d.pdState.colorName=name;},
+  setPdSize(sz){this._d.pdState.size=sz;},
+  setPdQty(d){this._d.pdState.qty=Math.max(1,Math.min(99,this._d.pdState.qty+d));},
+
+  /* Filters */
+  setSort(v){this._d.filters.sort=v;this.emit('filters');},
+  toggleCat(c){const f=this._d.filters.cats,i=f.indexOf(c);i===-1?f.push(c):f.splice(i,1);this.emit('filters');},
+  toggleSize(s){const f=this._d.filters.sizes,i=f.indexOf(s);i===-1?f.push(s):f.splice(i,1);this.emit('filters');},
+  setMaxPrice(v){this._d.filters.maxPrice=v;this.emit('filters');},
+  clearFilters(){this._d.filters={cats:[],sizes:[],maxPrice:12000,sort:'Önerilen'};this.emit('filters');},
+
+  /* Account tab */
+  setAccTab(id){this._d.activeAccTab=id;},
+};
+Store.load();
+
+/* ─── UTILS ─── */
+const fmt = n => '₺'+Number(n).toLocaleString('tr-TR');
+
+function getFiltered(){
+  let ps=[...PRODUCTS];
+  const f=Store.filters;
+  if(f.cats.length) ps=ps.filter(p=>f.cats.includes(p.cat));
+  if(f.sizes.length) ps=ps; // variant-level; pass-through for now
+  ps=ps.filter(p=>p.price<=f.maxPrice);
+  if(f.sort==='Fiyat: Artan') ps.sort((a,b)=>a.price-b.price);
+  else if(f.sort==='Fiyat: Azalan') ps.sort((a,b)=>b.price-a.price);
+  else if(f.sort==='Yeni Gelenler') ps.sort((a,b)=>b.id-a.id);
+  return ps;
+}
+
+/* ─── CARD BUILDER ─── */
+function makeCard(p,showAddBtn=false){
+  const isFav=Store.favHas(p.id);
+  const dots=p.colors.map((c,i)=>`<div class="cdot${i===0?' active':''}" style="background:${c}" onclick="event.stopPropagation()"></div>`).join('');
+  return `<div class="pc" onclick="openProduct(${p.id})">
+    <div class="pc-img">
+      ${p.badge?`<div class="pc-badge"><span class="badge ${p.b_cls||'b-lim'}">${p.badge}</span></div>`:''}
+      <img src="${p.img}" alt="${p.name}" loading="lazy">
+      <button class="pc-fav${isFav?' liked':''}" onclick="event.stopPropagation();cardFavToggle(this,${p.id})">${isFav?'♥':'♡'}</button>
+    </div>
+    <div class="pc-info">
+      <div class="pc-name">${p.name}</div>
+      <div class="pc-sub">${p.sub}</div>
+      <div><span class="pc-price${p.sale?' pc-sale':''}">${fmt(p.price)}</span>${p.was?`<span class="pc-was">${fmt(p.was)}</span>`:''}</div>
+      <div class="pc-dots">${dots}</div>
+      ${showAddBtn?`<button class="btn btn-p btn-full btn-sm" style="margin-top:10px" onclick="event.stopPropagation();quickAdd(${p.id})">Sepete Ekle</button>`:''}
+    </div>
+  </div>`;
+}
+
+/* ─── RENDERERS ─── */
+function renderGrids(){
+  const hp=document.getElementById('home-prods');
+  const rp=document.getElementById('related-prods');
+  const sp=document.getElementById('search-prods');
+  if(hp) hp.innerHTML=PRODUCTS.slice(0,4).map(p=>makeCard(p)).join('');
+  if(rp) rp.innerHTML=PRODUCTS.filter(p=>p.id!==Store.currentProductId).slice(0,4).map(p=>makeCard(p)).join('');
+  if(sp) sp.innerHTML=PRODUCTS.map(p=>makeCard(p)).join('');
+  renderCatGrid();
+}
+
+function renderCatGrid(){
+  const cp=document.getElementById('cat-prods');
+  if(!cp) return;
+  const prods=getFiltered();
+  const countEl=cp.closest('.prods-area')?.querySelector('p');
+  if(countEl) countEl.textContent=prods.length+' '+Store.t('showing');
+  cp.innerHTML=prods.length
+    ?prods.map(p=>makeCard(p)).join('')
+    :`<div style="grid-column:1/-1;text-align:center;padding:48px 0;color:var(--ink3)">Bu kriterlere uygun ürün bulunamadı.</div>`;
+}
+
+function renderFavorites(){
+  const fg=document.getElementById('fav-grid');
+  if(!fg) return;
+  const favs=Store.favProducts();
+  const countEl=document.querySelector('#page-favorites p');
+  if(countEl) countEl.textContent=favs.length+' '+Store.t('fav_count');
+  if(!favs.length){
+    fg.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:64px 20px">
+      <div style="font-size:40px;margin-bottom:16px">♡</div>
+      <div style="font-family:var(--fd);font-size:22px;margin-bottom:8px">Favori listeniz boş</div>
+      <p style="font-size:14px;color:var(--ink3);margin-bottom:20px">Beğendiğiniz ürünleri kalp ikonuna tıklayarak ekleyin.</p>
+      <button class="btn btn-p" onclick="go('categories')">Koleksiyonları Keşfet</button>
+    </div>`;
+    return;
+  }
+  fg.innerHTML=favs.map(p=>`
+    <div class="pc">
+      <div class="pc-img" onclick="openProduct(${p.id})" style="cursor:pointer">
+        <img src="${p.img}" alt="${p.name}" loading="lazy">
+        <button class="pc-fav liked" onclick="event.stopPropagation();cardFavToggle(this,${p.id})">♥</button>
+      </div>
+      <div class="pc-info">
+        <div class="pc-name">${p.name}</div>
+        <div class="pc-sub">${p.sub}</div>
+        <div><span class="pc-price${p.sale?' pc-sale':''}">${fmt(p.price)}</span>${p.was?`<span class="pc-was">${fmt(p.was)}</span>`:''}</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
+          <button class="btn btn-p btn-full btn-sm" onclick="quickAdd(${p.id})">Sepete Ekle</button>
+          <button class="btn btn-o btn-full btn-sm" onclick="favRemove(${p.id})">Favoriden Çıkar</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderCart(){
+  const c=document.getElementById('cart-items-container');
+  if(!c) return;
+  const items=Store.cart;
+  if(!items.length){
+    c.innerHTML=`<div style="text-align:center;padding:48px 20px">
+      <span style="font-size:48px;display:block;margin-bottom:16px">🛍</span>
+      <div style="font-family:var(--fd);font-size:24px;font-weight:300;margin-bottom:8px">${Store.t('cart_empty')}</div>
+      <p style="font-size:14px;color:var(--ink3);margin-bottom:24px">Ürün eklemeye başlayın.</p>
+      <button class="btn btn-p" onclick="go('categories')">Koleksiyonları Gör</button>
+    </div>`;
+    return;
+  }
+  c.innerHTML=items.map(i=>`
+    <div class="cart-item">
+      <div class="ci-img"><img src="${i.img}" alt="${i.name}"></div>
+      <div>
+        <div class="ci-name">${i.name}</div>
+        <div class="ci-var">${i.color} / ${i.size}</div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div class="qty-wrap">
+            <button class="qty-btn" onclick="cartQty(${i.id},'${i.color}','${i.size}',-1)">−</button>
+            <span class="qty-num">${i.qty}</span>
+            <button class="qty-btn" onclick="cartQty(${i.id},'${i.color}','${i.size}',1)">+</button>
+          </div>
+          <button class="ci-rm" onclick="cartRemove(${i.id},'${i.color}','${i.size}')">Kaldır</button>
+        </div>
+      </div>
+      <div class="ci-price">${fmt(i.price*i.qty)}</div>
+    </div>`).join('');
+}
+
+function renderCartSummary(){
+  const{sub,disc,ship,total}=Store.cartTotals();
+  const s=id=>document.getElementById(id);
+  if(s('cs-subtotal')) s('cs-subtotal').textContent=fmt(sub);
+  if(s('cs-disc-row')) s('cs-disc-row').style.display=disc>0?'flex':'none';
+  if(s('cs-disc')) s('cs-disc').textContent='−'+fmt(disc);
+  if(s('cs-shipping')) s('cs-shipping').innerHTML=ship===0?`<span style="color:var(--ok)">Ücretsiz</span>`:fmt(ship);
+  if(s('cs-total')) s('cs-total').textContent=fmt(total);
+  if(s('om-subtotal')) s('om-subtotal').textContent=fmt(sub);
+  if(s('om-disc')) s('om-disc').textContent='−'+fmt(disc);
+  if(s('om-shipping')) s('om-shipping').innerHTML=ship===0?`<span style="color:var(--ok)">Ücretsiz</span>`:fmt(ship);
+  if(s('om-total')) s('om-total').textContent=fmt(total);
+  if(s('ck-pay-btn')) s('ck-pay-btn').textContent='Siparişi Tamamla — '+fmt(total);
+  const cartSub=document.querySelector('.cart-sub');
+  if(cartSub) cartSub.textContent=Store.cartCount()+' ürün · '+fmt(sub);
+}
+
+function renderNavBadge(){
+  const b=document.querySelector('.nav-badge');
+  const cnt=Store.cartCount();
+  if(b){b.textContent=cnt;b.style.display=cnt>0?'flex':'none';}
+}
+
+function renderPdDetail(){
+  const p=PRODUCTS.find(x=>x.id===Store.currentProductId);
+  if(!p) return;
+  const st=Store.pdState;
+  const img=document.getElementById('pd-main-img');
+  if(img) img.src=p.img.replace('w=400','w=800');
+  const title=document.querySelector('.pd-title');
+  if(title) title.textContent=p.name;
+  const pr=document.querySelector('.pd-price');
+  if(pr) pr.textContent=fmt(p.price);
+  const was=document.querySelector('.pd-was');
+  if(was){was.textContent=p.was?fmt(p.was):'';was.style.display=p.was?'inline':'none';}
+  const colLbl=document.getElementById('sel-color');
+  if(colLbl) colLbl.textContent=st.colorName||p.colorNames?.[0]||'';
+  const szLbl=document.getElementById('sel-size');
+  if(szLbl) szLbl.textContent=st.size||Store.t('select_size');
+  const qtyEl=document.getElementById('qty');
+  if(qtyEl) qtyEl.textContent=st.qty;
+  // Fav button
+  const fb=document.getElementById('pd-fav-btn');
+  if(fb){
+    const f=Store.favHas(p.id);
+    fb.textContent=f?'♥ FAVORİLERDEN ÇIKAR':'♡ FAVORİLERE EKLE';
+    fb.style.borderColor=f?'var(--gold)':'';
+    fb.style.color=f?'var(--gold)':'';
+  }
+  // Color swatches
+  document.querySelectorAll('.col-sw').forEach((el,i)=>{
+    el.classList.toggle('active',i===st.colorIdx);
+  });
+  // Size buttons reset
+  document.querySelectorAll('.sz-btn:not(.out)').forEach(b=>{
+    b.classList.toggle('active',b.textContent.trim()===st.size);
+  });
+}
+
+function renderLang(){
+  const lang=Store.lang;
+  document.documentElement.setAttribute('lang',lang);
+  document.documentElement.setAttribute('dir',lang==='ar'?'rtl':'ltr');
+  document.querySelectorAll('.lb').forEach(b=>{
+    b.classList.toggle('active',b.textContent.trim().toLowerCase()===lang);
+  });
+  const ct=document.querySelector('.cart-title');
+  if(ct) ct.textContent=Store.t('cart_title');
+  const fb=document.getElementById('filt-btn');
+  if(fb){
+    const open=document.getElementById('filter-sb')?.classList.contains('open');
+    fb.textContent=open?Store.t('filter_hide'):Store.t('filter_show');
+  }
+}
+
+function renderCheckoutItems(){
+  const box=document.getElementById('om-items');
+  if(!box) return;
+  box.innerHTML=Store.cart.map(i=>`
+    <div class="om-item">
+      <div class="om-img"><img src="${i.img}" alt="${i.name}"></div>
+      <div style="flex:1"><div style="font-size:14px">${i.name}</div><div style="font-size:12px;color:var(--ink3)">${i.color} / ${i.size} · x${i.qty}</div></div>
+      <div class="om-price">${fmt(i.price*i.qty)}</div>
+    </div>`).join('');
+}
+
+function renderAccTab(){
+  const id=Store._d.activeAccTab;
+  ['acc-orders','acc-profile','acc-addr','acc-notifs'].forEach(t=>{
+    const el=document.getElementById(t);
+    if(el) el.style.display=t===id?'block':'none';
+  });
+  document.querySelectorAll('#page-account .acc-ni').forEach(n=>{
+    n.classList.toggle('active',n.dataset.tab===id);
+  });
+}
+
+function renderAll(){
+  renderNavBadge();
+  renderCartSummary();
+  renderLang();
+}
+
+/* ─── PAGE NAV ─── */
+function go(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const el=document.getElementById('page-'+name);
+  if(!el) return;
+  el.classList.add('active');
+  window.scrollTo(0,0);
+  document.getElementById('drawer')?.classList.remove('open');
+  if(name==='home'||name==='categories'||name==='product') renderGrids();
+  if(name==='cart'){renderCart();renderCartSummary();}
+  if(name==='favorites') renderFavorites();
+  if(name==='product') renderPdDetail();
+  if(name==='account') renderAccTab();
+  if(name==='checkout'){renderCartSummary();renderCheckoutItems();}
+  renderNavBadge();
+}
+
+function openProduct(id){
+  Store.openProduct(id);
+  go('product');
+}
+
+/* ─── MOBILE DRAWER ─── */
+function toggleDrawer(){
+  const d=document.getElementById('drawer');
+  d.classList.toggle('open');
+  document.getElementById('ham')?.setAttribute('aria-expanded',d.classList.contains('open'));
+}
+
+/* ─── FILTER CONTROLS ─── */
+function toggleFilter(){
+  const sb=document.getElementById('filter-sb');
+  const btn=document.getElementById('filt-btn');
+  sb.classList.toggle('open');
+  btn.textContent=sb.classList.contains('open')?Store.t('filter_hide'):Store.t('filter_show');
+}
+function clearFilters(){
+  Store.clearFilters();
+  document.querySelectorAll('#filter-sb input[type=checkbox]').forEach(cb=>cb.checked=false);
+  document.querySelectorAll('.sf-btn').forEach(b=>b.classList.remove('active'));
+  const pr=document.querySelector('#filter-sb input[type=range]');
+  if(pr) pr.value=12000;
+  document.getElementById('pr-txt')&&(document.getElementById('pr-txt').textContent='₺500 — ₺12.000');
+  renderCatGrid();
+  toast(Store.t('clear_filter'));
+}
+
+/* ─── LANG ─── */
+function setLang(lang){
+  Store.setLang(lang);
+  renderLang();
+  renderGrids();
+}
+
+/* ─── PRODUCT DETAIL INTERACTIONS ─── */
+function changePdImg(thumb,src){
+  document.querySelectorAll('.pd-thumb').forEach(t=>t.classList.remove('active'));
+  thumb.classList.add('active');
+  const img=document.getElementById('pd-main-img');
+  if(img){img.style.opacity='0';setTimeout(()=>{img.src=src+'&auto=format&fit=crop';img.style.opacity='1';},180);}
+}
+function selCol(el,name,idx){
+  document.querySelectorAll('.col-sw').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  Store.setPdColor(idx||0,name);
+  const lbl=document.getElementById('sel-color');
+  if(lbl) lbl.textContent=name;
+}
+function selSz(el,name){
+  document.querySelectorAll('.sz-btn:not(.out)').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  Store.setPdSize(name);
+  const lbl=document.getElementById('sel-size');
+  if(lbl) lbl.textContent=name;
+}
+function changeQty(d){
+  Store.setPdQty(d);
+  const el=document.getElementById('qty');
+  if(el) el.textContent=Store.pdState.qty;
+}
+function switchTab(btn,id){
+  document.querySelectorAll('.pd-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.pd-tab-body').forEach(b=>b.style.display='none');
+  btn.classList.add('active');
+  const el=document.getElementById(id);
+  if(el) el.style.display='block';
+}
+
+/* ─── CART ACTIONS ─── */
+function addToCart(){
+  const p=PRODUCTS.find(x=>x.id===Store.currentProductId);
+  if(!p) return;
+  const st=Store.pdState;
+  if(!st.size){toast(Store.t('no_size_warn'));return;}
+  Store.cartAdd(p,st.colorName,st.size,st.qty);
+  toast(Store.t('cart_added'));
+}
+function quickAdd(productId){
+  const p=PRODUCTS.find(x=>x.id===productId);
+  if(!p) return;
+  Store.cartAdd(p,p.colorNames[0],'M',1);
+  toast(Store.t('cart_added'));
+}
+function cartQty(id,color,size,delta){
+  Store.cartUpdateQty(id,color,size,delta);
+  renderCart();renderCartSummary();renderNavBadge();
+}
+function cartRemove(id,color,size){
+  Store.cartRemove(id,color,size);
+  renderCart();renderCartSummary();renderNavBadge();
+  toast(Store.t('cart_removed'));
+}
+function applyPromo(){
+  const v=document.getElementById('promo-in');
+  if(!v||!v.value.trim()){toast('Lütfen bir kod giriniz');return;}
+  const pct=Store.applyPromo(v.value.trim());
+  if(pct){toast(Store.t('promo_ok')+' (%'+pct+')');renderCartSummary();}
+  else toast(Store.t('promo_err'));
+}
+
+/* ─── FAVORITES ─── */
+function cardFavToggle(btn,productId){
+  const added=Store.favToggle(productId);
+  btn.classList.toggle('liked',added);
+  btn.textContent=added?'♥':'♡';
+  toast(added?Store.t('fav_added'):Store.t('fav_removed'));
+  renderNavBadge();
+  // sync pd fav btn if same product
+  if(productId===Store.currentProductId){
+    const fb=document.getElementById('pd-fav-btn');
+    if(fb){fb.textContent=added?'♥ FAVORİLERDEN ÇIKAR':'♡ FAVORİLERE EKLE';fb.style.borderColor=added?'var(--gold)':'';fb.style.color=added?'var(--gold)':'';}
+  }
+}
+function addFav(btn){
+  const added=Store.favToggle(Store.currentProductId);
+  btn.id='pd-fav-btn';
+  btn.textContent=added?'♥ FAVORİLERDEN ÇIKAR':'♡ FAVORİLERE EKLE';
+  btn.style.borderColor=added?'var(--gold)':'';
+  btn.style.color=added?'var(--gold)':'';
+  toast(added?Store.t('fav_added'):Store.t('fav_removed'));
+}
+function favRemove(productId){
+  Store.favToggle(productId); // removes since it exists
+  renderFavorites();
+  renderGrids();
+}
+
+/* ─── CHECKOUT FLOW ─── */
+function goPayment(){
+  document.getElementById('ck-delivery').style.display='none';
+  document.getElementById('ck-payment').style.display='block';
+  const s2=document.getElementById('ck-s2');
+  s2.classList.remove('active');s2.classList.add('done');
+  s2.querySelector('.ck-num').textContent='✓';
+  document.getElementById('ck-s3').classList.add('active');
+  window.scrollTo(0,0);
+}
+function confirmOrder(){
+  Store.cartClear();
+  document.getElementById('ck-payment').style.display='none';
+  document.getElementById('ck-confirm').style.display='block';
+  const s3=document.getElementById('ck-s3');
+  s3.classList.remove('active');s3.classList.add('done');
+  s3.querySelector('.ck-num').textContent='✓';
+  document.getElementById('ck-s4').classList.add('active');
+  renderNavBadge();
+  window.scrollTo(0,0);
+}
+function selPay(el){
+  document.querySelectorAll('.pay-m').forEach(m=>m.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ─── ACCOUNT ─── */
+function showAccTab(id,btn){
+  Store.setAccTab(id);
+  renderAccTab();
+}
+
+/* ─── SEARCH ─── */
+function handleSearch(val){
+  const el=document.getElementById('search-result-txt');
+  const sp=document.getElementById('search-prods');
+  const q=val.trim().toLowerCase();
+  const res=q?PRODUCTS.filter(p=>p.name.toLowerCase().includes(q)||p.cat.toLowerCase().includes(q)||p.fabric.toLowerCase().includes(q)):PRODUCTS;
+  if(el) el.textContent=q?'"'+val+'" için '+res.length+' sonuç':'Tüm ürünler gösteriliyor';
+  if(sp) sp.innerHTML=res.length?res.map(p=>makeCard(p)).join(''):`<div style="grid-column:1/-1;text-align:center;padding:48px 0;color:var(--ink3)">Sonuç bulunamadı.</div>`;
+}
+function setSearch(val){
+  const el=document.getElementById('search-input');
+  if(el){el.value=val;handleSearch(val);}
+}
+
+/* ─── TOAST ─── */
+let _tt;
+function toast(msg){
+  const t=document.getElementById('toast');
+  const m=document.getElementById('toast-msg');
+  if(m) m.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(_tt);
+  _tt=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+/* ─── REACTIVE SUBSCRIPTIONS ─── */
+Store.on('cart',()=>{renderNavBadge();renderCartSummary();});
+Store.on('favorites',()=>{}); // card-level updates handled in place
+Store.on('lang',()=>{renderLang();});
+Store.on('filters',()=>{renderCatGrid();});
+
+/* ─── BOOT ─── */
+document.addEventListener('DOMContentLoaded',()=>{
+  // Wire filter checkboxes
+  document.querySelectorAll('#filter-sb input[type=checkbox]').forEach(cb=>{
+    const txt=cb.closest('label')?.textContent.trim()||'';
+    ['Abayalar','Tunikler','Elbiseler','Paltolar','Aksesuar'].forEach(cat=>{
+      if(txt.startsWith(cat)) cb.addEventListener('change',()=>{Store.toggleCat(cat);renderCatGrid();});
+    });
+  });
+  // Wire size filter buttons
+  document.querySelectorAll('.sf-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      btn.classList.toggle('active');
+      Store.toggleSize(btn.textContent.trim());
+      renderCatGrid();
+    });
+  });
+  // Wire sort select (remove inline onchange)
+  document.querySelectorAll('.cat-toolbar select').forEach(sel=>{
+    if(sel.options[0]?.text==='Önerilen'){
+      sel.removeAttribute('onchange');
+      sel.addEventListener('change',e=>Store.setSort(e.target.value));
+    }
+  });
+  // Wire price range
+  const prRange=document.querySelector('#filter-sb input[type=range]');
+  if(prRange){
+    prRange.removeAttribute('oninput');
+    prRange.addEventListener('input',e=>{
+      document.getElementById('pr-txt').textContent='₺500 — ₺'+parseInt(e.target.value).toLocaleString();
+      Store.setMaxPrice(parseInt(e.target.value));
+    });
+  }
+  // Wire clear filters
+  document.querySelector('#filter-sb .btn-o')?.addEventListener('click',clearFilters);
+  // Tag account nav buttons with data-tab
+  document.querySelectorAll('#page-account .acc-ni').forEach(btn=>{
+    const m=btn.getAttribute('onclick')?.match(/showAccTab\('([^']+)'/);
+    if(m) btn.dataset.tab=m[1];
+  });
+  // Wire pd fav button id
+  const pdFavBtns=document.querySelectorAll('.pd-acts .btn-o');
+  pdFavBtns.forEach(b=>{ if(b.textContent.includes('FAVORİ')) b.id='pd-fav-btn'; });
+  // Wire size guide
+  document.querySelector('.sz-gl')&&(document.querySelector('.sz-gl').onclick=openSizeGuide);
+  // Initial render
+  renderAll();
+  renderGrids();
+  renderAccTab();
+});
+</script>
+
+
+<!-- ══════════════════════════════════
+     LOGIN / REGISTER PAGE
+══════════════════════════════════ -->
+<main id="page-login" class="page">
+<style>
+.auth-wrap{min-height:calc(100vh - var(--nav-h));display:grid;grid-template-columns:1fr 1fr}
+.auth-left{background:var(--ink);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:48px}
+.auth-left img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.35}
+.auth-left-content{position:relative;z-index:1;text-align:center;max-width:340px}
+.auth-left-title{font-family:var(--fd);font-size:clamp(36px,4vw,52px);font-weight:300;color:var(--cream);line-height:1.1;margin-bottom:16px}
+.auth-left-sub{font-size:14px;color:rgba(250,247,242,.55);line-height:1.8}
+.auth-right{display:flex;align-items:center;justify-content:center;padding:clamp(32px,5vw,64px) clamp(24px,4vw,48px);background:var(--cream)}
+.auth-box{width:100%;max-width:420px}
+.auth-tabs{display:flex;border-bottom:1px solid var(--stone);margin-bottom:28px}
+.auth-tab{padding:10px 0;margin-right:28px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all 150ms}
+.auth-tab.active{color:var(--ink);border-bottom-color:var(--gold)}
+.auth-title{font-family:var(--fd);font-size:clamp(24px,3vw,32px);font-weight:300;margin-bottom:6px}
+.auth-sub{font-size:13px;color:var(--ink3);margin-bottom:24px;line-height:1.7}
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--stone)}
+.divider span{font-size:11px;color:var(--ink4);letter-spacing:.1em;text-transform:uppercase}
+.social-login{display:flex;gap:10px;margin-bottom:20px}
+.soc-btn{flex:1;padding:11px;border:1px solid var(--stone);background:#fff;cursor:pointer;font-size:13px;color:var(--ink2);display:flex;align-items:center;justify-content:center;gap:8px;transition:border-color 150ms}
+.soc-btn:hover{border-color:var(--gold)}
+@media(max-width:780px){
+  .auth-wrap{grid-template-columns:1fr}
+  .auth-left{display:none}
+}
+</style>
+<div class="auth-wrap">
+  <div class="auth-left">
+    <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=900&q=80&auto=format&fit=crop" alt="">
+    <div class="auth-left-content">
+      <div style="font-family:var(--fd);font-size:28px;letter-spacing:.2em;color:var(--cream);margin-bottom:20px">HAYAZEEM</div>
+      <div class="auth-left-title">Zarafetle<br><em style="color:var(--gold)">Karşılaşın</em></div>
+      <p class="auth-left-sub">Yeni koleksiyonlara özel erişim, kişiselleştirilmiş öneriler ve sipariş takibi.</p>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-box">
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab(this,'login-form')">Giriş Yap</button>
+        <button class="auth-tab" onclick="switchAuthTab(this,'register-form')">Kayıt Ol</button>
+      </div>
+
+      <!-- LOGIN -->
+      <div id="login-form">
+        <h1 class="auth-title">Hoş Geldiniz</h1>
+        <p class="auth-sub">Hesabınıza giriş yapın.</p>
+        <div class="social-login">
+          <button class="soc-btn" onclick="toast('Google ile giriş')"><span>G</span> Google</button>
+          <button class="soc-btn" onclick="toast('Apple ile giriş')"><span>🍎</span> Apple</button>
+        </div>
+        <div class="divider"><span>veya e-posta ile</span></div>
+        <div class="fg"><label class="fl">E-posta</label><input class="fi" placeholder="ornek@email.com" type="email" autocomplete="email"></div>
+        <div class="fg">
+          <label class="fl" style="display:flex;justify-content:space-between">
+            <span>Şifre</span>
+            <button style="font-size:11px;color:var(--gold);background:none;border:none;cursor:pointer;letter-spacing:.05em" onclick="toast('Şifre sıfırlama e-postası gönderildi')">Şifremi unuttum</button>
+          </label>
+          <input class="fi" placeholder="••••••••" type="password" autocomplete="current-password">
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);cursor:pointer;margin-bottom:20px">
+          <input type="checkbox" style="accent-color:var(--gold)"> Beni hatırla
+        </label>
+        <button class="btn btn-p btn-full btn-lg" onclick="toast('Giriş yapıldı ✓');go('home')">Giriş Yap</button>
+        <p style="text-align:center;font-size:13px;color:var(--ink3);margin-top:16px">Hesabınız yok mu? <button onclick="switchAuthTabByName('register-form')" style="color:var(--gold);background:none;border:none;cursor:pointer;font-size:13px">Kayıt olun</button></p>
+      </div>
+
+      <!-- REGISTER -->
+      <div id="register-form" style="display:none">
+        <h1 class="auth-title">Hesap Oluştur</h1>
+        <p class="auth-sub">Birkaç adımda premium deneyime katılın.</p>
+        <div class="frow">
+          <div class="fg"><label class="fl">Ad</label><input class="fi" placeholder="Adınız" type="text" autocomplete="given-name"></div>
+          <div class="fg"><label class="fl">Soyad</label><input class="fi" placeholder="Soyadınız" type="text" autocomplete="family-name"></div>
+        </div>
+        <div class="fg"><label class="fl">E-posta</label><input class="fi" placeholder="ornek@email.com" type="email" autocomplete="email"></div>
+        <div class="fg"><label class="fl">Telefon</label><input class="fi" placeholder="+90 5__ ___ __ __" type="tel" autocomplete="tel"></div>
+        <div class="fg"><label class="fl">Şifre</label><input class="fi" placeholder="En az 8 karakter" type="password" autocomplete="new-password"></div>
+        <div class="fg"><label class="fl">Şifre Tekrar</label><input class="fi" placeholder="Şifrenizi tekrar girin" type="password" autocomplete="new-password"></div>
+        <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--ink2);cursor:pointer;margin-bottom:10px">
+          <input type="checkbox" style="accent-color:var(--gold);margin-top:2px;flex-shrink:0"> <span><a href="#" style="color:var(--gold)">Kullanım Koşulları</a> ve <a href="#" style="color:var(--gold)">Gizlilik Politikası</a>'nı okudum, kabul ediyorum.</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);cursor:pointer;margin-bottom:20px">
+          <input type="checkbox" style="accent-color:var(--gold)"> Kampanya ve indirim bildirimlerini almak istiyorum.
+        </label>
+        <button class="btn btn-g btn-full btn-lg" onclick="toast('Hesap oluşturuldu ✓');go('home')">Hesap Oluştur</button>
+        <p style="text-align:center;font-size:13px;color:var(--ink3);margin-top:16px">Zaten hesabınız var mı? <button onclick="switchAuthTabByName('login-form')" style="color:var(--gold);background:none;border:none;cursor:pointer;font-size:13px">Giriş yapın</button></p>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+
+<!-- ══════════════════════════════════
+     SEARCH PAGE
+══════════════════════════════════ -->
+<main id="page-search" class="page">
+<div class="search-hero">
+  <div class="container" style="text-align:center">
+    <div class="eyebrow" style="justify-content:center;margin-bottom:12px">Arama</div>
+    <h1 class="d" style="font-size:clamp(28px,4vw,44px);margin-bottom:24px">Ne arıyorsunuz?</h1>
+    <div class="search-bar-wrap">
+      <input class="search-bar" placeholder="Ürün adı, kategori veya renk…" type="search" id="search-input" oninput="handleSearch(this.value)">
+      <button class="search-bar-ico">🔍</button>
+    </div>
+    <div class="search-tags">
+      <button class="search-tag" onclick="setSearch('Abaya')">Abaya</button>
+      <button class="search-tag" onclick="setSearch('Keten')">Keten</button>
+      <button class="search-tag" onclick="setSearch('İpek')">İpek</button>
+      <button class="search-tag" onclick="setSearch('Palto')">Palto</button>
+      <button class="search-tag" onclick="setSearch('Tunik')">Tunik</button>
+      <button class="search-tag" onclick="setSearch('Krem')">Krem</button>
+      <button class="search-tag" onclick="setSearch('Yeni')">Yeni Gelenler</button>
+    </div>
+  </div>
+</div>
+<div class="container" style="padding-top:32px;padding-bottom:48px">
+  <div class="search-results-header">
+    <div id="search-result-txt" style="font-size:14px;color:var(--ink3)">Popüler ürünler gösteriliyor</div>
+    <select class="fs" style="width:auto;min-width:160px;padding:9px 36px 9px 14px">
+      <option>Önerilen</option><option>Fiyat: Artan</option><option>Fiyat: Azalan</option>
+    </select>
+  </div>
+  <div class="prods-grid" id="search-prods"></div>
+</div>
+</main>
+
+<!-- ══════════════════════════════════
+     ORDER DETAIL PAGE
+══════════════════════════════════ -->
+<main id="page-order-detail" class="page">
+<style>
+.od-layout{display:grid;grid-template-columns:1fr 340px;gap:clamp(20px,3vw,36px);align-items:start;padding:clamp(24px,4vw,48px) 0}
+.od-timeline{position:relative;padding-left:28px;margin:24px 0}
+.od-timeline::before{content:'';position:absolute;left:9px;top:0;bottom:0;width:1px;background:var(--stone)}
+.od-event{position:relative;margin-bottom:20px}
+.od-event::before{content:'';position:absolute;left:-22px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--stone);border:2px solid #fff}
+.od-event.done::before{background:var(--gold)}
+.od-event.active::before{background:var(--ink);border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,169,110,.2)}
+.od-event-title{font-size:14px;font-weight:500;margin-bottom:2px}
+.od-event-sub{font-size:12px;color:var(--ink3)}
+@media(max-width:780px){.od-layout{grid-template-columns:1fr}}
+</style>
+<div class="container od-layout">
+  <div>
+    <nav style="font-size:12px;color:var(--ink3);margin-bottom:16px">
+      <button onclick="go('account')" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--ink3)">Hesabım</button>
+      <span style="margin:0 6px">/</span>
+      <button onclick="showAccTab('acc-orders',null);go('account')" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--ink3)">Siparişlerim</button>
+      <span style="margin:0 6px">/</span>
+      <span style="color:var(--ink)">#HYZ-2025-0847</span>
+    </nav>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px">
+      <div>
+        <h1 class="d" style="font-size:clamp(24px,3vw,32px)">Sipariş #HYZ-2025-0847</h1>
+        <div style="font-size:13px;color:var(--ink3);margin-top:4px">12 Mayıs 2025, Pazartesi</div>
+      </div>
+      <span class="badge b-ship" style="padding:6px 14px">Kargoda</span>
+    </div>
+
+    <!-- Tracking -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title" style="font-family:var(--fd);font-size:18px;font-weight:400;margin-bottom:20px">📍 Kargo Takibi</div>
+      <div style="display:flex;align-items:center;gap:12px;padding:14px;background:rgba(201,169,110,.06);border:1px solid rgba(201,169,110,.2);margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <div style="flex:1"><div style="font-size:12px;color:var(--ink3);margin-bottom:3px">Kargo Firması</div><div style="font-size:15px;font-weight:500">MNG Kargo</div></div>
+        <div style="flex:1"><div style="font-size:12px;color:var(--ink3);margin-bottom:3px">Takip Numarası</div><div style="font-size:15px;font-family:monospace">#4782934</div></div>
+        <div style="flex:1"><div style="font-size:12px;color:var(--ink3);margin-bottom:3px">Tahmini Teslimat</div><div style="font-size:15px;font-weight:500">17 Mayıs 2025</div></div>
+        <button class="btn btn-o btn-sm" onclick="go('track')">Kargo Takip →</button>
+      </div>
+      <div class="od-timeline">
+        <div class="od-event done"><div class="od-event-title">Sipariş Alındı</div><div class="od-event-sub">12 Mayıs 2025, 09:15</div></div>
+        <div class="od-event done"><div class="od-event-title">Ödeme Onaylandı</div><div class="od-event-sub">12 Mayıs 2025, 09:17 · Kredi Kartı ····4211</div></div>
+        <div class="od-event done"><div class="od-event-title">Sipariş Hazırlandı</div><div class="od-event-sub">13 Mayıs 2025, 14:30 · Depo: Hatay</div></div>
+        <div class="od-event active"><div class="od-event-title">Kargoya Verildi</div><div class="od-event-sub">14 Mayıs 2025, 08:00 · İstanbul Dağıtım Merkezi'nde</div></div>
+        <div class="od-event"><div class="od-event-title" style="color:var(--ink3)">Teslim Edilecek</div><div class="od-event-sub">17 Mayıs 2025 (Bekleniyor)</div></div>
+      </div>
+    </div>
+
+    <!-- Items -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title" style="font-family:var(--fd);font-size:18px;font-weight:400;margin-bottom:20px">📦 Sipariş İçeriği</div>
+      <div style="display:flex;gap:16px;padding-bottom:16px;border-bottom:1px solid var(--stone);margin-bottom:16px;align-items:center;flex-wrap:wrap">
+        <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=200&q=80" alt="" style="width:72px;height:90px">
+        <div style="flex:1">
+          <div style="font-size:15px;font-weight:500;margin-bottom:3px">Medine İpek Abaya</div>
+          <div style="font-size:13px;color:var(--ink3);margin-bottom:8px">Krem Bej / M · x1</div>
+          <button class="btn btn-o btn-sm" onclick="go('product')">Tekrar Sipariş Et</button>
+        </div>
+        <div style="font-family:var(--fd);font-size:22px">₺4.850</div>
+      </div>
+      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+        <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=200&q=80" alt="" style="width:72px;height:90px">
+        <div style="flex:1">
+          <div style="font-size:15px;font-weight:500;margin-bottom:3px">Nour Keten Elbise</div>
+          <div style="font-size:13px;color:var(--ink3);margin-bottom:8px">Nude / L · x1</div>
+          <button class="btn btn-o btn-sm" onclick="go('product')">Tekrar Sipariş Et</button>
+        </div>
+        <div style="font-family:var(--fd);font-size:22px">₺3.200</div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-o" onclick="toast('İade talebi oluşturuldu')">↩ İade / Değişim Talep Et</button>
+      <button class="btn btn-o" onclick="toast('Fatura indirildi')">📄 Fatura İndir</button>
+      <button class="btn btn-o" onclick="toast('Destek talebi açıldı')">💬 Destek Al</button>
+    </div>
+  </div>
+
+  <!-- Summary sidebar -->
+  <aside>
+    <div class="cart-sum">
+      <div class="cs-title">Sipariş Özeti</div>
+      <div class="cs-row"><span>Ara Toplam</span><span>₺8.050</span></div>
+      <div class="cs-row"><span>Kargo</span><span style="color:var(--ok)">Ücretsiz</span></div>
+      <div class="cs-row"><span>İndirim (ANNE25)</span><span style="color:var(--gold)">−₺1.350</span></div>
+      <div class="cs-row tot"><span>Toplam</span><span class="d" style="font-size:22px">₺6.700</span></div>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--stone)">
+        <div style="font-size:12px;color:var(--ink3);margin-bottom:8px;letter-spacing:.1em;text-transform:uppercase">Teslimat Adresi</div>
+        <div style="font-size:14px;color:var(--ink2);line-height:1.7">Ayşe Yıldız<br>Örnek Mah. Güzel Sok. No:5/3<br>Kadıköy / İstanbul 34710<br>+90 532 000 0000</div>
+      </div>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--stone)">
+        <div style="font-size:12px;color:var(--ink3);margin-bottom:8px;letter-spacing:.1em;text-transform:uppercase">Ödeme Yöntemi</div>
+        <div style="font-size:14px;color:var(--ink2)">Kredi Kartı<br>****  ****  ****  4211</div>
+      </div>
+    </div>
+  </aside>
+</div>
+</main>
+
+<!-- ══════════════════════════════════
+     SIZE GUIDE MODAL
+══════════════════════════════════ -->
+<div id="size-guide-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(44,36,32,.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px">
+<style>
+.sg-modal{background:var(--cream);max-width:640px;width:100%;max-height:90vh;overflow-y:auto;position:relative}
+.sg-header{padding:24px 28px;border-bottom:1px solid var(--stone);display:flex;align-items:center;justify-content:space-between}
+.sg-title{font-family:var(--fd);font-size:26px;font-weight:300}
+.sg-close{width:36px;height:36px;border:none;background:none;cursor:pointer;font-size:22px;color:var(--ink3);display:flex;align-items:center;justify-content:center;transition:color 150ms}
+.sg-close:hover{color:var(--ink)}
+.sg-body{padding:24px 28px}
+.sg-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px}
+.sg-table th{padding:10px 14px;background:var(--bone);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);font-weight:500;text-align:left}
+.sg-table td{padding:12px 14px;border-bottom:1px solid var(--stone);text-align:center}
+.sg-table tr:last-child td{border-bottom:none}
+.sg-table td:first-child{text-align:left;font-weight:500}
+.measure-tip{display:flex;gap:20px;flex-wrap:wrap;margin-top:20px}
+.mt-item{flex:1;min-width:140px;padding:16px;background:var(--bone);text-align:center}
+.mt-icon{font-size:28px;display:block;margin-bottom:8px}
+.mt-title{font-size:13px;font-weight:500;margin-bottom:4px}
+.mt-desc{font-size:12px;color:var(--ink3);line-height:1.6}
+</style>
+  <div class="sg-modal">
+    <div class="sg-header">
+      <div class="sg-title">Beden Rehberi</div>
+      <button class="sg-close" onclick="closeSizeGuide()">✕</button>
+    </div>
+    <div class="sg-body">
+      <p style="font-size:13px;color:var(--ink3);margin-bottom:16px;line-height:1.7">Doğru beden için vücudunuzun en geniş noktalarından ölçüm alın. Tereddüt ettiğinizde bir büyük bedeni tercih etmenizi öneririz.</p>
+      <table class="sg-table">
+        <thead>
+          <tr><th>Beden</th><th>Göğüs (cm)</th><th>Bel (cm)</th><th>Kalça (cm)</th><th>Boy (cm)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>XS</td><td>80–84</td><td>62–66</td><td>88–92</td><td>155–160</td></tr>
+          <tr><td>S</td><td>85–89</td><td>67–71</td><td>93–97</td><td>160–165</td></tr>
+          <tr style="background:rgba(201,169,110,.06)"><td><strong>M ★</strong></td><td>90–94</td><td>72–76</td><td>98–102</td><td>165–170</td></tr>
+          <tr><td>L</td><td>95–100</td><td>77–82</td><td>103–108</td><td>168–173</td></tr>
+          <tr><td>XL</td><td>101–107</td><td>83–89</td><td>109–115</td><td>170–175</td></tr>
+          <tr><td>2XL</td><td>108–115</td><td>90–97</td><td>116–123</td><td>172–177</td></tr>
+          <tr><td>3XL</td><td>116–124</td><td>98–106</td><td>124–132</td><td>174–179</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:12px;color:var(--gold);margin-bottom:20px">★ En popüler beden</p>
+      <div class="measure-tip">
+        <div class="mt-item"><span class="mt-icon">📏</span><div class="mt-title">Göğüs</div><div class="mt-desc">Kolları yanlara sarkıtın, mezurayı göğsünüzün en geniş noktasından geçirin.</div></div>
+        <div class="mt-item"><span class="mt-icon">⭕</span><div class="mt-title">Bel</div><div class="mt-desc">Doğal bel çizginizden, göbeğinizin 2–3 cm üstünden ölçün.</div></div>
+        <div class="mt-item"><span class="mt-icon">📐</span><div class="mt-title">Kalça</div><div class="mt-desc">Kalçanızın en geniş noktasından yatay olarak ölçün.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     CONTACT / SUPPORT PAGE
+══════════════════════════════════ -->
+<main id="page-contact" class="page">
+<style>
+.contact-layout{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,64px);padding:clamp(32px,5vw,72px) 0;align-items:start}
+.contact-info-item{display:flex;gap:16px;margin-bottom:28px}
+.ci-icon{width:42px;height:42px;background:var(--bone);border:1px solid var(--stone);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ci-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
+.ci-val{font-size:14px;color:var(--ink2);line-height:1.7}
+@media(max-width:700px){.contact-layout{grid-template-columns:1fr}}
+</style>
+<div class="container contact-layout">
+  <div>
+    <div class="eyebrow">İletişim</div>
+    <h1 class="d" style="font-size:clamp(32px,4vw,48px);margin:12px 0 20px">Size Nasıl<br>Yardımcı Olabiliriz?</h1>
+    <p style="font-size:15px;color:var(--ink2);line-height:1.9;margin-bottom:32px">Sorularınız, önerileriniz veya özel sipariş talepleriniz için bizimle iletişime geçin. En kısa sürede yanıt vereceğiz.</p>
+    <div class="contact-info-item"><div class="ci-icon">📧</div><div><div class="ci-label">E-posta</div><div class="ci-val">info@hayazeem.com<br>destek@hayazeem.com</div></div></div>
+    <div class="contact-info-item"><div class="ci-icon">📱</div><div><div class="ci-label">WhatsApp & Telefon</div><div class="ci-val">+90 326 000 0000<br>Hafta içi 09:00–18:00</div></div></div>
+    <div class="contact-info-item"><div class="ci-icon">📍</div><div><div class="ci-label">Adres</div><div class="ci-val">Hatay Merkez, Türkiye<br>Showroom'a randevu gereklidir.</div></div></div>
+    <div class="contact-info-item"><div class="ci-icon">◎</div><div><div class="ci-label">Sosyal Medya</div><div class="ci-val">@hayazeem.official<br>Instagram · TikTok · Pinterest</div></div></div>
+  </div>
+  <div>
+    <div class="card">
+      <div style="font-family:var(--fd);font-size:22px;font-weight:300;margin-bottom:20px">Mesaj Gönderin</div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Ad</label><input class="fi" placeholder="Adınız" type="text"></div>
+        <div class="fg"><label class="fl">Soyad</label><input class="fi" placeholder="Soyadınız" type="text"></div>
+      </div>
+      <div class="fg"><label class="fl">E-posta</label><input class="fi" placeholder="ornek@email.com" type="email"></div>
+      <div class="fg"><label class="fl">Konu</label>
+        <select class="fs">
+          <option>Sipariş hakkında</option>
+          <option>İade / değişim</option>
+          <option>Ürün bilgisi</option>
+          <option>Özel sipariş</option>
+          <option>Toptan satış</option>
+          <option>Diğer</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Mesajınız</label><textarea class="fta" placeholder="Mesajınızı buraya yazın…" style="min-height:140px"></textarea></div>
+      <button class="btn btn-g btn-full btn-lg" onclick="toast('Mesajınız gönderildi ✓')">Mesaj Gönder</button>
+    </div>
+  </div>
+</div>
+</main>
+
+<!-- ══════════════════════════════════
+     PASSWORD RESET PAGE
+══════════════════════════════════ -->
+<main id="page-reset" class="page">
+<div style="min-height:calc(100vh - var(--nav-h));display:flex;align-items:center;justify-content:center;padding:32px 20px">
+  <div style="width:100%;max-width:440px">
+    <div style="text-align:center;margin-bottom:32px">
+      <div style="font-family:var(--fd);font-size:42px;color:var(--gold);margin-bottom:16px">✦</div>
+      <h1 class="d" style="font-size:32px;margin-bottom:8px">Şifre Sıfırlama</h1>
+      <p style="font-size:14px;color:var(--ink3)">E-posta adresinizi girin, sıfırlama bağlantısı gönderelim.</p>
+    </div>
+    <div id="reset-step-1">
+      <div class="fg"><label class="fl">E-posta Adresiniz</label><input class="fi" placeholder="ornek@email.com" type="email"></div>
+      <button class="btn btn-p btn-full btn-lg" onclick="showResetStep2()">Sıfırlama Bağlantısı Gönder</button>
+      <p style="text-align:center;margin-top:16px"><button onclick="go('login')" style="font-size:13px;color:var(--gold);background:none;border:none;cursor:pointer">← Giriş sayfasına dön</button></p>
+    </div>
+    <div id="reset-step-2" style="display:none;text-align:center">
+      <div style="font-size:48px;margin-bottom:16px">📧</div>
+      <h2 class="d" style="font-size:24px;margin-bottom:8px">E-posta Gönderildi</h2>
+      <p style="font-size:14px;color:var(--ink3);line-height:1.8;margin-bottom:24px">ornek@email.com adresine sıfırlama bağlantısı gönderildi. Lütfen gelen kutunuzu kontrol edin.</p>
+      <button class="btn btn-o btn-full" onclick="go('login')">Giriş Sayfasına Dön</button>
+    </div>
+  </div>
+</div>
+</main>
+
+<!-- ══════════════════════════════════
+     404 / NOT FOUND PAGE
+══════════════════════════════════ -->
+<main id="page-404" class="page">
+<div style="min-height:calc(100vh - var(--nav-h));display:flex;align-items:center;justify-content:center;text-align:center;padding:32px 20px">
+  <div style="max-width:480px">
+    <div style="font-family:var(--fd);font-size:120px;color:var(--stone);line-height:1;margin-bottom:16px">404</div>
+    <h1 class="d" style="font-size:36px;margin-bottom:12px">Sayfa Bulunamadı</h1>
+    <p style="font-size:15px;color:var(--ink3);line-height:1.8;margin-bottom:32px">Aradığınız sayfa kaldırılmış ya da taşınmış olabilir. Anasayfaya dönerek alışverişe devam edebilirsiniz.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-p btn-lg" onclick="go('home')">Anasayfaya Dön</button>
+      <button class="btn btn-o btn-lg" onclick="go('categories')">Koleksiyonları Gör</button>
+    </div>
+  </div>
+</div>
+</main>
+
+<script>
+/* ── NEW PAGE SCRIPTS ── */
+
+
+/* ── Ana Sayfa Arama ── */
+function homeSearch(val){
+  const drop = document.getElementById('home-search-drop-items');
+  if(!drop) return;
+  const q = val.trim().toLowerCase();
+  if(!q){ drop.innerHTML = ''; document.getElementById('home-search-drop').style.display='none'; return; }
+  const results = PRODUCTS.filter(p =>
+    p.name.toLowerCase().includes(q) ||
+    p.cat.toLowerCase().includes(q) ||
+    p.fabric.toLowerCase().includes(q)
+  ).slice(0,6);
+  if(!results.length){
+    drop.innerHTML = '<div style="padding:12px 16px;font-size:13px;color:var(--ink3)">Sonuç bulunamadı</div>';
+    return;
+  }
+  drop.innerHTML = results.map(p => `
+    <div onclick="openProduct(${p.id});document.getElementById('home-search-drop').style.display='none'"
+      style="display:flex;align-items:center;gap:12px;padding:10px 16px;cursor:pointer;border-bottom:1px solid var(--stone);transition:background 150ms"
+      onmouseover="this.style.background='var(--bone)'" onmouseout="this.style.background=''">
+      <img src="${p.img.replace('w=400','w=80')}" alt="" style="width:40px;height:50px;object-fit:cover;flex-shrink:0">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
+        <div style="font-size:11px;color:var(--ink3)">${p.cat} · ${p.fabric}</div>
+      </div>
+      <div style="font-family:var(--fd);font-size:16px;white-space:nowrap;flex-shrink:0">${fmt(p.price)}</div>
+    </div>`).join('');
+  document.getElementById('home-search-drop').style.display = 'block';
+}
+
+function submitHomeSearch(){
+  const val = document.getElementById('home-search-input')?.value?.trim();
+  if(!val) return;
+  // Sync search page input and go
+  const si = document.getElementById('search-input');
+  if(si) si.value = val;
+  handleSearch(val);
+  go('search');
+}
+
+function goSearchTag(val){
+  // Tag tıklandığında arama sayfasına git ve filtrele
+  const si = document.getElementById('search-input');
+  if(si) si.value = val;
+  const hi = document.getElementById('home-search-input');
+  if(hi) hi.value = val;
+  handleSearch(val);
+  go('search');
+}
+
+/* ── filterByCat: kategori grid kartlarından filtre uygula ── */
+function filterByCat(cat){
+  Store._d.filters.cats = cat ? [cat] : [];
+  Store.emit('filters');
+  document.querySelectorAll('#filter-sb input[type=checkbox]').forEach(cb=>{
+    const txt = cb.closest('label')?.textContent.trim()||'';
+    cb.checked = cat ? txt.startsWith(cat) : false;
+  });
+  go('categories');
+  setTimeout(()=>{
+    document.getElementById('cat-prods')?.scrollIntoView({behavior:'smooth',block:'start'});
+  }, 80);
+  if(cat) toast(cat+' koleksiyonu');
+}
+
+/* Auth tabs */
+function switchAuthTab(btn, id){
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('login-form').style.display = id==='login-form' ? 'block' : 'none';
+  document.getElementById('register-form').style.display = id==='register-form' ? 'block' : 'none';
+}
+function switchAuthTabByName(id){
+  const tabs = document.querySelectorAll('.auth-tab');
+  tabs.forEach(t=>t.classList.remove('active'));
+  if(id==='login-form') tabs[0].classList.add('active');
+  else tabs[1].classList.add('active');
+  document.getElementById('login-form').style.display = id==='login-form' ? 'block' : 'none';
+  document.getElementById('register-form').style.display = id==='register-form' ? 'block' : 'none';
+}
+
+/* Search */
+function handleSearch(val){
+  const el = document.getElementById('search-result-txt');
+  if(el) el.textContent = val ? `"${val}" için ${Math.floor(Math.random()*40+5)} sonuç bulundu` : 'Popüler ürünler gösteriliyor';
+}
+function setSearch(val){
+  const el = document.getElementById('search-input');
+  if(el){ el.value = val; handleSearch(val); }
+}
+document.addEventListener('DOMContentLoaded', ()=>{
+  const sp = document.getElementById('search-prods');
+  if(sp) sp.innerHTML = (window.PRODUCTS||[]).map(p=>makeCard(p)).join('');
+});
+
+/* Size guide */
+function openSizeGuide(){
+  const m = document.getElementById('size-guide-modal');
+  m.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeSizeGuide(){
+  const m = document.getElementById('size-guide-modal');
+  m.style.display = 'none';
+  document.body.style.overflow = '';
+}
+document.getElementById('size-guide-modal').addEventListener('click', function(e){
+  if(e.target === this) closeSizeGuide();
+});
+
+/* Reset */
+function showResetStep2(){
+  document.getElementById('reset-step-1').style.display='none';
+  document.getElementById('reset-step-2').style.display='block';
+}
+
+/* Update navbar to add search & login buttons */
+(function(){
+  const nl = document.querySelector('.nav-links');
+  if(nl){
+    const searchBtn = document.createElement('button');
+    searchBtn.className='nl';
+    searchBtn.textContent='Arama';
+    searchBtn.onclick = ()=>go('search');
+    nl.appendChild(searchBtn);
+  }
+  // Add search icon to nav-r before ham
+  const navR = document.querySelector('.nav-r');
+  if(navR){
+    const loginBtn = document.createElement('button');
+    loginBtn.className='nl';
+    loginBtn.style.cssText='font-size:11px;padding:7px 14px;border:1px solid var(--warm);color:var(--ink2)';
+    loginBtn.textContent='GİRİŞ';
+    loginBtn.onclick = ()=>go('login');
+    navR.insertBefore(loginBtn, navR.querySelector('.ham'));
+  }
+  // Add order detail link in account orders
+  const ordRows = document.querySelectorAll('.ord-row');
+  ordRows.forEach(row=>{
+    const btn = row.querySelector('button');
+    if(btn && btn.textContent==='Takip Et'){
+      const detailBtn = document.createElement('button');
+      detailBtn.className='btn btn-o btn-sm';
+      detailBtn.style.marginTop='4px';
+      detailBtn.textContent='Detay';
+      detailBtn.onclick = ()=>go('order-detail');
+      btn.after(detailBtn);
+    }
+  });
+  // Wire size guide button in product detail
+  const szgl = document.querySelector('.sz-gl');
+  if(szgl) szgl.onclick = openSizeGuide;
+})();
+</script>
+</body>
+</html>
