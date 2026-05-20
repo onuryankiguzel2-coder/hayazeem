@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HAYAZEEM — Premium Tesettür Moda</title>
+<title>HAYAZEEEM — Premium Tesettür Moda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -471,6 +471,8 @@ img{display:block;max-width:100%;object-fit:cover}
   #nav-login-btn{display:none !important}
   #nav-account-btn{display:none !important}
   .ham{display:flex !important}
+  /* kullanıcı ve favori ikonları drawer'da var, kaldır */
+  .nav-icon:not([title="Sepet"]){display:none !important}
 }
 /* RTL */
 [dir=rtl] .nav-links{flex-direction:row-reverse}
@@ -487,7 +489,7 @@ img{display:block;max-width:100%;object-fit:cover}
 
 <!-- NAVBAR -->
 <nav class="navbar">
-  <button class="nav-logo" onclick="go('home')">H<span>A</span>YAZEEM</button>
+  <button class="nav-logo" onclick="go('home')">H<span>A</span>YAZEEEM</button>
   <div class="nav-links">
     <button class="nl" onclick="go('home')">Ana Sayfa</button>
     <button class="nl" onclick="go('categories')">Ürünler</button>
@@ -511,13 +513,13 @@ img{display:block;max-width:100%;object-fit:cover}
       <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
       <span class="nav-badge">2</span>
     </button>
+    <button class="ham" onclick="toggleDrawer()" id="ham" aria-label="Menü" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
     <button id="nav-login-btn" onclick="go('login')" style="padding:7px 14px;border:1px solid var(--warm);background:none;cursor:pointer;font-size:11px;letter-spacing:.08em;color:var(--ink2);white-space:nowrap">GİRİŞ</button>
     <button id="nav-account-btn" onclick="go('account')" style="display:none;align-items:center;gap:6px;padding:7px 14px;border:1px solid var(--gold);background:none;cursor:pointer;font-size:11px;letter-spacing:.08em;color:var(--gold)">
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span id="nav-account-name">Hesabım</span>
-    </button>
-    <button class="ham" onclick="toggleDrawer()" id="ham">
-      <span></span><span></span><span></span>
     </button>
   </div>
 </nav>
@@ -548,7 +550,7 @@ img{display:block;max-width:100%;object-fit:cover}
       <div class="hero-content">
         <div class="eyebrow fu">Bahar — Yaz Koleksiyonu 2025</div>
         <h1 class="hero-title fu fu1">Zarafetin<br>En <em>Saf</em><br>Hali</h1>
-        <p class="hero-sub fu fu2">Her dikiş bir anın hatırası. Her kumaş bir duygunun dokunuşu. HAYAZEEM; sizi hem içten hem dıştan güzel hissettirmek için var.</p>
+        <p class="hero-sub fu fu2">Her dikiş bir anın hatırası. Her kumaş bir duygunun dokunuşu. HAYAZEEEM; sizi hem içten hem dıştan güzel hissettirmek için var.</p>
         <blockquote class="hero-story fu fu3">"Hatıra, sevgi ve zarafet… Kaybedemeyeceğimiz tek şeyler."</blockquote>
         <div class="hero-cta fu fu4">
           <button class="btn btn-p btn-lg" onclick="go('categories')">Koleksiyonu Keşfet</button>
@@ -556,12 +558,111 @@ img{display:block;max-width:100%;object-fit:cover}
         </div>
       </div>
     </div>
-    <div class="hero-r">
-      <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=900&q=80&auto=format&fit=crop" alt="HAYAZEEM koleksiyon">
-      <div class="hero-r-ov"></div>
+    <div class="hero-r" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#f0e8d8 0%,#e8d8c0 50%,#ddd0b5 100%);position:relative;overflow:hidden">
+      <!-- Kumaş doku çizgileri -->
+      <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:.12" preserveAspectRatio="xMidYMid slice" viewBox="0 0 400 600">
+        <path d="M0 60 Q100 30 200 65 Q300 95 400 58" stroke="#b8944a" stroke-width=".8" fill="none"/>
+        <path d="M0 130 Q120 95 240 132 Q340 162 400 128" stroke="#b8944a" stroke-width=".7" fill="none"/>
+        <path d="M0 200 Q80 170 200 205 Q320 238 400 198" stroke="#b8944a" stroke-width=".6" fill="none"/>
+        <path d="M0 280 Q140 248 260 282 Q360 308 400 275" stroke="#b8944a" stroke-width=".7" fill="none"/>
+        <path d="M0 360 Q100 330 220 362 Q330 388 400 358" stroke="#b8944a" stroke-width=".6" fill="none"/>
+        <path d="M0 440 Q150 410 280 445 Q360 468 400 438" stroke="#b8944a" stroke-width=".7" fill="none"/>
+        <path d="M0 520 Q90 492 210 525 Q320 552 400 520" stroke="#b8944a" stroke-width=".5" fill="none"/>
+      </svg>
+
+      <!-- Kutu -->
+      <div id="heroBoxWrap" onclick="heroToggleBox()" style="position:relative;width:min(380px,80%);cursor:pointer;perspective:900px">
+
+        <!-- Gölge -->
+        <div style="position:absolute;bottom:-14px;left:10%;right:10%;height:14px;background:radial-gradient(ellipse,rgba(120,85,40,.22) 0%,transparent 70%)"></div>
+
+        <!-- Kutu gövde -->
+        <div style="position:relative;width:100%;padding-top:62%;border:1px solid rgba(185,148,90,.3);border-radius:3px;overflow:visible;background:linear-gradient(135deg,#f5ede2 0%,#ece0cc 55%,#dfd0b5 100%)">
+
+          <!-- İç alan (kapılar açılınca görünür) -->
+          <div id="heroBoxInner" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .7s .35s;background:linear-gradient(180deg,#fffbf2 0%,#f8f0dd 100%)">
+            <!-- Işık hunisi -->
+            <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:55%;height:70%;background:radial-gradient(ellipse at 50% 0%,rgba(255,242,185,.9) 0%,rgba(255,230,140,.35) 45%,transparent 75%);pointer-events:none"></div>
+            <!-- Kemer -->
+            <div style="position:absolute;top:8%;left:50%;transform:translateX(-50%);width:44%;height:60%;border:1.5px solid rgba(185,148,90,.5);border-bottom:none;border-radius:50% 50% 0 0;pointer-events:none">
+              <div style="position:absolute;inset:7%;border:1px solid rgba(185,148,90,.2);border-bottom:none;border-radius:50% 50% 0 0"></div>
+            </div>
+            <!-- İçerik -->
+            <div style="position:relative;z-index:2;text-align:center;margin-top:10%">
+              <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(10px,1.8vw,13px);color:rgba(175,138,75,.85);letter-spacing:.35em;margin-bottom:3px">✦ H ✦</div>
+              <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(14px,2.8vw,20px);font-weight:300;letter-spacing:.3em;color:rgba(55,40,22,.8)">HAYAZEEEM</div>
+              <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(9px,1.4vw,11px);font-style:italic;color:rgba(125,95,55,.7);letter-spacing:.07em;margin-top:6px;line-height:1.6">Zarafet, hissedilir<br>sessiz bir değer..</div>
+              <div style="font-size:clamp(8px,1.2vw,10px);color:rgba(175,138,75,.55);letter-spacing:.2em;margin-top:5px">· · ·</div>
+            </div>
+          </div>
+
+          <!-- Sol kapı -->
+          <div id="heroBoxDoorL" style="position:absolute;inset:0;width:50%;background:linear-gradient(135deg,#f2e6d2 0%,#e9d9bf 55%,#dccba5 100%);border-right:.5px solid rgba(185,148,90,.25);transform-origin:right center;transition:transform .95s cubic-bezier(.25,.1,.25,1);transform-style:preserve-3d;overflow:hidden">
+            <!-- Kapı deseni -->
+            <div style="position:absolute;inset:8px;border:1px solid rgba(185,148,90,.2);border-radius:1px;pointer-events:none"></div>
+            <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);width:42%;height:32%;border:1.5px solid rgba(185,148,90,.3);border-bottom:none;border-radius:50% 50% 0 0;pointer-events:none"></div>
+            <!-- Menteşe -->
+            <div style="position:absolute;top:28%;right:5px;width:8px;height:15px;background:rgba(185,148,90,.5);border-radius:2px"></div>
+            <div style="position:absolute;top:62%;right:5px;width:8px;height:15px;background:rgba(185,148,90,.5);border-radius:2px"></div>
+            <!-- Tokmak -->
+            <div style="position:absolute;top:47%;right:9px;width:7px;height:7px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#e8c870,#b0883c)"></div>
+            <!-- Melek figürleri -->
+            <div class="hero-angel" style="position:absolute;font-size:clamp(18px,3vw,26px);opacity:.38;top:14%;left:12%;transition:all .9s">👼</div>
+            <div class="hero-angel" style="position:absolute;font-size:clamp(14px,2.2vw,20px);opacity:.3;top:42%;left:6%;transition:all .9s .1s">👼</div>
+            <div class="hero-angel" style="position:absolute;font-size:clamp(12px,1.8vw,17px);opacity:.25;top:66%;left:18%;transition:all .9s .2s">👼</div>
+          </div>
+
+          <!-- Sağ kapı -->
+          <div id="heroBoxDoorR" style="position:absolute;inset:0;left:50%;width:50%;background:linear-gradient(225deg,#f2e6d2 0%,#e9d9bf 55%,#dccba5 100%);border-left:.5px solid rgba(185,148,90,.25);transform-origin:left center;transition:transform .95s cubic-bezier(.25,.1,.25,1);transform-style:preserve-3d;overflow:hidden">
+            <div style="position:absolute;inset:8px;border:1px solid rgba(185,148,90,.2);border-radius:1px;pointer-events:none"></div>
+            <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);width:42%;height:32%;border:1.5px solid rgba(185,148,90,.3);border-bottom:none;border-radius:50% 50% 0 0;pointer-events:none"></div>
+            <div style="position:absolute;top:28%;left:5px;width:8px;height:15px;background:rgba(185,148,90,.5);border-radius:2px"></div>
+            <div style="position:absolute;top:62%;left:5px;width:8px;height:15px;background:rgba(185,148,90,.5);border-radius:2px"></div>
+            <div style="position:absolute;top:47%;left:9px;width:7px;height:7px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#e8c870,#b0883c)"></div>
+            <div class="hero-angel" style="position:absolute;font-size:clamp(14px,2vw,19px);opacity:.28;top:20%;right:10%;transition:all .9s .15s">👼</div>
+            <div class="hero-angel" style="position:absolute;font-size:clamp(12px,1.6vw,15px);opacity:.22;top:55%;right:14%;transition:all .9s .3s">👼</div>
+          </div>
+        </div>
+
+        <!-- Hint -->
+        <div id="heroBoxHint" style="text-align:center;margin-top:14px;font-family:'Jost',system-ui,sans-serif;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:rgba(140,100,55,.55);transition:opacity .4s">— Kutunuzu açın —</div>
+      </div>
+
+      <!-- Sayı badge -->
       <div class="hero-num"><span class="hero-num-val">200+</span><span class="hero-num-lbl">Premium Ürün</span></div>
-      <div class="scroll-hint"><div class="scroll-line"></div><span class="scroll-txt">Keşfet</span></div>
     </div>
+
+<style>
+#heroBoxWrap.box-open #heroBoxDoorL{transform:perspective(600px) rotateY(-112deg)}
+#heroBoxWrap.box-open #heroBoxDoorR{transform:perspective(600px) rotateY(112deg)}
+#heroBoxWrap.box-open #heroBoxInner{opacity:1}
+#heroBoxWrap.box-open #heroBoxHint{opacity:0}
+#heroBoxWrap.box-open .hero-angel{opacity:0 !important;transform:translateY(-12px)}
+</style>
+<script>
+(function(){
+  function heroToggleBox(){
+    var w=document.getElementById('heroBoxWrap');
+    if(!w) return;
+    w.classList.toggle('box-open');
+    if(w.classList.contains('box-open')){
+      setTimeout(function(){
+        var inner=document.getElementById('heroBoxInner');
+        if(inner) inner.style.opacity='1';
+      },360);
+    } else {
+      var inner=document.getElementById('heroBoxInner');
+      if(inner) inner.style.opacity='0';
+    }
+  }
+  window.heroToggleBox=heroToggleBox;
+  // Otomatik açılış — sayfa yüklenince 1.8sn sonra
+  setTimeout(function(){
+    var w=document.getElementById('heroBoxWrap');
+    if(w && !w.classList.contains('box-open')) heroToggleBox();
+  },1800);
+})();
+</script>
   </section>
 
   <!-- ── ANA SAYFA ARAMA ŞERİDİ ── -->
@@ -624,7 +725,7 @@ img{display:block;max-width:100%;object-fit:cover}
     <div class="ab-text">
       <div class="eyebrow">Hikayemiz</div>
       <blockquote class="ab-quote">"Bazı isimler unutulmaz. Onları taşıyoruz — dikişlerimize, kumaşlarımıza, kalbimize..."</blockquote>
-      <div class="ab-sig">— Kurucular, HAYAZEEM</div>
+      <div class="ab-sig">— Kurucular, HAYAZEEEM</div>
       <button class="btn btn-p" style="margin-top:32px" onclick="go('about')">Hikayemizi Okuyun →</button>
     </div>
   </section>
@@ -656,7 +757,7 @@ img{display:block;max-width:100%;object-fit:cover}
     <div class="container">
       <div class="promise-grid">
         <div><span class="p-icon">🚚</span><div class="p-title">Ücretsiz Kargo</div><p class="p-desc">500₺ ve üzeri siparişlerde ücretsiz</p></div>
-        <div><span class="p-icon">↩</span><div class="p-title">14 Gün İade</div><p class="p-desc">Koşulsuz iade ve değişim hakkı</p></div>
+        <div onclick="go('returns')" style="cursor:pointer"><span class="p-icon">↩</span><div class="p-title">14 Gün İade</div><p class="p-desc">Koşulsuz iade ve değişim hakkı</p></div>
         <div><span class="p-icon">🔒</span><div class="p-title">Güvenli Ödeme</div><p class="p-desc">256-bit SSL şifreleme</p></div>
         <div><span class="p-icon">✦</span><div class="p-title">Premium Kalite</div><p class="p-desc">El yapımı özenle hazırlanır</p></div>
       </div>
@@ -666,7 +767,7 @@ img{display:block;max-width:100%;object-fit:cover}
   <footer class="footer">
     <div class="fg-grid">
       <div>
-        <div class="f-brand">HAYAZEEM</div>
+        <div class="f-brand">HAYAZEEEM</div>
         <p class="f-desc">Zarafet, huzur ve manevi bağlılıkla tasarlanmış premium tesettür giyim markası. Hatay'dan dünyaya.</p>
         <div class="f-soc">
           <div class="f-soc-btn">◎</div><div class="f-soc-btn">f</div>
@@ -684,7 +785,7 @@ img{display:block;max-width:100%;object-fit:cover}
       <div>
         <div class="f-col-title">Yardım</div>
         <button class="f-link" onclick="go('track')">Sipariş Takip</button>
-        <button class="f-link">İade & Değişim</button>
+        <button class="f-link" onclick="go('returns')">İade & Değişim</button>
         <button class="f-link" onclick="go('product')">Beden Rehberi</button>
         <button class="f-link">Kargo Bilgisi</button>
         <button class="f-link">İletişim</button>
@@ -699,7 +800,7 @@ img{display:block;max-width:100%;object-fit:cover}
       </div>
     </div>
     <div class="f-bottom">
-      <span>© 2025 HAYAZEEM. Tüm hakları saklıdır.</span>
+      <span>© 2025 HAYAZEEEM. Tüm hakları saklıdır.</span>
       <span class="f-italic">Zarafetle tasarlandı.</span>
       <div style="display:flex;gap:16px">
         <button class="f-link" style="margin:0;font-size:11px">Gizlilik</button>
@@ -831,7 +932,7 @@ img{display:block;max-width:100%;object-fit:cover}
         <span style="color:var(--ink)">Medine İpek Abaya</span>
       </nav>
 
-      <div class="pd-brand">HAYAZEEM</div>
+      <div class="pd-brand">HAYAZEEEM</div>
       <h1 class="pd-title">Medine İpek Abaya</h1>
       <div class="pd-sku">Ürün Kodu: HYZ-001 · 5 Renk, 7 Beden</div>
 
@@ -1143,7 +1244,7 @@ img{display:block;max-width:100%;object-fit:cover}
 ══════════════════════════════════ -->
 <main id="page-about" class="page">
   <section class="about-hero">
-    <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=1200&q=80&auto=format&fit=crop" alt="HAYAZEEM atölye" loading="lazy">
+    <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=1200&q=80&auto=format&fit=crop" alt="HAYAZEEEM atölye" loading="lazy">
     <div class="about-hero-ov"></div>
     <div class="about-hero-c">
       <div class="eyebrow">Hikayemiz</div>
@@ -1180,7 +1281,7 @@ img{display:block;max-width:100%;object-fit:cover}
       <div class="timeline">
         <div class="tl-item">
           <div class="tl-year">2023</div>
-          <div class="tl-body"><h4>Bir Hayalin Doğuşu</h4><p>Deprem acısının ardından, sevdiklerimizin anısını yaşatmak için HAYAZEEM'in temelleri atıldı.</p></div>
+          <div class="tl-body"><h4>Bir Hayalin Doğuşu</h4><p>Deprem acısının ardından, sevdiklerimizin anısını yaşatmak için HAYAZEEEM'in temelleri atıldı.</p></div>
         </div>
         <div class="tl-item">
           <div class="tl-year">2024</div>
@@ -1196,12 +1297,12 @@ img{display:block;max-width:100%;object-fit:cover}
 
   <footer class="footer">
     <div class="fg-grid">
-      <div><div class="f-brand">HAYAZEEM</div><p class="f-desc">Zarafet ve manevi bağlılıkla tasarlanmış premium tesettür giyim markası.</p></div>
+      <div><div class="f-brand">HAYAZEEEM</div><p class="f-desc">Zarafet ve manevi bağlılıkla tasarlanmış premium tesettür giyim markası.</p></div>
       <div><div class="f-col-title">Koleksiyonlar</div><button class="f-link" onclick="go('categories')">Abayalar</button><button class="f-link" onclick="go('categories')">Tunikler</button><button class="f-link" onclick="go('categories')">Elbiseler</button></div>
-      <div><div class="f-col-title">Yardım</div><button class="f-link" onclick="go('track')">Sipariş Takip</button><button class="f-link">İade</button><button class="f-link">İletişim</button></div>
+      <div><div class="f-col-title">Yardım</div><button class="f-link" onclick="go('track')">Sipariş Takip</button><button class="f-link" onclick="go('returns')">İade & Değişim</button><button class="f-link">İletişim</button></div>
       <div><div class="f-col-title">Bülten</div><p style="font-size:12px;color:rgba(250,247,242,.38);line-height:1.8;margin-bottom:14px">Yeni koleksiyonlar için abone olun.</p><input type="email" placeholder="E-posta" style="width:100%;padding:10px 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--cream);font-size:13px;outline:none;margin-bottom:8px"><button class="btn btn-g btn-full" style="padding:10px" onclick="toast('Bültene abone oldunuz ✓')">Abone Ol</button></div>
     </div>
-    <div class="f-bottom"><span>© 2025 HAYAZEEM.</span><span class="f-italic">Zarafetle tasarlandı.</span></div>
+    <div class="f-bottom"><span>© 2025 HAYAZEEEM.</span><span class="f-italic">Zarafetle tasarlandı.</span></div>
   </footer>
 </main>
 
@@ -1245,7 +1346,7 @@ img{display:block;max-width:100%;object-fit:cover}
           </div>
         </div>
         <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--stone);display:flex;gap:12px;flex-wrap:wrap">
-          <button class="btn btn-o btn-sm" onclick="toast('İade talebi oluşturuldu')">İade/Değişim Talep Et</button>
+          <button class="btn btn-o btn-sm" onclick="go('returns')">↩ İade / Değişim Talep Et</button>
           <button class="btn btn-p btn-sm" onclick="go('account')">Hesabıma Git</button>
         </div>
       </div>
@@ -1378,7 +1479,7 @@ img{display:block;max-width:100%;object-fit:cover}
 
 <script>
 /* ══════════════════════════════════════════
-   HAYAZEEM — Global State Management v2
+   HAYAZEEEM — Global State Management v2
    localStorage kalıcı + reaktif event bus
 ══════════════════════════════════════════ */
 
@@ -2082,7 +2183,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   <div class="auth-left">
     <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=900&q=80&auto=format&fit=crop" alt="">
     <div class="auth-left-content">
-      <div style="font-family:var(--fd);font-size:28px;letter-spacing:.2em;color:var(--cream);margin-bottom:20px">HAYAZEEM</div>
+      <div style="font-family:var(--fd);font-size:28px;letter-spacing:.2em;color:var(--cream);margin-bottom:20px">HAYAZEEEM</div>
       <div class="auth-left-title">Zarafetle<br><em style="color:var(--gold)">Karşılaşın</em></div>
       <p class="auth-left-sub">Yeni koleksiyonlara özel erişim, kişiselleştirilmiş öneriler ve sipariş takibi.</p>
     </div>
@@ -2254,7 +2355,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
     <!-- Actions -->
     <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn btn-o" onclick="toast('İade talebi oluşturuldu')">↩ İade / Değişim Talep Et</button>
+      <button class="btn btn-o" onclick="go('returns')">↩ İade / Değişim Talep Et</button>
       <button class="btn btn-o" onclick="toast('Fatura indirildi')">📄 Fatura İndir</button>
       <button class="btn btn-o" onclick="toast('Destek talebi açıldı')">💬 Destek Al</button>
     </div>
@@ -2376,6 +2477,134 @@ document.addEventListener('DOMContentLoaded',()=>{
       </div>
       <div class="fg"><label class="fl">Mesajınız</label><textarea class="fta" placeholder="Mesajınızı buraya yazın…" style="min-height:140px"></textarea></div>
       <button class="btn btn-g btn-full btn-lg" onclick="toast('Mesajınız gönderildi ✓')">Mesaj Gönder</button>
+    </div>
+  </div>
+</div>
+</main>
+
+<!-- ══════════════════════════════════
+     İADE & DEĞİŞİM SAYFASI
+══════════════════════════════════ -->
+<main id="page-returns" class="page">
+<style>
+.ret-hero{background:var(--bone);padding:clamp(40px,6vw,80px) 0;border-bottom:1px solid var(--stone);text-align:center}
+.ret-layout{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,56px);padding:clamp(32px,5vw,64px) 0;align-items:start}
+.ret-card{background:#fff;border:1px solid rgba(184,168,152,.2);padding:28px 32px;margin-bottom:16px}
+.ret-card-title{font-family:var(--fd);font-size:20px;font-weight:400;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.ret-step{display:flex;gap:16px;margin-bottom:20px;align-items:flex-start}
+.ret-step-num{width:32px;height:32px;border-radius:50%;background:var(--ink);color:var(--cream);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;flex-shrink:0}
+.ret-step-body{flex:1}
+.ret-step-title{font-size:14px;font-weight:500;margin-bottom:4px}
+.ret-step-desc{font-size:13px;color:var(--ink3);line-height:1.7}
+.ret-tag{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:rgba(201,169,110,.1);color:var(--gold-dk);font-size:12px;letter-spacing:.06em;border-radius:2px;margin-bottom:8px}
+.ret-table{width:100%;border-collapse:collapse;font-size:13px}
+.ret-table th{padding:10px 14px;background:var(--bone);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);font-weight:500;text-align:left;border-bottom:1px solid var(--stone)}
+.ret-table td{padding:12px 14px;border-bottom:1px solid var(--stone);color:var(--ink2);vertical-align:top}
+.ret-table tr:last-child td{border-bottom:none}
+.ret-ok{color:var(--ok)}
+.ret-no{color:var(--err)}
+@media(max-width:768px){.ret-layout{grid-template-columns:1fr}}
+</style>
+
+<div class="ret-hero">
+  <div class="container">
+    <div class="eyebrow" style="justify-content:center;margin-bottom:12px">Müşteri Memnuniyeti</div>
+    <h1 class="d" style="font-size:clamp(30px,4vw,48px);margin-bottom:12px">İade & Değişim</h1>
+    <p style="font-size:15px;color:var(--ink2);max-width:520px;margin:0 auto;line-height:1.85">Satın aldığınız üründen memnun kalmazsanız, <strong>14 gün içinde</strong> koşulsuz iade veya değişim hakkınız vardır.</p>
+  </div>
+</div>
+
+<div class="container ret-layout">
+
+  <!-- Sol: Süreç -->
+  <div>
+    <div class="ret-card">
+      <div class="ret-card-title">📦 İade Süreci — 3 Adım</div>
+      <div class="ret-step">
+        <div class="ret-step-num">1</div>
+        <div class="ret-step-body">
+          <div class="ret-step-title">İade Talebi Oluşturun</div>
+          <div class="ret-step-desc">Hesabınızdan veya aşağıdaki formu doldurarak iade talebinizi başlatın. Sipariş numaranızı hazır bulundurun.</div>
+        </div>
+      </div>
+      <div class="ret-step">
+        <div class="ret-step-num">2</div>
+        <div class="ret-step-body">
+          <div class="ret-step-title">Ürünü Gönderin</div>
+          <div class="ret-step-desc">Size e-posta ile gönderilen kargo etiketini ürünün üzerine yapıştırın. Orijinal ambalajında gönderin. Kargo ücreti tarafımızca karşılanır.</div>
+        </div>
+      </div>
+      <div class="ret-step">
+        <div class="ret-step-num">3</div>
+        <div class="ret-step-body">
+          <div class="ret-step-title">İade / Değişim Tamamlanır</div>
+          <div class="ret-step-desc">Ürün depomiza ulaştıktan sonra <strong>3-5 iş günü</strong> içinde ödeme iadesi veya değişim işleminiz tamamlanır.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ret-card">
+      <div class="ret-card-title">⏱ Süreler & Koşullar</div>
+      <table class="ret-table">
+        <thead><tr><th>Durum</th><th>İade</th><th>Değişim</th></tr></thead>
+        <tbody>
+          <tr><td>Kullanılmamış, etiketli ürün</td><td class="ret-ok">✓ 14 gün</td><td class="ret-ok">✓ 14 gün</td></tr>
+          <tr><td>Ambalajı açılmış, denenmemiş</td><td class="ret-ok">✓ 14 gün</td><td class="ret-ok">✓ 14 gün</td></tr>
+          <tr><td>Kullanılmış / yıkanmış ürün</td><td class="ret-no">✗</td><td class="ret-no">✗</td></tr>
+          <tr><td>Özel sipariş / kişiselleştirilmiş</td><td class="ret-no">✗</td><td class="ret-no">✗</td></tr>
+          <tr><td>İç giyim & eşarp (hijyen)</td><td class="ret-no">✗</td><td class="ret-no">✗</td></tr>
+          <tr><td>İndirimli ürünler</td><td class="ret-ok">✓ 14 gün</td><td class="ret-ok">✓ 14 gün</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="ret-card">
+      <div class="ret-card-title">💳 Ödeme İadesi</div>
+      <div style="font-size:13px;color:var(--ink2);line-height:1.85">
+        <p style="margin-bottom:10px">İade onaylandıktan sonra ödeme, kullandığınız ödeme yöntemine geri yapılır:</p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:var(--gold);flex-shrink:0">—</span><span><strong>Kredi / Banka Kartı:</strong> 3–7 iş günü (bankanıza göre değişir)</span></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:var(--gold);flex-shrink:0">—</span><span><strong>Havale / EFT:</strong> 1–3 iş günü</span></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:var(--gold);flex-shrink:0">—</span><span><strong>Kapıda Ödeme:</strong> IBAN bilgisi ile 2–4 iş günü</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sağ: Form -->
+  <div>
+    <div class="ret-card">
+      <div class="ret-card-title">↩ İade / Değişim Talebi</div>
+      <div class="fg"><label class="fl">Ad Soyad</label><input class="fi" placeholder="Adınız Soyadınız" type="text"></div>
+      <div class="fg"><label class="fl">E-posta</label><input class="fi" placeholder="ornek@email.com" type="email"></div>
+      <div class="fg"><label class="fl">Sipariş Numarası</label><input class="fi" placeholder="HYZ-2025-XXXX" type="text"></div>
+      <div class="fg"><label class="fl">Talep Türü</label>
+        <select class="fs">
+          <option>İade — Para İadesi</option>
+          <option>Değişim — Farklı Beden</option>
+          <option>Değişim — Farklı Renk</option>
+          <option>Değişim — Farklı Ürün</option>
+          <option>Hasarlı / Hatalı Ürün</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">İade Nedeni</label>
+        <select class="fs">
+          <option>Beden uygun değil</option>
+          <option>Beklentimi karşılamadı</option>
+          <option>Yanlış ürün gönderildi</option>
+          <option>Hasarlı / defolu geldi</option>
+          <option>Renk farklı</option>
+          <option>Diğer</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Açıklama (isteğe bağlı)</label><textarea class="fta" placeholder="Ek bilgi vermek istiyorsanız buraya yazın…" style="min-height:100px"></textarea></div>
+      <button class="btn btn-g btn-full btn-lg" onclick="toast('İade talebiniz alındı ✓ E-posta ile bilgilendirileceksiniz.')">İade / Değişim Talebi Gönder</button>
+      <p style="font-size:12px;color:var(--ink3);margin-top:14px;line-height:1.7;text-align:center">Talebiniz <strong>1 iş günü</strong> içinde incelenir ve e-posta ile yanıtlanır.<br>Sorularınız için: <a href="mailto:iade@hayazeem.com" style="color:var(--gold)">iade@hayazeem.com</a></p>
+    </div>
+
+    <div style="background:rgba(201,169,110,.08);border:1px solid rgba(201,169,110,.25);padding:20px 24px;margin-top:4px">
+      <div style="font-size:13px;font-weight:500;margin-bottom:8px;color:var(--ink)">🚚 Kargo Bilgisi</div>
+      <div style="font-size:13px;color:var(--ink2);line-height:1.8">İade kargosunda <strong>MNG Kargo</strong> ile çalışıyoruz. Talebiniz onaylandıktan sonra size ücretsiz kargo etiketi e-posta ile iletilir. Ürünü herhangi bir MNG Kargo şubesine teslim edebilirsiniz.</div>
     </div>
   </div>
 </div>
