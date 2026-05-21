@@ -6,6 +6,127 @@
 <title>HAYAZEEEM — Premium Tesettür Moda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ── SUPABASE BAĞLANTISI ──
+const _SB_URL = 'https://vuusgbthelegugpcbdye.supabase.co';
+const _SB_KEY = 'sb_publishable_AEgf5P40juSWSFyGGTtOrQ_3gfL9Anl';
+const _sbClient = window.supabase.createClient(_SB_URL, _SB_KEY);
+
+// ── GLOBAL STATE ──
+const SB = {
+  user: null,
+  products: [],
+  categories: [],
+
+  // Ürünleri çek
+  async getProducts(filters = {}) {
+    let q = _sbClient.from('products').select('*').eq('is_active', true);
+    if (filters.category_id) q = q.eq('category_id', filters.category_id);
+    if (filters.featured) q = q.eq('is_featured', true);
+    if (filters.search) q = q.ilike('name_tr', `%${filters.search}%`);
+    const { data, error } = await q.order('created_at', { ascending: false });
+    if (error) { console.error('Ürün çekme hatası:', error); return []; }
+    return data || [];
+  },
+
+  // Kategorileri çek
+  async getCategories() {
+    const { data, error } = await _sbClient.from('categories').select('*').order('sort_order');
+    if (error) { console.error('Kategori hatası:', error); return []; }
+    return data || [];
+  },
+
+  // Sipariş oluştur
+  async createOrder(orderData) {
+    const { data, error } = await _sbClient.from('orders').insert([orderData]).select().single();
+    if (error) { console.error('Sipariş hatası:', error); return null; }
+    return data;
+  },
+
+  // Kullanıcı oturumu
+  async getSession() {
+    const { data: { session } } = await _sbClient.auth.getSession();
+    this.user = session?.user || null;
+    return this.user;
+  },
+
+  // Kayıt ol
+  async signUp(email, password, fullName) {
+    const { data, error } = await _sbClient.auth.signUp({
+      email, password,
+      options: { data: { full_name: fullName } }
+    });
+    if (error) return { error: error.message };
+    // Profil oluştur
+    if (data.user) {
+      await _sbClient.from('profiles').upsert({
+        id: data.user.id,
+        full_name: fullName
+      });
+    }
+    return { user: data.user };
+  },
+
+  // Giriş yap
+  async signIn(email, password) {
+    const { data, error } = await _sbClient.auth.signInWithPassword({ email, password });
+    if (error) return { error: error.message };
+    this.user = data.user;
+    return { user: data.user };
+  },
+
+  // Çıkış yap
+  async signOut() {
+    await _sbClient.auth.signOut();
+    this.user = null;
+  },
+
+  // Profil getir
+  async getProfile() {
+    if (!this.user) return null;
+    const { data } = await _sbClient.from('profiles').select('*').eq('id', this.user.id).single();
+    return data;
+  },
+
+  // Sipariş takip
+  async getOrderByCode(code) {
+    const { data } = await _sbClient.from('orders').select('*').eq('id', code).single();
+    return data;
+  }
+};
+
+// Sayfa yüklenince oturumu kontrol et
+document.addEventListener('DOMContentLoaded', async () => {
+  await SB.getSession();
+  updateNavAuth();
+
+  // Auth değişikliklerini dinle
+  _sbClient.auth.onAuthStateChange(async (event, session) => {
+    SB.user = session?.user || null;
+    updateNavAuth();
+  });
+});
+
+// Navbar auth durumunu güncelle
+function updateNavAuth() {
+  const loginBtn = document.getElementById('nav-login-btn');
+  const accountBtn = document.getElementById('nav-account-btn');
+  const accountName = document.getElementById('nav-account-name');
+  if (!loginBtn || !accountBtn) return;
+  if (SB.user) {
+    loginBtn.style.display = 'none';
+    accountBtn.style.display = 'flex';
+    if (accountName) {
+      const name = SB.user.user_metadata?.full_name || SB.user.email?.split('@')[0] || 'Hesabım';
+      accountName.textContent = name;
+    }
+  } else {
+    loginBtn.style.display = '';
+    accountBtn.style.display = 'none';
+  }
+}
+</script>
 <style>
 /* ═══════ TOKENS ═══════ */
 :root{
@@ -2010,7 +2131,32 @@ function goPayment(){
   document.getElementById('ck-s3').classList.add('active');
   window.scrollTo(0,0);
 }
-function confirmOrder(){
+async function confirmOrder(){
+  // Sipariş verilerini topla
+  const cartItems = Store._d?.cart || [];
+  const total = cartItems.reduce((sum, item) => sum + (item.price * item.qty), 0);
+  const shipping = total >= 500 ? 0 : 49.90;
+
+  // Teslimat adresini al
+  const addrInputs = document.querySelectorAll('#ck-address input, #ck-address select');
+  const address = {};
+  addrInputs.forEach(inp => { if(inp.name) address[inp.name] = inp.value; });
+
+  // Supabase'e kaydet
+  const orderData = {
+    user_id: SB.user?.id || null,
+    guest_email: !SB.user ? (document.getElementById('ck-email')?.value || null) : null,
+    items: cartItems,
+    subtotal: total,
+    shipping: shipping,
+    total: total + shipping,
+    status: 'pending',
+    shipping_address: address
+  };
+
+  const order = await SB.createOrder(orderData);
+
+  // UI güncelle
   Store.cartClear();
   document.getElementById('ck-payment').style.display='none';
   document.getElementById('ck-confirm').style.display='block';
@@ -2018,6 +2164,13 @@ function confirmOrder(){
   s3.classList.remove('active');s3.classList.add('done');
   s3.querySelector('.ck-num').textContent='✓';
   document.getElementById('ck-s4').classList.add('active');
+
+  // Sipariş numarasını göster
+  if(order) {
+    const orderNumEl = document.getElementById('ck-order-num');
+    if(orderNumEl) orderNumEl.textContent = 'HYZ-' + order.id.slice(0,8).toUpperCase();
+  }
+
   renderNavBadge();
   window.scrollTo(0,0);
 }
@@ -2788,37 +2941,47 @@ function goSearchTag(val){
 
 
 /* ── AUTH FONKSİYONLARI ── */
-function doLogin(){
+async function doLogin(){
   const email = document.getElementById('login-email')?.value?.trim() ||
                 document.querySelector('#login-form input[type=email]')?.value?.trim();
   const pass  = document.querySelector('#login-form input[type=password]')?.value;
   if(!email){ toast('Lütfen e-posta adresinizi girin'); return; }
   if(!pass)  { toast('Lütfen şifrenizi girin'); return; }
-  // Demo: herhangi bir email/şifre kabul et
-  const name = email.split('@')[0];
-  Store.login(name, email);
-  renderAuth();
-  updateAccUser();
-  toast('Hoş geldiniz, '+name+' ✓');
+  toast('Giriş yapılıyor...');
+  const { user, error } = await SB.signIn(email, pass);
+  if(error){ toast('Hata: ' + error); return; }
+  const name = user.user_metadata?.full_name || email.split('@')[0];
+  // Eski Store ile uyum
+  if(window.Store) Store.login(name, email);
+  renderAuth && renderAuth();
+  updateAccUser && updateAccUser();
+  toast('Hoş geldiniz, ' + name + ' ✓');
   go('account');
 }
 
-function doRegister(){
+async function doRegister(){
   const inputs = document.querySelectorAll('#register-form input');
   const fname = inputs[0]?.value?.trim();
   const lname = inputs[1]?.value?.trim();
   const email = inputs[2]?.value?.trim();
+  const pass  = inputs[3]?.value;
   if(!fname || !email){ toast('Lütfen ad ve e-posta alanlarını doldurun'); return; }
-  Store.login(fname+' '+lname, email);
-  renderAuth();
-  updateAccUser();
-  toast('Hesabınız oluşturuldu, hoş geldiniz ✓');
+  if(!pass || pass.length < 6){ toast('Şifre en az 6 karakter olmalı'); return; }
+  toast('Hesap oluşturuluyor...');
+  const fullName = (fname + ' ' + (lname||'')).trim();
+  const { user, error } = await SB.signUp(email, pass, fullName);
+  if(error){ toast('Hata: ' + error); return; }
+  if(window.Store) Store.login(fullName, email);
+  renderAuth && renderAuth();
+  updateAccUser && updateAccUser();
+  toast('Hesabınız oluşturuldu ✓ E-postanızı onaylayın');
   go('account');
 }
 
-function doLogout(){
-  Store.logout();
-  renderAuth();
+async function doLogout(){
+  await SB.signOut();
+  if(window.Store) Store.logout();
+  renderAuth && renderAuth();
   toast('Çıkış yapıldı');
   go('home');
 }
