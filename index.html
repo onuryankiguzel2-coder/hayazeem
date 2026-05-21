@@ -96,6 +96,39 @@ const SB = {
   }
 };
 
+// ── E-POSTA DOĞRULAMA TOKEN YAKALAMA ──
+(async function handleAuthCallback() {
+  const hash = window.location.hash;
+  const qp = new URLSearchParams(window.location.search);
+  const hp = hash ? new URLSearchParams(hash.substring(1)) : new URLSearchParams();
+
+  const accessToken  = qp.get('access_token')  || hp.get('access_token');
+  const refreshToken = qp.get('refresh_token') || hp.get('refresh_token');
+  const type         = qp.get('type')          || hp.get('type');
+
+  if (accessToken && refreshToken) {
+    try {
+      const { data, error } = await _sbClient.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken
+      });
+      if (!error && data.user) {
+        SB.user = data.user;
+        window.history.replaceState({}, document.title, window.location.pathname);
+        if (type === 'signup') {
+          setTimeout(() => {
+            updateNavAuth();
+            toast('E-posta adresiniz onaylandı ✓ Hoş geldiniz!');
+            go('account');
+          }, 800);
+        } else if (type === 'recovery') {
+          setTimeout(() => { go('reset'); }, 800);
+        }
+      }
+    } catch(e) { console.error('Auth callback error:', e); }
+  }
+})();
+
 // Sayfa yüklenince oturumu kontrol et
 document.addEventListener('DOMContentLoaded', async () => {
   await SB.getSession();
