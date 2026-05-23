@@ -55,17 +55,38 @@ const SB = {
   async signUp(email, password, fullName) {
     const { data, error } = await _sbClient.auth.signUp({
       email, password,
-      options: { data: { full_name: fullName } }
+      options: {
+        data: { full_name: fullName },
+        emailRedirectTo: 'https://onuryankiguzel2-coder.github.io/hayazeem'
+      }
     });
     if (error) return { error: error.message };
-    // Profil oluştur
+    // E-posta onayı beklenmeden direkt oturum aç
     if (data.user) {
       await _sbClient.from('profiles').upsert({
         id: data.user.id,
         full_name: fullName
       });
+      // Oturumu direkt set et
+      if (data.session) {
+        SB.user = data.user;
+      } else {
+        // E-posta onayı açıksa bile giriş dene
+        const { data: signInData } = await _sbClient.auth.signInWithPassword({ email, password });
+        if (signInData?.user) SB.user = signInData.user;
+      }
     }
     return { user: data.user };
+  },
+
+  // Google ile giriş
+  async signInWithGoogle() {
+    const { data, error } = await _sbClient.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: 'https://hayazeem.onrender.com' }
+    });
+    if (error) return { error: error.message };
+    return { data };
   },
 
   // Giriş yap
@@ -2355,7 +2376,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         <h1 class="auth-title">Hoş Geldiniz</h1>
         <p class="auth-sub">Hesabınıza giriş yapın.</p>
         <div class="social-login">
-          <button class="soc-btn" onclick="toast('Google ile giriş')"><span>G</span> Google</button>
+          <button class="soc-btn" onclick="SB.signInWithGoogle()"><span>G</span> Google</button>
           <button class="soc-btn" onclick="toast('Apple ile giriş')"><span>🍎</span> Apple</button>
         </div>
         <div class="divider"><span>veya e-posta ile</span></div>
@@ -3005,10 +3026,14 @@ async function doRegister(){
   const { user, error } = await SB.signUp(email, pass, fullName);
   if(error){ toast('Hata: ' + error); return; }
   if(window.Store) Store.login(fullName, email);
-  renderAuth && renderAuth();
-  updateAccUser && updateAccUser();
-  toast('Hesabınız oluşturuldu ✓ E-postanızı onaylayın');
-  go('account');
+  updateNavAuth();
+  if(SB.user){
+    toast('Hoş geldiniz, ' + fullName + ' ✓');
+    go('account');
+  } else {
+    toast('Hesabınız oluşturuldu ✓ Lütfen e-postanızı onaylayın, ardından giriş yapın.');
+    go('login');
+  }
 }
 
 async function doLogout(){
