@@ -259,7 +259,11 @@ img{display:block;object-fit:cover}
     <div class="sb-sec" style="margin-top:auto">
       <div class="sb-lbl">Sistem</div>
       <button class="sb-item" onclick="showAP('settings',this)">⚙️ Ayarlar</button>
-      <button class="sb-item" style="color:rgba(201,169,110,.7);border-top:1px solid rgba(255,255,255,.05);margin-top:4px" onclick="window.open('store.html','_blank')">↩ Siteyi Aç</button>
+      <button class="sb-item" style="color:rgba(201,169,110,.7);border-top:1px solid rgba(255,255,255,.05);margin-top:4px" onclick="window.open('index.html','_blank')">↩ Siteyi Aç</button>
+      <div style="padding:12px 16px;border-top:1px solid rgba(255,255,255,.06);margin-top:4px">
+        <div style="font-size:11px;color:rgba(250,247,242,.4);margin-bottom:6px" id="admin-user-name">—</div>
+        <button onclick="adminLogout()" style="background:rgba(201,169,110,.12);border:1px solid rgba(201,169,110,.2);color:var(--gold);font-size:11px;letter-spacing:.1em;padding:7px 14px;cursor:pointer;width:100%;text-align:center">Çıkış Yap</button>
+      </div>
     </div>
   </nav>
 </aside>
@@ -441,23 +445,34 @@ img{display:block;object-fit:cover}
   <div class="topbar">
     <div class="page-title">Yeni Ürün Ekle</div>
     <div style="display:flex;gap:8px">
-      <button class="btn btn-o btn-sm" onclick="toast('Taslak kaydedildi')">Taslak Kaydet</button>
-      <button class="btn btn-g btn-sm" onclick="toast('Ürün yayınlandı ✓')">Yayınla</button>
+      <button class="btn btn-o btn-sm" onclick="saveProd('draft')">Taslak Kaydet</button>
+      <button class="btn btn-g btn-sm" onclick="saveProd('active')">Yayınla</button>
     </div>
   </div>
   <div style="display:grid;grid-template-columns:1fr 380px;gap:16px" id="prod-form-grid">
     <div>
       <div class="af-card">
         <div class="af-title">Temel Bilgiler</div>
-        <label class="afl">Ürün Adı</label><input class="afi" placeholder="örn. Medine İpek Abaya" type="text">
-        <label class="afl">Açıklama</label><textarea class="afta" placeholder="Ürün açıklaması…"></textarea>
+        <label class="afl">Ürün Adı (TR)</label><input class="afi" id="prod-name-tr" placeholder="örn. Medine İpek Abaya" type="text">
+        <label class="afl">Ürün Adı (EN)</label><input class="afi" id="prod-name-en" placeholder="e.g. Medina Silk Abaya" type="text">
+        <label class="afl">Ürün Adı (AR)</label><input class="afi" id="prod-name-ar" placeholder="مثال: عباءة حرير المدينة" type="text" dir="rtl">
+        <label class="afl">Açıklama (TR)</label><textarea class="afta" id="prod-desc-tr" placeholder="Ürün açıklaması…"></textarea>
         <div class="afrow">
-          <div><label class="afl">Kategori</label><select class="afs"><option>Kategori seçin</option><option>Abayalar</option><option>Tunikler</option><option>Elbiseler</option><option>Paltolar</option><option>Setler</option></select></div>
-          <div><label class="afl">SKU</label><input class="afi" placeholder="HYZ-XXX" type="text"></div>
+          <div><label class="afl">Kategori</label>
+            <select class="afs" id="prod-cat">
+              <option value="">Kategori seçin</option>
+              <option>Abayalar</option><option>Tunikler</option><option>Elbiseler</option><option>Paltolar</option><option>Setler</option>
+            </select>
+          </div>
+          <div><label class="afl">SKU</label><input class="afi" id="prod-sku" placeholder="HYZ-XXX" type="text"></div>
         </div>
         <div class="afrow">
-          <div><label class="afl">Satış Fiyatı (₺)</label><input class="afi" placeholder="0.00" type="number"></div>
-          <div><label class="afl">İndirimli Fiyat (₺)</label><input class="afi" placeholder="0.00" type="number"></div>
+          <div><label class="afl">Satış Fiyatı (₺)</label><input class="afi" id="prod-price" placeholder="0.00" type="number"></div>
+          <div><label class="afl">İndirimli Fiyat (₺)</label><input class="afi" id="prod-orig-price" placeholder="0.00" type="number"></div>
+        </div>
+        <div class="afrow">
+          <div><label class="afl">Toplam Stok</label><input class="afi" id="prod-stock" placeholder="0" type="number"></div>
+          <div><label class="afl">Kumaş</label><input class="afi" id="prod-fabric" placeholder="%80 Medine İpeği, %20 Elastan" type="text"></div>
         </div>
       </div>
 
@@ -479,67 +494,42 @@ img{display:block;object-fit:cover}
           <span class="v-chip">Zeytin <button class="v-chip-x" onclick="rmChip(this)">×</button></span>
           <input class="add-chip" placeholder="+ Ekle" onkeydown="addChip(event,'color-chips')">
         </div>
-        <div style="font-size:12px;color:var(--ink3);margin:8px 0 10px;display:flex;align-items:center;gap:6px">
-          <span style="width:7px;height:7px;border-radius:50%;background:var(--gold);display:inline-block;flex-shrink:0"></span>
-          Oluşturulan varyantlar — stok miktarlarını girin:
-        </div>
-        <div style="overflow-x:auto">
-          <table class="vt">
-            <thead><tr><th>Renk</th><th>Beden</th><th>Stok</th><th>Fiyat Farkı (₺)</th></tr></thead>
-            <tbody>
-              <tr><td>Krem</td><td>XS</td><td><input class="vt-in" value="15" type="number" min="0"></td><td><input class="vt-in" value="0" type="number" style="width:80px"></td></tr>
-              <tr><td>Krem</td><td>S</td><td><input class="vt-in" value="22" type="number" min="0"></td><td><input class="vt-in" value="0" type="number" style="width:80px"></td></tr>
-              <tr><td>Krem</td><td>M</td><td><input class="vt-in" value="18" type="number" min="0"></td><td><input class="vt-in" value="0" type="number" style="width:80px"></td></tr>
-              <tr><td>Krem</td><td>L</td><td><input class="vt-in" value="12" type="number" min="0"></td><td><input class="vt-in" value="0" type="number" style="width:80px"></td></tr>
-              <tr><td>Krem</td><td>XL</td><td><input class="vt-in" value="8" type="number" min="0"></td><td><input class="vt-in" value="0" type="number" style="width:80px"></td></tr>
-              <tr><td>Bej</td><td>XS</td><td><input class="vt-in" value="10" type="number" min="0"></td><td><input class="vt-in" value="0" type="number" style="width:80px"></td></tr>
-              <tr><td>Bej</td><td>S</td><td><input class="vt-in" value="20" type="number" min="0"></td><td><input class="vt-in" value="0" type="number" style="width:80px"></td></tr>
-              <tr><td>Bej</td><td>M</td><td><input class="vt-in" value="25" type="number" min="0"></td><td><input class="vt-in" value="0" type="number" style="width:80px"></td></tr>
-              <tr><td>Zeytin</td><td>S</td><td><input class="vt-in" value="14" type="number" min="0"></td><td><input class="vt-in" value="0" type="number" style="width:80px"></td></tr>
-              <tr><td>Zeytin</td><td>M</td><td><input class="vt-in" value="17" type="number" min="0"></td><td><input class="vt-in" value="0" type="number" style="width:80px"></td></tr>
-            </tbody>
-          </table>
-        </div>
       </div>
 
       <div class="af-card">
         <div class="af-title">Kumaş & Bakım</div>
-        <label class="afl">Kumaş Bileşimi</label><input class="afi" placeholder="%80 Medine İpeği, %20 Elastan" type="text">
+        <label class="afl">Kumaş Bileşimi</label><input class="afi" id="prod-composition" placeholder="%80 Medine İpeği, %20 Elastan" type="text">
         <div class="afrow">
-          <div><label class="afl">Kumaş Ağırlığı</label><input class="afi" placeholder="85 gr/m²" type="text"></div>
-          <div><label class="afl">Menşei</label><input class="afi" placeholder="Türkiye, Bursa" type="text"></div>
+          <div><label class="afl">Kumaş Ağırlığı</label><input class="afi" id="prod-weight" placeholder="85 gr/m²" type="text"></div>
+          <div><label class="afl">Menşei</label><input class="afi" id="prod-origin" placeholder="Türkiye, Bursa" type="text"></div>
         </div>
         <label class="afl">Bakım Talimatları</label>
-        <input class="afi" placeholder="30°C hassas yıkama, düşük ütü…" type="text">
+        <input class="afi" id="prod-care" placeholder="30°C hassas yıkama, düşük ütü…" type="text">
       </div>
     </div>
 
     <div>
       <div class="af-card">
         <div class="af-title">Ürün Görselleri</div>
-        <div class="upload-zone" onclick="toast('Dosya seçici açıldı')" tabindex="0">
+        <div class="upload-zone" id="upload-zone" tabindex="0">
           <span class="up-icon">📁</span>
-          <div class="up-text">Görselleri buraya sürükleyin<br><span style="font-size:11px;color:var(--ink4)">JPG, PNG · Maks. 5 MB</span></div>
+          <div class="up-text">Görselleri buraya sürükleyin veya tıklayın<br><span style="font-size:11px;color:var(--ink4)">JPG, PNG · Maks. 5 MB</span></div>
+          <input type="file" id="prod-images" multiple accept="image/*" style="display:none" onchange="handleImageUpload(this)">
         </div>
-        <div class="up-imgs">
-          <div class="up-img"><img src="https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=200&q=70" alt=""><button class="up-del" onclick="toast('Görsel kaldırıldı')">×</button></div>
-          <div class="up-img"><img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=200&q=70" alt=""><button class="up-del" onclick="toast('Görsel kaldırıldı')">×</button></div>
-          <div class="up-img" style="background:var(--stone);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:24px;color:var(--warm)" onclick="toast('Görsel ekle')">+</div>
-          <div class="up-img" style="background:var(--stone);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:24px;color:var(--warm)" onclick="toast('Görsel ekle')">+</div>
-        </div>
+        <div class="up-imgs" id="image-previews"></div>
       </div>
       <div class="af-card">
         <div class="af-title">SEO & Yayın</div>
-        <label class="afl">Meta Başlık (TR)</label><input class="afi" placeholder="Arama motoru başlığı (max 60 karakter)" type="text">
-        <label class="afl">Meta Açıklama</label><textarea class="afta" placeholder="Arama sonuçlarında görünecek açıklama…" style="min-height:72px"></textarea>
-        <label class="afl">URL Slug</label><input class="afi" placeholder="medine-ipek-abaya" type="text">
+        <label class="afl">Meta Başlık (TR)</label><input class="afi" id="prod-meta-title" placeholder="Arama motoru başlığı (max 60 karakter)" type="text">
+        <label class="afl">Meta Açıklama</label><textarea class="afta" id="prod-meta-desc" placeholder="Arama sonuçlarında görünecek açıklama…" style="min-height:72px"></textarea>
+        <label class="afl">URL Slug</label><input class="afi" id="prod-slug" placeholder="medine-ipek-abaya" type="text">
         <label class="afl">Durum</label>
-        <select class="afs"><option>Taslak</option><option>Yayında</option><option>Gizli</option><option>Arşiv</option></select>
+        <select class="afs" id="prod-status"><option value="draft">Taslak</option><option value="active">Yayında</option><option value="hidden">Gizli</option></select>
         <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);cursor:pointer;margin-bottom:10px">
-          <input type="checkbox" checked style="accent-color:var(--gold)"> Anasayfada öne çıkar
+          <input type="checkbox" id="prod-featured" style="accent-color:var(--gold)"> Anasayfada öne çıkar
         </label>
         <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);cursor:pointer">
-          <input type="checkbox" style="accent-color:var(--gold)"> Yeni ürün etiketi göster
+          <input type="checkbox" id="prod-is-new" style="accent-color:var(--gold)"> Yeni ürün etiketi göster
         </label>
       </div>
     </div>
@@ -1000,6 +990,226 @@ img{display:block;object-fit:cover}
 
 <!-- Mobile toggle -->
 <button class="sb-mobile-toggle" onclick="toggleSB()" id="sb-tog" aria-label="Menüyü aç">☰</button>
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ════ SUPABASE ADMIN ════ */
+const _SB_URL='https://vuusgbthelegugpcbdye.supabase.co';
+const _SB_KEY='sb_publishable_AEgf5P40juSWSFyGGTtOrQ_3gfL9Anl';
+const _sb=window.supabase.createClient(_SB_URL,_SB_KEY);
+
+/* ── Admin Login Modal ── */
+function showAdminLogin(){
+  let m=document.getElementById('adm-login');
+  if(!m){
+    m=document.createElement('div');m.id='adm-login';
+    m.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(20,14,4,.95);display:flex;align-items:center;justify-content:center';
+    m.innerHTML=`<div style="background:#fff;width:340px;padding:40px;text-align:center">
+      <div style="font-family:serif;font-size:22px;font-weight:300;letter-spacing:.25em;margin-bottom:4px">HAYAZEEEM</div>
+      <div style="font-size:10px;letter-spacing:.3em;color:#999;margin-bottom:28px;text-transform:uppercase">Admin Paneli</div>
+      <input id="adm-e" type="email" placeholder="E-posta" style="width:100%;padding:11px 12px;border:1px solid #e0d8cc;margin-bottom:10px;font-size:13px;box-sizing:border-box;outline:none">
+      <input id="adm-p" type="password" placeholder="Şifre" style="width:100%;padding:11px 12px;border:1px solid #e0d8cc;margin-bottom:16px;font-size:13px;box-sizing:border-box;outline:none" onkeydown="if(event.key==='Enter')adminLogin()">
+      <button onclick="adminLogin()" style="width:100%;padding:13px;background:#2a1f10;color:#fff;border:none;font-size:11px;letter-spacing:.2em;cursor:pointer;text-transform:uppercase">Giriş Yap</button>
+      <div id="adm-err" style="color:#c0392b;font-size:12px;margin-top:10px;min-height:18px"></div>
+    </div>`;
+    document.body.appendChild(m);
+  }
+  m.style.display='flex';
+}
+async function adminLogin(){
+  const e=document.getElementById('adm-e')?.value?.trim();
+  const p=document.getElementById('adm-p')?.value;
+  const err=document.getElementById('adm-err');
+  if(!e||!p){if(err)err.textContent='E-posta ve şifre giriniz';return;}
+  const {data,error}=await _sb.auth.signInWithPassword({email:e,password:p});
+  if(error){if(err)err.textContent='Hatalı giriş bilgileri';return;}
+  document.getElementById('adm-login').style.display='none';
+  const nameEl=document.getElementById('admin-user-name');
+  if(nameEl)nameEl.textContent=data.user.user_metadata?.full_name||data.user.email;
+  toast('Hoş geldiniz ✓');
+  loadProducts();loadOrders();
+}
+async function adminLogout(){
+  await _sb.auth.signOut();showAdminLogin();
+}
+
+/* ── Görsel Yükleme ── */
+let _imgs=[];
+function handleImageUpload(input){
+  Array.from(input.files).forEach(file=>{
+    if(file.size>5*1024*1024){toast('Max 5MB');return;}
+    const r=new FileReader();
+    r.onload=e=>{
+      _imgs.push(e.target.result);
+      const prev=document.getElementById('image-previews');
+      if(prev){const d=document.createElement('div');d.className='up-img';d.innerHTML=`<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover"><button class="up-del" onclick="this.closest('.up-img').remove();_imgs.splice(_imgs.indexOf('${e.target.result}'),1)">×</button>`;prev.appendChild(d);}
+    };r.readAsDataURL(file);
+  });
+}
+
+/* ── Ürün Kaydet → Supabase ── */
+async function saveProd(statusOverride){
+  const name=document.getElementById('prod-name-tr')?.value?.trim();
+  const price=parseFloat(document.getElementById('prod-price')?.value)||0;
+  if(!name){toast('Ürün adı zorunlu');return;}
+  if(!price){toast('Fiyat zorunlu');return;}
+  const sizes=[...document.querySelectorAll('#size-chips .v-chip')].map(c=>c.textContent.replace('×','').trim());
+  const colors=[...document.querySelectorAll('#color-chips .v-chip')].map(c=>c.textContent.replace('×','').trim());
+  const isActive=(statusOverride||document.getElementById('prod-status')?.value)==='active';
+  const prodData={
+    name_tr:name,
+    name_en:document.getElementById('prod-name-en')?.value?.trim()||'',
+    name_ar:document.getElementById('prod-name-ar')?.value?.trim()||'',
+    description_tr:document.getElementById('prod-desc-tr')?.value?.trim()||'',
+    price:price,
+    original_price:parseFloat(document.getElementById('prod-orig-price')?.value)||null,
+    stock:parseInt(document.getElementById('prod-stock')?.value)||0,
+    sizes:sizes,colors:colors,images:_imgs.slice(0,5),
+    is_active:isActive,
+    is_featured:document.getElementById('prod-featured')?.checked||false,
+  };
+  const btn=document.querySelector('#ap-addprod .btn-g');
+  if(btn){btn.textContent='Kaydediliyor…';btn.disabled=true;}
+  const {error}=await _sb.from('products').insert([prodData]);
+  if(btn){btn.textContent='Yayınla';btn.disabled=false;}
+  if(error){toast('Hata: '+error.message);console.error(error);return;}
+  toast(isActive?'Ürün yayınlandı ✓':'Taslak kaydedildi ✓');
+  // Formu sıfırla
+  ['prod-name-tr','prod-name-en','prod-name-ar','prod-desc-tr','prod-price','prod-orig-price','prod-stock','prod-slug'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  _imgs=[];const prev=document.getElementById('image-previews');if(prev)prev.innerHTML='';
+  loadProducts();showAP('products',null);
+}
+
+/* ── Ürünleri Listele ── */
+async function loadProducts(){
+  const {data,error}=await _sb.from('products').select('*').order('created_at',{ascending:false});
+  if(error||!data)return;
+  const tbody=document.querySelector('#ap-products .tbl tbody');
+  if(!tbody)return;
+  tbody.innerHTML=data.map(p=>`<tr>
+    <td><div style="display:flex;align-items:center;gap:10px">
+      ${p.images&&p.images[0]?`<img src="${p.images[0]}" style="width:40px;height:40px;object-fit:cover;border-radius:2px">`:'<div style="width:40px;height:40px;background:var(--bone);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:18px">👗</div>'}
+      <div><div style="font-size:13px;font-weight:500">${p.name_tr||''}</div><div style="font-size:11px;color:var(--ink3)">${(p.sizes||[]).join(', ')}</div></div>
+    </div></td>
+    <td style="font-family:var(--fd);font-size:16px">₺${(p.price||0).toLocaleString('tr-TR')}</td>
+    <td><span class="badge ${p.stock>10?'b-done':p.stock>0?'b-ship':'b-cancel'}">${p.stock||0}</span></td>
+    <td><span class="badge ${p.is_active?'b-done':'b-pend'}">${p.is_active?'Yayında':'Taslak'}</span></td>
+    <td style="display:flex;gap:6px">
+      <button class="btn btn-o btn-sm" onclick="editProduct('${p.id}')">Düzenle</button>
+      <button class="btn-ico" onclick="deleteProduct('${p.id}',this)">✕</button>
+    </td>
+  </tr>`).join('');
+}
+
+async function deleteProduct(id,btn){
+  if(!confirm('Ürünü silmek istiyor musunuz?'))return;
+  const {error}=await _sb.from('products').delete().eq('id',id);
+  if(error){toast('Hata: '+error.message);return;}
+  btn.closest('tr').remove();toast('Ürün silindi ✓');
+}
+
+async function editProduct(id){
+  const {data,error}=await _sb.from('products').select('*').eq('id',id).single();
+  if(error||!data){toast('Yüklenemedi');return;}
+  showAP('addprod',null);
+  setTimeout(()=>{
+    ['prod-name-tr','prod-name-en','prod-name-ar','prod-desc-tr','prod-price','prod-orig-price','prod-stock'].forEach(fid=>{
+      const key=fid.replace('prod-','').replace('-','_').replace('name_tr','name_tr').replace('name_en','name_en').replace('name_ar','name_ar').replace('desc_tr','description_tr').replace('orig_price','original_price');
+      const el=document.getElementById(fid);if(el)el.value=data[key]||data[fid.replace('prod-','')]||'';
+    });
+    document.getElementById('prod-name-tr').value=data.name_tr||'';
+    document.getElementById('prod-price').value=data.price||'';
+    document.getElementById('prod-stock').value=data.stock||'';
+    if(document.getElementById('prod-featured'))document.getElementById('prod-featured').checked=data.is_featured||false;
+    _imgs=data.images||[];
+    const prev=document.getElementById('image-previews');
+    if(prev)prev.innerHTML=_imgs.map(img=>`<div class="up-img"><img src="${img}" style="width:100%;height:100%;object-fit:cover"><button class="up-del" onclick="this.closest('.up-img').remove()">×</button></div>`).join('');
+    const saveBtn=document.querySelector('#ap-addprod .btn-g');
+    if(saveBtn){saveBtn.textContent='Güncelle';saveBtn.onclick=()=>updateProduct(id);}
+  },150);
+}
+
+async function updateProduct(id){
+  const name=document.getElementById('prod-name-tr')?.value?.trim();
+  const price=parseFloat(document.getElementById('prod-price')?.value)||0;
+  if(!name||!price){toast('Ad ve fiyat zorunlu');return;}
+  const {error}=await _sb.from('products').update({
+    name_tr:name,name_en:document.getElementById('prod-name-en')?.value||'',
+    price:price,stock:parseInt(document.getElementById('prod-stock')?.value)||0,
+    images:_imgs,is_featured:document.getElementById('prod-featured')?.checked||false,is_active:true
+  }).eq('id',id);
+  if(error){toast('Hata: '+error.message);return;}
+  toast('Ürün güncellendi ✓');
+  loadProducts();showAP('products',null);
+  const saveBtn=document.querySelector('#ap-addprod .btn-g');
+  if(saveBtn){saveBtn.textContent='Yayınla';saveBtn.onclick=()=>saveProd('active');}
+}
+
+/* ── Siparişler ── */
+async function loadOrders(){
+  const {data,error}=await _sb.from('orders').select('*').order('created_at',{ascending:false});
+  if(error||!data)return;
+  const tbody=document.querySelector('#ap-orders .tbl tbody');
+  if(!tbody)return;
+  const sm={pending:'Bekliyor',confirmed:'Onaylandı',shipped:'Kargoda',delivered:'Teslim',cancelled:'İptal'};
+  const bm={pending:'b-pend',confirmed:'b-ship',shipped:'b-ship',delivered:'b-done',cancelled:'b-cancel'};
+  tbody.innerHTML=data.map(o=>{
+    const items=Array.isArray(o.items)?o.items:[];
+    const sum=items.map(i=>i.name_tr||i.name||'Ürün').join(', ').slice(0,35)||'—';
+    const dt=new Date(o.created_at).toLocaleDateString('tr-TR');
+    const st=o.status||'pending';
+    return `<tr>
+      <td style="font-weight:500">#HYZ-${o.id.slice(0,8).toUpperCase()}</td>
+      <td>${o.guest_email||'—'}</td>
+      <td style="color:var(--ink3);font-size:12px">${sum}</td>
+      <td style="font-family:var(--fd);font-size:16px">₺${(o.total||0).toLocaleString('tr-TR')}</td>
+      <td style="color:var(--ink3)">${dt}</td>
+      <td><span class="badge ${bm[st]||'b-pend'}">${sm[st]||st}</span></td>
+      <td style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-o btn-sm" onclick="openOrderDetail('#HYZ-${o.id.slice(0,8).toUpperCase()}')">Detay</button>
+        <button class="btn btn-o btn-sm" onclick="printCargoLabel('#HYZ-${o.id.slice(0,8).toUpperCase()}')">🖨</button>
+        <select class="afs" style="padding:6px 8px;font-size:11px;margin:0;height:32px" onchange="updateOrderStatus('${o.id}',this.value,this)">
+          <option value="">Durum ▾</option>
+          <option value="confirmed">Onayla</option><option value="shipped">Kargoya Ver</option>
+          <option value="delivered">Teslim Edildi</option><option value="cancelled">İptal Et</option>
+        </select>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function updateOrderStatus(id,status,sel){
+  if(!status)return;
+  const {error}=await _sb.from('orders').update({status,updated_at:new Date().toISOString()}).eq('id',id);
+  if(error){toast('Hata: '+error.message);return;}
+  if(sel)sel.value='';
+  toast('Sipariş durumu güncellendi ✓');
+  loadOrders();
+}
+
+/* ── DOMContentLoaded ── */
+document.addEventListener('DOMContentLoaded',async()=>{
+  // Upload zone
+  const zone=document.getElementById('upload-zone');
+  const inp=document.getElementById('prod-images');
+  if(zone&&inp)zone.addEventListener('click',()=>inp.click());
+  // Slug otofill
+  const nameI=document.getElementById('prod-name-tr');
+  const slugI=document.getElementById('prod-slug');
+  if(nameI&&slugI)nameI.addEventListener('input',()=>{
+    slugI.value=nameI.value.toLowerCase().replace(/\s+/g,'-').replace(/[ğ]/g,'g').replace(/[ü]/g,'u').replace(/[ş]/g,'s').replace(/[ı]/g,'i').replace(/[ö]/g,'o').replace(/[ç]/g,'c').replace(/[^a-z0-9-]/g,'');
+  });
+  // Auth kontrol
+  const {data:{session}}=await _sb.auth.getSession();
+  if(!session){showAdminLogin();}
+  else{
+    const nameEl=document.getElementById('admin-user-name');
+    if(nameEl)nameEl.textContent=session.user.user_metadata?.full_name||session.user.email;
+    loadProducts();loadOrders();
+  }
+});
+</script>
 
 <script>
 /* SIDEBAR */
