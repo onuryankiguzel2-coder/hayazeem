@@ -1024,6 +1024,12 @@ async function adminLogin(){
   if(!e||!p){if(err)err.textContent='E-posta ve şifre giriniz';return;}
   const {data,error}=await _sb.auth.signInWithPassword({email:e,password:p});
   if(error){if(err)err.textContent='Hatalı giriş bilgileri';return;}
+  // Admin kontrolü
+  const {data:adminData}=await _sb.from('admins').select('role').eq('email',e).single();
+  if(!adminData){
+    await _sb.auth.signOut();
+    if(err)err.textContent='Bu hesabın admin yetkisi yok';return;
+  }
   document.getElementById('adm-login').style.display='none';
   const nameEl=document.getElementById('admin-user-name');
   if(nameEl)nameEl.textContent=data.user.user_metadata?.full_name||data.user.email;
@@ -1204,6 +1210,13 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const {data:{session}}=await _sb.auth.getSession();
   if(!session){showAdminLogin();}
   else{
+    // Admin yetkisi kontrol et
+    const {data:adminData}=await _sb.from('admins').select('role').eq('email',session.user.email).single();
+    if(!adminData){
+      await _sb.auth.signOut();
+      showAdminLogin();
+      return;
+    }
     const nameEl=document.getElementById('admin-user-name');
     if(nameEl)nameEl.textContent=session.user.user_metadata?.full_name||session.user.email;
     loadProducts();loadOrders();
