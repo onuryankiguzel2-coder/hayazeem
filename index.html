@@ -1816,7 +1816,7 @@ function getFiltered(){
 /* ─── CARD BUILDER ─── */
 function makeCard(p,showAddBtn=false){
   const isFav=Store.favHas(p.id);
-  const pid=JSON.stringify(String(p.id));
+  const pid="'"+String(p.id).replace(/'/g,"\\'")+"'";
   const dots=(p.colors||[]).map((c,i)=>`<div class="cdot${i===0?' active':''}" style="background:${c}" onclick="event.stopPropagation()"></div>`).join('');
   return `<div class="pc" onclick="openProduct(${pid})">
     <div class="pc-img">
