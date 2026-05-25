@@ -158,27 +158,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Auth değişikliklerini dinle
   _sbClient.auth.onAuthStateChange(async (event, session) => {
     SB.user = session?.user || null;
-    updateNavAuth();
+    if(SB.user && !Store.isLoggedIn){
+      const name = SB.user.user_metadata?.full_name || SB.user.email?.split('@')[0] || 'Hesabım';
+      Store.login(name, SB.user.email);
+    } else if(!SB.user && Store.isLoggedIn){
+      Store.logout();
+    }
+    renderAuth();
+    updateAccUser && updateAccUser();
   });
 });
 
 // Navbar auth durumunu güncelle
 function updateNavAuth() {
-  const loginBtn = document.getElementById('nav-login-btn');
-  const accountBtn = document.getElementById('nav-account-btn');
-  const accountName = document.getElementById('nav-account-name');
-  if (!loginBtn || !accountBtn) return;
-  if (SB.user) {
-    loginBtn.style.display = 'none';
-    accountBtn.style.display = 'flex';
-    if (accountName) {
-      const name = SB.user.user_metadata?.full_name || SB.user.email?.split('@')[0] || 'Hesabım';
-      accountName.textContent = name;
-    }
-  } else {
-    loginBtn.style.display = '';
-    accountBtn.style.display = 'none';
-  }
+  renderAuth();
+  updateAccUser && updateAccUser();
 }
 </script>
 <style>
@@ -1919,14 +1913,23 @@ function renderAuth(){
   const accountBtn = document.getElementById('nav-account-btn');
   const nameSpan   = document.getElementById('nav-account-name');
   const userIcon   = document.getElementById('nav-user-icon');
-  const loggedIn   = Store.isLoggedIn;
+
+  // Supabase oturumu varsa Store ile senkronize et
+  const sbUser = SB.user;
+  if(sbUser && !Store.isLoggedIn){
+    const name = sbUser.user_metadata?.full_name || sbUser.email?.split('@')[0] || 'Hesabım';
+    Store.login(name, sbUser.email);
+  }
+
+  const loggedIn = Store.isLoggedIn || !!sbUser;
+  const displayName = sbUser?.user_metadata?.full_name || sbUser?.email?.split('@')[0] || Store.user?.name || 'Hesabım';
 
   if(loginBtn)   loginBtn.style.display   = loggedIn ? 'none' : '';
   if(accountBtn) accountBtn.style.display = loggedIn ? 'flex' : 'none';
-  if(nameSpan)   nameSpan.textContent     = loggedIn ? Store.user.name.split(' ')[0] : 'Hesabım';
+  if(nameSpan)   nameSpan.textContent     = loggedIn ? displayName.split(' ')[0] : 'Hesabım';
   if(userIcon){
     userIcon.style.color = loggedIn ? 'var(--gold)' : '';
-    userIcon.title       = loggedIn ? Store.user.name : 'Giriş Yap';
+    userIcon.title       = loggedIn ? displayName : 'Giriş Yap';
   }
 }
 
@@ -3045,10 +3048,20 @@ async function doLogout(){
 }
 
 function updateAccUser(){
+  const sbUser = SB.user;
+  const name  = sbUser?.user_metadata?.full_name || Store.user?.name || 'Kullanıcı';
+  const email = sbUser?.email || Store.user?.email || '';
   const nameEl  = document.getElementById('acc-user-name');
   const emailEl = document.getElementById('acc-user-email');
-  if(nameEl)  nameEl.textContent  = Store.user.name  || 'Kullanıcı';
-  if(emailEl) emailEl.textContent = Store.user.email || '';
+  if(nameEl)  nameEl.textContent  = name;
+  if(emailEl) emailEl.textContent = email;
+
+  // Hesabım sayfası: giriş yapılmışsa profil göster, değilse login formu
+  const accProfile = document.getElementById('acc-profile');
+  const accLogin   = document.getElementById('acc-login-section');
+  const loggedIn   = !!sbUser || Store.isLoggedIn;
+  if(accProfile) accProfile.style.display = loggedIn ? '' : 'none';
+  if(accLogin)   accLogin.style.display   = loggedIn ? 'none' : '';
 }
 
 /* ── filterByCat: kategori grid kartlarından filtre uygula ── */
