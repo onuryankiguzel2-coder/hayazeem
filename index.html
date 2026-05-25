@@ -1756,13 +1756,14 @@ const Store = {
 
   /* Favorites */
   favToggle(id){
-    const i=this._d.favorites.indexOf(id);
+    const sid=String(id);
+    const i=this._d.favorites.findIndex(f=>String(f)===sid);
     const added=i===-1;
-    if(added)this._d.favorites.push(id);else this._d.favorites.splice(i,1);
+    if(added)this._d.favorites.push(sid);else this._d.favorites.splice(i,1);
     this.save('favorites'); this.emit('favorites'); return added;
   },
-  favHas(id){return this._d.favorites.includes(id);},
-  favProducts(){return PRODUCTS.filter(p=>this._d.favorites.includes(p.id));},
+  favHas(id){return this._d.favorites.some(f=>String(f)===String(id));},
+  favProducts(){return PRODUCTS.filter(p=>this._d.favorites.some(f=>String(f)===String(p.id)));},
 
   /* Promo */
   applyPromo(code){
@@ -1776,8 +1777,9 @@ const Store = {
 
   /* Product detail */
   openProduct(id){
-    this._d.currentProductId=id;
-    const p=PRODUCTS.find(x=>x.id===id);
+    const sid=String(id);
+    this._d.currentProductId=sid;
+    const p=PRODUCTS.find(x=>String(x.id)===sid);
     this._d.pdState={colorIdx:0,colorName:p?.colorNames?.[0]||'',size:'',qty:1};
   },
   setPdColor(idx,name){this._d.pdState.colorIdx=idx;this._d.pdState.colorName=name;},
@@ -1814,19 +1816,20 @@ function getFiltered(){
 /* ─── CARD BUILDER ─── */
 function makeCard(p,showAddBtn=false){
   const isFav=Store.favHas(p.id);
-  const dots=p.colors.map((c,i)=>`<div class="cdot${i===0?' active':''}" style="background:${c}" onclick="event.stopPropagation()"></div>`).join('');
-  return `<div class="pc" onclick="openProduct(${p.id})">
+  const pid=JSON.stringify(String(p.id));
+  const dots=(p.colors||[]).map((c,i)=>`<div class="cdot${i===0?' active':''}" style="background:${c}" onclick="event.stopPropagation()"></div>`).join('');
+  return `<div class="pc" onclick="openProduct(${pid})">
     <div class="pc-img">
       ${p.badge?`<div class="pc-badge"><span class="badge ${p.b_cls||'b-lim'}">${p.badge}</span></div>`:''}
       <img src="${p.img}" alt="${p.name}" loading="lazy">
-      <button class="pc-fav${isFav?' liked':''}" onclick="event.stopPropagation();cardFavToggle(this,${p.id})">${isFav?'♥':'♡'}</button>
+      <button class="pc-fav${isFav?' liked':''}" onclick="event.stopPropagation();cardFavToggle(this,${pid})">${isFav?'♥':'♡'}</button>
     </div>
     <div class="pc-info">
       <div class="pc-name">${p.name}</div>
-      <div class="pc-sub">${p.sub}</div>
+      <div class="pc-sub">${p.sub||''}</div>
       <div><span class="pc-price${p.sale?' pc-sale':''}">${fmt(p.price)}</span>${p.was?`<span class="pc-was">${fmt(p.was)}</span>`:''}</div>
       <div class="pc-dots">${dots}</div>
-      ${showAddBtn?`<button class="btn btn-p btn-full btn-sm" style="margin-top:10px" onclick="event.stopPropagation();quickAdd(${p.id})">Sepete Ekle</button>`:''}
+      ${showAddBtn?`<button class="btn btn-p btn-full btn-sm" style="margin-top:10px" onclick="event.stopPropagation();quickAdd(${pid})">Sepete Ekle</button>`:''}
     </div>
   </div>`;
 }
@@ -1967,7 +1970,7 @@ function renderAuth(){
 }
 
 function renderPdDetail(){
-  const p=PRODUCTS.find(x=>x.id===Store.currentProductId);
+  const p=PRODUCTS.find(x=>String(x.id)===String(Store.currentProductId));
   if(!p) return;
   const st=Store.pdState;
   const img=document.getElementById('pd-main-img');
@@ -2154,7 +2157,7 @@ function switchTab(btn,id){
 
 /* ─── CART ACTIONS ─── */
 function addToCart(){
-  const p=PRODUCTS.find(x=>x.id===Store.currentProductId);
+  const p=PRODUCTS.find(x=>String(x.id)===String(Store.currentProductId));
   if(!p) return;
   const st=Store.pdState;
   if(!st.size){toast(Store.t('no_size_warn'));return;}
@@ -2162,7 +2165,7 @@ function addToCart(){
   toast(Store.t('cart_added'));
 }
 function quickAdd(productId){
-  const p=PRODUCTS.find(x=>x.id===productId);
+  const p=PRODUCTS.find(x=>String(x.id)===String(productId));
   if(!p) return;
   Store.cartAdd(p,p.colorNames[0],'M',1);
   toast(Store.t('cart_added'));
