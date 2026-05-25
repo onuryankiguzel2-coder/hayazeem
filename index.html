@@ -1519,21 +1519,11 @@ img{display:block;max-width:100%;object-fit:cover}
         <!-- Orders -->
         <div id="acc-orders">
           <h1 class="acc-title">Siparişlerim</h1>
-          <p class="acc-sub">3 sipariş</p>
-          <div class="ord-row">
-            <div><div class="ord-id">#HYZ-2025-0847</div><div class="ord-name">Medine İpek Abaya + 1 ürün</div><div class="ord-date">12 Mayıs 2025</div></div>
-            <span class="badge b-ship">Kargoda</span>
-            <div style="text-align:right"><div class="ord-price">₺6.700</div><button class="btn btn-o btn-sm" style="margin-top:8px" onclick="go('track')">Takip Et</button></div>
-          </div>
-          <div class="ord-row">
-            <div><div class="ord-id">#HYZ-2025-0621</div><div class="ord-name">Serenity Şifon Tunik</div><div class="ord-date">28 Nisan 2025</div></div>
-            <span class="badge b-done">Teslim Edildi</span>
-            <div style="text-align:right"><div class="ord-price">₺1.890</div><button class="btn btn-o btn-sm" style="margin-top:8px" onclick="addToCart()">Tekrar Al</button></div>
-          </div>
-          <div class="ord-row">
-            <div><div class="ord-id">#HYZ-2025-0388</div><div class="ord-name">Rahel Jacquard Palto</div><div class="ord-date">3 Mart 2025</div></div>
-            <span class="badge b-done">Teslim Edildi</span>
-            <div style="text-align:right"><div class="ord-price">₺8.950</div><button class="btn btn-o btn-sm" style="margin-top:8px">İade Et</button></div>
+          <div id="acc-orders-list">
+            <div style="text-align:center;padding:40px;color:var(--ink3)">
+              <div style="font-size:32px;margin-bottom:12px">📦</div>
+              <div style="font-size:14px">Siparişler yükleniyor…</div>
+            </div>
           </div>
         </div>
 
@@ -1542,13 +1532,12 @@ img{display:block;max-width:100%;object-fit:cover}
           <h1 class="acc-title">Profilim</h1>
           <p class="acc-sub">Kişisel bilgilerinizi güncelleyin</p>
           <div class="acc-frow">
-            <div class="fg"><label class="fl">Ad</label><input class="fi" value="Ayşe" type="text"></div>
-            <div class="fg"><label class="fl">Soyad</label><input class="fi" value="Yıldız" type="text"></div>
+            <div class="fg"><label class="fl">Ad</label><input class="fi" id="prof-fname" type="text"></div>
+            <div class="fg"><label class="fl">Soyad</label><input class="fi" id="prof-lname" type="text"></div>
           </div>
-          <div class="fg"><label class="fl">E-posta</label><input class="fi" value="ayse@email.com" type="email"></div>
-          <div class="fg"><label class="fl">Telefon</label><input class="fi" value="+90 532 000 0000" type="tel"></div>
-          <div class="fg"><label class="fl">Doğum Tarihi</label><input class="fi" value="1990-05-15" type="date"></div>
-          <button class="btn btn-p" onclick="toast('Profil güncellendi ✓')">Kaydet</button>
+          <div class="fg"><label class="fl">E-posta</label><input class="fi" id="prof-email" type="email" readonly style="background:var(--bone)"></div>
+          <div class="fg"><label class="fl">Telefon</label><input class="fi" id="prof-phone" type="tel" placeholder="+90 5xx xxx xxxx"></div>
+          <button class="btn btn-p" onclick="saveProfile()">Kaydet</button>
         </div>
 
         <!-- Addresses -->
@@ -3056,12 +3045,98 @@ function updateAccUser(){
   if(nameEl)  nameEl.textContent  = name;
   if(emailEl) emailEl.textContent = email;
 
+  // Profil formunu doldur
+  if(sbUser){
+    const parts = (sbUser.user_metadata?.full_name||'').split(' ');
+    const fname = document.getElementById('prof-fname');
+    const lname = document.getElementById('prof-lname');
+    const pemail = document.getElementById('prof-email');
+    const pphone = document.getElementById('prof-phone');
+    if(fname) fname.value = parts[0]||'';
+    if(lname) lname.value = parts.slice(1).join(' ')||'';
+    if(pemail) pemail.value = sbUser.email||'';
+    if(pphone) pphone.value = sbUser.user_metadata?.phone||'';
+  }
+
   // Hesabım sayfası: giriş yapılmışsa profil göster, değilse login formu
-  const accProfile = document.getElementById('acc-profile');
-  const accLogin   = document.getElementById('acc-login-section');
-  const loggedIn   = !!sbUser || Store.isLoggedIn;
-  if(accProfile) accProfile.style.display = loggedIn ? '' : 'none';
-  if(accLogin)   accLogin.style.display   = loggedIn ? 'none' : '';
+  const accProfileSection = document.getElementById('acc-profile-section');
+  const accLoginSection   = document.getElementById('acc-login-section');
+  const loggedIn = !!sbUser || Store.isLoggedIn;
+  if(accProfileSection) accProfileSection.style.display = loggedIn ? '' : 'none';
+  if(accLoginSection)   accLoginSection.style.display   = loggedIn ? 'none' : '';
+
+  // Siparişleri yükle
+  if(loggedIn) loadUserOrders();
+}
+
+async function loadUserOrders(){
+  const list = document.getElementById('acc-orders-list');
+  if(!list) return;
+
+  const userId = SB.user?.id;
+  const userEmail = SB.user?.email;
+  if(!userId && !userEmail){ 
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--ink3)"><div style="font-size:32px;margin-bottom:12px">📦</div><div>Henüz siparişiniz yok.</div></div>';
+    return;
+  }
+
+  let query = _sbClient.from('orders').select('*').order('created_at',{ascending:false});
+  if(userId) query = query.eq('user_id', userId);
+  else if(userEmail) query = query.eq('guest_email', userEmail);
+
+  const {data, error} = await query;
+
+  if(error || !data || data.length === 0){
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--ink3)"><div style="font-size:32px;margin-bottom:12px">📦</div><div style="font-size:14px">Henüz siparişiniz bulunmuyor.</div><button class="btn btn-p btn-sm" style="margin-top:16px" onclick="go(\'categories\')">Alışverişe Başla</button></div>';
+    const subEl = document.querySelector('#acc-orders .acc-sub');
+    if(subEl) subEl.textContent = '0 sipariş';
+    return;
+  }
+
+  const statusMap = {pending:'Bekliyor',confirmed:'Onaylandı',shipped:'Kargoda',delivered:'Teslim Edildi',cancelled:'İptal'};
+  const badgeMap = {pending:'b-pend',confirmed:'b-ship',shipped:'b-ship',delivered:'b-done',cancelled:'b-cancel'};
+
+  const subEl = document.querySelector('#acc-orders .acc-title');
+  const sub2 = document.querySelector('#acc-orders');
+  if(sub2){
+    let subP = sub2.querySelector('.acc-sub');
+    if(!subP){ subP = document.createElement('p'); subP.className='acc-sub'; subEl?.after(subP); }
+    subP.textContent = data.length + ' sipariş';
+  }
+
+  list.innerHTML = data.map(o=>{
+    const items = Array.isArray(o.items)?o.items:[];
+    const itemName = items.length > 0 ? (items[0].name_tr||items[0].name||'Ürün') + (items.length>1?` + ${items.length-1} ürün`:'') : '—';
+    const date = new Date(o.created_at).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
+    const st = o.status||'pending';
+    return `<div class="ord-row">
+      <div>
+        <div class="ord-id">#HYZ-${o.id.slice(0,8).toUpperCase()}</div>
+        <div class="ord-name">${itemName}</div>
+        <div class="ord-date">${date}</div>
+      </div>
+      <span class="badge ${badgeMap[st]||'b-pend'}">${statusMap[st]||st}</span>
+      <div style="text-align:right">
+        <div class="ord-price">₺${(o.total||0).toLocaleString('tr-TR')}</div>
+        ${st==='shipped'?`<button class="btn btn-o btn-sm" style="margin-top:8px" onclick="go('track')">Takip Et</button>`:''}
+        ${st==='delivered'?`<button class="btn btn-o btn-sm" style="margin-top:8px" onclick="go('returns')">İade Et</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function saveProfile(){
+  const fname = document.getElementById('prof-fname')?.value?.trim();
+  const lname = document.getElementById('prof-lname')?.value?.trim();
+  const phone = document.getElementById('prof-phone')?.value?.trim();
+  const fullName = (fname+' '+lname).trim();
+  const {error} = await _sbClient.auth.updateUser({
+    data: { full_name: fullName, phone: phone }
+  });
+  if(error){ toast('Hata: '+error.message); return; }
+  if(SB.user) SB.user.user_metadata = {...SB.user.user_metadata, full_name: fullName, phone};
+  toast('Profil güncellendi ✓');
+  updateAccUser();
 }
 
 /* ── filterByCat: kategori grid kartlarından filtre uygula ── */
