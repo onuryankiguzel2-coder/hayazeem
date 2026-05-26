@@ -945,11 +945,11 @@ img{display:block;max-width:100%;object-fit:cover}
       <aside class="filter-sb" id="filter-sb">
         <div class="f-sec">
           <div class="f-title">Kategori</div>
-          <label class="f-check"><input type="checkbox" checked style="accent-color:var(--gold)"> Abayalar (48)</label>
-          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Tunikler (62)</label>
-          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Elbiseler (35)</label>
-          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Paltolar (21)</label>
-          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Aksesuar (18)</label>
+          <label class="f-check"><input type="checkbox" checked style="accent-color:var(--gold)"> Abayalar</label>
+          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Tunikler</label>
+          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Elbiseler</label>
+          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Paltolar</label>
+          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Aksesuar</label>
         </div>
         <div class="f-sec">
           <div class="f-title">Beden</div>
@@ -975,15 +975,15 @@ img{display:block;max-width:100%;object-fit:cover}
         </div>
         <div class="f-sec">
           <div class="f-title">Fiyat Aralığı</div>
-          <div style="font-size:13px;color:var(--ink2);margin-bottom:8px" id="pr-txt">₺500 — ₺12.000</div>
-          <input type="range" min="500" max="12000" value="12000" style="width:100%;accent-color:var(--gold)" oninput="document.getElementById('pr-txt').textContent='₺500 — ₺'+parseInt(this.value).toLocaleString()">
+          <div style="font-size:13px;color:var(--ink2);margin-bottom:8px" id="pr-txt">₺500 — ₺25.000</div>
+          <input type="range" min="500" max="25000" value="25000" style="width:100%;accent-color:var(--gold)" oninput="document.getElementById('pr-txt').textContent='₺500 — ₺'+parseInt(this.value).toLocaleString('tr-TR')">
         </div>
         <div class="f-sec">
           <div class="f-title">Kumaş</div>
-          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> İpek (24)</label>
-          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Keten (18)</label>
-          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Şifon (31)</label>
-          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Triko (15)</label>
+          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> İpek</label>
+          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Keten</label>
+          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Şifon</label>
+          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Triko</label>
         </div>
         <button class="btn btn-o btn-full btn-sm" onclick="toast('Filtreler temizlendi')">Filtreleri Temizle</button>
       </aside>
@@ -1452,41 +1452,14 @@ img{display:block;max-width:100%;object-fit:cover}
     <div class="track-cont">
       <div class="section-h"><div class="eyebrow">Sipariş Durumu</div><h1 class="d" style="font-size:clamp(26px,3vw,34px);margin-top:8px">Siparişimi Takip Et</h1></div>
       <div class="track-sr">
-        <input class="track-fi" placeholder="Sipariş numarası veya e-posta adresi" id="track-in">
-        <button class="track-btn" onclick="toast('Sipariş bulundu ✓')">Sorgula</button>
+        <input class="track-fi" placeholder="Sipariş numarası (HYZ-XXXXXXXX) veya e-posta" id="track-in" onkeydown="if(event.key==='Enter')trackOrder()">
+        <button class="track-btn" onclick="trackOrder()">Sorgula</button>
       </div>
-      <div class="track-card">
-        <div class="track-hdr">
-          <div><div style="font-size:12px;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Sipariş No</div><div class="track-onum">#HYZ-2025-0847</div></div>
-          <span class="badge b-ship">Kargoda</span>
-        </div>
-        <div class="track-steps">
-          <div class="ts"><div class="ts-c done">✓</div><div class="ts-n">Sipariş<br>Alındı</div></div>
-          <div class="ts"><div class="ts-c done">✓</div><div class="ts-n">Hazırlandı</div></div>
-          <div class="ts"><div class="ts-c active">◎</div><div class="ts-n active">Kargoya<br>Verildi</div></div>
-          <div class="ts"><div class="ts-c">4</div><div class="ts-n">Teslim<br>Edildi</div></div>
-        </div>
-        <div class="track-del">
-          <div><div class="track-del-lbl">Tahmini Teslimat</div><div class="track-del-val">17 Mayıs 2025, Cumartesi</div></div>
-          <div style="text-align:right"><div class="track-del-lbl">Kargo</div><div style="font-size:13px;color:var(--ink2)">MNG Kargo · #4782934</div></div>
-        </div>
-        <div style="margin-top:20px">
-          <div style="font-size:11px;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px">Sipariş İçeriği</div>
-          <div class="track-item">
-            <div class="ti-img"><img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=200&q=70" alt=""></div>
-            <div style="flex:1"><div style="font-size:14px">Medine İpek Abaya</div><div style="font-size:12px;color:var(--ink3)">Krem Bej / M · x1</div></div>
-            <div class="d" style="font-size:18px">₺4.850</div>
-          </div>
-          <div class="track-item">
-            <div class="ti-img"><img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=200&q=70" alt=""></div>
-            <div style="flex:1"><div style="font-size:14px">Nour Keten Elbise</div><div style="font-size:12px;color:var(--ink3)">Nude / L · x1</div></div>
-            <div class="d" style="font-size:18px">₺3.200</div>
-          </div>
-        </div>
-        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--stone);display:flex;gap:12px;flex-wrap:wrap">
-          <button class="btn btn-o btn-sm" onclick="go('returns')">↩ İade / Değişim Talep Et</button>
-          <button class="btn btn-p btn-sm" onclick="go('account')">Hesabıma Git</button>
-        </div>
+      <div id="track-result" style="display:none"></div>
+      <div id="track-empty" style="text-align:center;padding:48px 20px;display:none">
+        <div style="font-size:48px;margin-bottom:12px">📦</div>
+        <div style="font-size:15px;font-weight:500;margin-bottom:8px">Sipariş bulunamadı</div>
+        <div style="font-size:13px;color:var(--ink3)">Sipariş numaranızı veya e-posta adresinizi kontrol edin.</div>
       </div>
     </div>
   </div>
@@ -1653,6 +1626,28 @@ async function loadProductsFromDB(){
       sale: p.original_price && p.original_price > p.price,
     }));
   }
+
+  // Filtre sayılarını güncelle
+  const catCounts = {};
+  const fabricCounts = {};
+  PRODUCTS.forEach(p=>{
+    if(p.cat){ catCounts[p.cat] = (catCounts[p.cat]||0)+1; }
+    if(p.fabric){ fabricCounts[p.fabric] = (fabricCounts[p.fabric]||0)+1; }
+  });
+  document.querySelectorAll('#filter-sb .f-check').forEach(label=>{
+    const text = label.textContent.trim();
+    const cats = ['Abayalar','Tunikler','Elbiseler','Paltolar','Aksesuar'];
+    const fabrics = ['İpek','Keten','Şifon','Triko'];
+    [...cats,...fabrics].forEach(name=>{
+      if(text===name || text.startsWith(name+' (')){
+        const count = catCounts[name]||fabricCounts[name]||0;
+        const inp = label.querySelector('input');
+        label.innerHTML = '';
+        if(inp) label.appendChild(inp);
+        label.append(` ${name}${count>0?' ('+count+')':''}`);
+      }
+    });
+  });
 
   // UI'ı güncelle
   window.PRODUCTS = PRODUCTS;
@@ -1871,22 +1866,25 @@ function renderFavorites(){
     </div>`;
     return;
   }
-  fg.innerHTML=favs.map(p=>`
+  fg.innerHTML=favs.map(p=>{
+    const pid="'"+String(p.id).replace(/'/g,"\\'")+"'";
+    return `
     <div class="pc">
-      <div class="pc-img" onclick="openProduct(${p.id})" style="cursor:pointer">
+      <div class="pc-img" onclick="openProduct(${pid})" style="cursor:pointer">
         <img src="${p.img}" alt="${p.name}" loading="lazy">
-        <button class="pc-fav liked" onclick="event.stopPropagation();cardFavToggle(this,${p.id})">♥</button>
+        <button class="pc-fav liked" onclick="event.stopPropagation();cardFavToggle(this,${pid})">♥</button>
       </div>
       <div class="pc-info">
         <div class="pc-name">${p.name}</div>
-        <div class="pc-sub">${p.sub}</div>
+        <div class="pc-sub">${p.sub||''}</div>
         <div><span class="pc-price${p.sale?' pc-sale':''}">${fmt(p.price)}</span>${p.was?`<span class="pc-was">${fmt(p.was)}</span>`:''}</div>
         <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
-          <button class="btn btn-p btn-full btn-sm" onclick="quickAdd(${p.id})">Sepete Ekle</button>
-          <button class="btn btn-o btn-full btn-sm" onclick="favRemove(${p.id})">Favoriden Çıkar</button>
+          <button class="btn btn-p btn-full btn-sm" onclick="quickAdd(${pid})">Sepete Ekle</button>
+          <button class="btn btn-o btn-full btn-sm" onclick="favRemove(${pid})">Favoriden Çıkar</button>
         </div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function renderCart(){
@@ -2109,7 +2107,7 @@ function clearFilters(){
   document.querySelectorAll('.sf-btn').forEach(b=>b.classList.remove('active'));
   const pr=document.querySelector('#filter-sb input[type=range]');
   if(pr) pr.value=12000;
-  document.getElementById('pr-txt')&&(document.getElementById('pr-txt').textContent='₺500 — ₺12.000');
+  document.getElementById('pr-txt')&&(document.getElementById('pr-txt').textContent='₺500 — ₺25.000');
   renderCatGrid();
   toast(Store.t('clear_filter'));
 }
@@ -2224,49 +2222,7 @@ function goPayment(){
   document.getElementById('ck-s3').classList.add('active');
   window.scrollTo(0,0);
 }
-async function confirmOrder(){
-  // Sipariş verilerini topla
-  const cartItems = Store._d?.cart || [];
-  const total = cartItems.reduce((sum, item) => sum + (item.price * item.qty), 0);
-  const shipping = total >= 500 ? 0 : 49.90;
 
-  // Teslimat adresini al
-  const addrInputs = document.querySelectorAll('#ck-address input, #ck-address select');
-  const address = {};
-  addrInputs.forEach(inp => { if(inp.name) address[inp.name] = inp.value; });
-
-  // Supabase'e kaydet
-  const orderData = {
-    user_id: SB.user?.id || null,
-    guest_email: !SB.user ? (document.getElementById('ck-email')?.value || null) : null,
-    items: cartItems,
-    subtotal: total,
-    shipping: shipping,
-    total: total + shipping,
-    status: 'pending',
-    shipping_address: address
-  };
-
-  const order = await SB.createOrder(orderData);
-
-  // UI güncelle
-  Store.cartClear();
-  document.getElementById('ck-payment').style.display='none';
-  document.getElementById('ck-confirm').style.display='block';
-  const s3=document.getElementById('ck-s3');
-  s3.classList.remove('active');s3.classList.add('done');
-  s3.querySelector('.ck-num').textContent='✓';
-  document.getElementById('ck-s4').classList.add('active');
-
-  // Sipariş numarasını göster
-  if(order) {
-    const orderNumEl = document.getElementById('ck-order-num');
-    if(orderNumEl) orderNumEl.textContent = 'HYZ-' + order.id.slice(0,8).toUpperCase();
-  }
-
-  renderNavBadge();
-  window.scrollTo(0,0);
-}
 function selPay(el){
   document.querySelectorAll('.pay-m').forEach(m=>m.classList.remove('active'));
   el.classList.add('active');
@@ -3276,6 +3232,95 @@ function showResetStep2(){
   const szgl = document.querySelector('.sz-gl');
   if(szgl) szgl.onclick = openSizeGuide;
 })();
+
+/* ── Sipariş Takip ── */
+async function trackOrder(){
+  const input = document.getElementById('track-in')?.value?.trim();
+  if(!input){ toast('Sipariş numarası veya e-posta girin'); return; }
+  const resultEl = document.getElementById('track-result');
+  const emptyEl  = document.getElementById('track-empty');
+  if(resultEl) resultEl.style.display='none';
+  if(emptyEl)  emptyEl.style.display='none';
+  toast('Sorgulanıyor…');
+  const isEmail = input.includes('@');
+  let query = _sbClient.from('orders').select('*');
+  if(isEmail){
+    query = query.eq('guest_email', input);
+  } else {
+    const shortId = input.replace(/^#?HYZ-/i,'').toLowerCase();
+    query = query.ilike('id', shortId+'%');
+  }
+  const {data, error} = await query.limit(1).maybeSingle();
+  if(error || !data){
+    if(emptyEl) emptyEl.style.display='block';
+    return;
+  }
+  const sm={pending:'Bekliyor',confirmed:'Onaylandı',shipped:'Kargoda',delivered:'Teslim Edildi',cancelled:'İptal'};
+  const bm={pending:'b-pend',confirmed:'b-ship',shipped:'b-ship',delivered:'b-done',cancelled:'b-cancel'};
+  const steps=['pending','confirmed','shipped','delivered'];
+  const curStep=steps.indexOf(data.status);
+  const items=Array.isArray(data.items)?data.items:[];
+  const date=new Date(data.created_at).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
+  const orderNo='#HYZ-'+data.id.slice(0,8).toUpperCase();
+  if(resultEl){
+    resultEl.style.display='block';
+    resultEl.innerHTML=`<div class="track-card">
+      <div class="track-hdr">
+        <div><div style="font-size:12px;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Sipariş No</div>
+        <div class="track-onum">${orderNo}</div>
+        <div style="font-size:12px;color:var(--ink3);margin-top:4px">${date}</div></div>
+        <span class="badge ${bm[data.status]||'b-pend'}">${sm[data.status]||data.status}</span>
+      </div>
+      <div class="track-steps">
+        <div class="ts"><div class="ts-c ${curStep>=0?'done':''}">✓</div><div class="ts-n">Sipariş<br>Alındı</div></div>
+        <div class="ts"><div class="ts-c ${curStep>=1?'done':curStep===0?'active':''}">✓</div><div class="ts-n ${curStep===1?'active':''}">Onaylandı</div></div>
+        <div class="ts"><div class="ts-c ${curStep>=2?'done':curStep===1?'active':''}">◎</div><div class="ts-n ${curStep===2?'active':''}">Kargoya<br>Verildi</div></div>
+        <div class="ts"><div class="ts-c ${curStep>=3?'done':''}">4</div><div class="ts-n ${curStep===3?'active':''}">Teslim<br>Edildi</div></div>
+      </div>
+      <div style="margin-top:20px">
+        <div style="font-size:11px;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px">Sipariş İçeriği</div>
+        ${items.map(item=>`<div class="track-item">
+          <div class="ti-img" style="background:var(--bone);width:56px;height:56px;flex-shrink:0;border-radius:2px"></div>
+          <div style="flex:1"><div style="font-size:14px">${item.name_tr||item.name||'Ürün'}</div>
+          <div style="font-size:12px;color:var(--ink3)">${[item.color,item.size?'/ '+item.size:''].filter(Boolean).join(' ')} · x${item.qty||1}</div></div>
+          <div class="d" style="font-size:18px">₺${((item.price||0)*(item.qty||1)).toLocaleString('tr-TR')}</div>
+        </div>`).join('')}
+      </div>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--stone);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div style="font-size:15px;font-weight:500">Toplam: <span style="font-family:var(--fd);font-size:20px">₺${(data.total||0).toLocaleString('tr-TR')}</span></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-o btn-sm" onclick="go('returns')">↩ İade Talebi</button>
+          <button class="btn btn-p btn-sm" onclick="go('account')">Hesabıma Git</button>
+        </div>
+      </div>
+    </div>`;
+  }
+}
+
+/* ── Sipariş Tamamla ── */
+async function confirmOrder(){
+  const cartItems = Store._d?.cart || [];
+  const total = cartItems.reduce((s,i)=>s+(i.price*i.qty),0);
+  const shipping = total >= 500 ? 0 : 49.90;
+  const addrInputs = document.querySelectorAll('#ck-address input, #ck-address select');
+  const address = {};
+  addrInputs.forEach(inp=>{if(inp.name) address[inp.name]=inp.value;});
+  const orderData = {
+    user_id: SB.user?.id||null,
+    guest_email: !SB.user?(document.getElementById('ck-email')?.value||null):null,
+    items: cartItems, subtotal: total, shipping: shipping,
+    total: total+shipping, status: 'pending', shipping_address: address
+  };
+  const order = await SB.createOrder(orderData);
+  Store.cartClear();
+  document.getElementById('ck-payment').style.display='none';
+  document.getElementById('ck-confirm').style.display='block';
+  const s3=document.getElementById('ck-s3');
+  if(s3){s3.classList.remove('active');s3.classList.add('done');s3.querySelector('.ck-num').textContent='✓';}
+  const s4=document.getElementById('ck-s4');if(s4)s4.classList.add('active');
+  if(order){const el=document.getElementById('ck-order-num');if(el)el.textContent='HYZ-'+order.id.slice(0,8).toUpperCase();}
+  renderNavBadge();window.scrollTo(0,0);
+}
 </script>
 </body>
 </html>
