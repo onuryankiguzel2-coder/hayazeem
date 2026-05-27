@@ -240,7 +240,7 @@ img{display:block;object-fit:cover}
     <div class="sb-sec">
       <div class="sb-lbl">Genel</div>
       <button class="sb-item active" onclick="showAP('dashboard',this)">📊 Genel Bakış</button>
-      <button class="sb-item" onclick="showAP('orders',this)">📦 Siparişler<span class="sb-badge">12</span></button>
+      <button class="sb-item" onclick="showAP('orders',this)">📦 Siparişler<span class="sb-badge" id="sb-orders-badge" style="display:none">0</span></button>
     </div>
     <div class="sb-sec">
       <div class="sb-lbl">Ürünler</div>
@@ -272,75 +272,38 @@ img{display:block;object-fit:cover}
 <div class="content" id="content">
 
 <!-- ── DASHBOARD ── -->
-<div id="ap-dashboard" class="ap active">
-  <div class="topbar">
-    <div><div class="page-title">Genel Bakış</div><div style="font-size:13px;color:var(--ink3)">15 Mayıs 2025, Cuma · Günaydın!</div></div>
-    <div class="user-chip">
-      <div class="av">SA</div>
-      <div><div style="font-size:13px">Super Admin</div><div style="font-size:11px;color:var(--ink3)">Tüm yetkiler</div></div>
-    </div>
-  </div>
-
+<div id="ap-dashboard" class="ap">
+  <div class="topbar"><div class="page-title">Genel Bakış</div></div>
   <div class="metrics">
-    <div class="mc"><div class="mc-lbl">Günlük Sipariş</div><div class="mc-val">24</div><div class="mc-ch pos">↑ +18% dün</div></div>
-    <div class="mc"><div class="mc-lbl">Günlük Gelir</div><div class="mc-val">₺48.2K</div><div class="mc-ch pos">↑ +22% dün</div></div>
-    <div class="mc"><div class="mc-lbl">Bekleyen</div><div class="mc-val">12</div><div class="mc-ch neg">↑ +4 yeni</div></div>
-    <div class="mc"><div class="mc-lbl">İade Talebi</div><div class="mc-val">3</div><div class="mc-ch pos">Normal</div></div>
+    <div class="mc"><div class="mc-lbl">Günlük Sipariş</div><div class="mc-val" id="dash-orders">—</div><div class="mc-ch">Yükleniyor</div></div>
+    <div class="mc"><div class="mc-lbl">Günlük Gelir</div><div class="mc-val" id="dash-revenue">—</div><div class="mc-ch">Yükleniyor</div></div>
+    <div class="mc"><div class="mc-lbl">Bekleyen</div><div class="mc-val" id="dash-pending">—</div><div class="mc-ch">Yükleniyor</div></div>
+    <div class="mc"><div class="mc-lbl">İade Talebi</div><div class="mc-val" id="dash-returns">0</div><div class="mc-ch">—</div></div>
   </div>
-
   <div class="g2">
     <div class="card">
-      <div class="card-title">⚡ Hazırlanacak Siparişler</div>
-      <div class="arow"><div><div style="font-size:13px;font-weight:500">#HYZ-0851</div><div style="font-size:12px;color:var(--ink3)">Medine Abaya M — Zeynep K.</div></div><span class="badge b-prep">Hazırlan.</span></div>
-      <div class="arow"><div><div style="font-size:13px;font-weight:500">#HYZ-0849</div><div style="font-size:12px;color:var(--ink3)">Nour Elbise L — Fatma Y.</div></div><span class="badge b-new">Yeni</span></div>
-      <div class="arow"><div><div style="font-size:13px;font-weight:500">#HYZ-0847</div><div style="font-size:12px;color:var(--ink3)">Rahel Palto XL — Meryem A.</div></div><span class="badge b-prep">Hazırlan.</span></div>
-      <div class="arow"><div><div style="font-size:13px;font-weight:500">#HYZ-0845</div><div style="font-size:12px;color:var(--ink3)">Hira Set S — Sena B.</div></div><span class="badge b-new">Yeni</span></div>
+      <div class="card-title">⚡ Son Siparişler</div>
+      <div id="dash-recent-orders" style="color:var(--ink3);font-size:13px;padding:8px 0">Yükleniyor…</div>
     </div>
     <div class="card">
       <div class="card-title">⚠️ Düşük Stok Uyarıları</div>
-      <div class="arow"><div><div style="font-size:13px;font-weight:500">Medine Abaya — Krem/M</div><div style="font-size:12px;color:var(--ink3)">2 adet kaldı</div></div><span class="badge b-low">Kritik</span></div>
-      <div class="arow"><div><div style="font-size:13px;font-weight:500">Serenity Tunik — Nude/S</div><div style="font-size:12px;color:var(--ink3)">4 adet kaldı</div></div><span class="badge b-prep">Düşük</span></div>
-      <div class="arow"><div><div style="font-size:13px;font-weight:500">Rahel Palto — Siyah/XL</div><div style="font-size:12px;color:var(--ink3)">1 adet kaldı</div></div><span class="badge b-low">Kritik</span></div>
-      <div class="arow"><div><div style="font-size:13px;font-weight:500">Zeynep Kaban — Zeytin/L</div><div style="font-size:12px;color:var(--ink3)">3 adet kaldı</div></div><span class="badge b-prep">Düşük</span></div>
+      <div id="dash-low-stock" style="color:var(--ink3);font-size:13px;padding:8px 0">Yükleniyor…</div>
     </div>
   </div>
-
-  <div class="card">
-    <div class="card-title">📈 Bu Haftanın En Çok Satanları</div>
-    <div class="g3">
-      <div style="text-align:center;padding:16px;background:var(--cream)">
-        <img src="https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=300&q=70" alt="" style="width:100%;height:120px;object-fit:cover;margin-bottom:8px">
-        <div style="font-size:13px;font-weight:500">Medine Abaya</div>
-        <div style="font-family:var(--fd);font-size:20px;color:var(--gold)">47 adet</div>
-      </div>
-      <div style="text-align:center;padding:16px;background:var(--cream)">
-        <img src="https://images.unsplash.com/photo-1537984822441-cff330075342?w=300&q=70" alt="" style="width:100%;height:120px;object-fit:cover;margin-bottom:8px">
-        <div style="font-size:13px;font-weight:500">Nour Elbise</div>
-        <div style="font-family:var(--fd);font-size:20px;color:var(--gold)">38 adet</div>
-      </div>
-      <div style="text-align:center;padding:16px;background:var(--cream)">
-        <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=300&q=70" alt="" style="width:100%;height:120px;object-fit:cover;margin-bottom:8px">
-        <div style="font-size:13px;font-weight:500">Serenity Tunik</div>
-        <div style="font-family:var(--fd);font-size:20px;color:var(--gold)">29 adet</div>
-      </div>
-    </div>
-  </div>
-
   <div class="card">
     <div class="card-title">📊 Haftalık Satış Grafiği</div>
     <div class="chart-bars">
-      <div class="cb" style="height:60%" title="Pazartesi: ₺28K"></div>
-      <div class="cb" style="height:75%" title="Salı: ₺35K"></div>
-      <div class="cb" style="height:45%" title="Çarşamba: ₺21K"></div>
-      <div class="cb" style="height:90%" title="Perşembe: ₺42K"></div>
-      <div class="cb today" style="height:100%" title="Cuma (bugün): ₺48K"></div>
-      <div class="cb" style="height:20%;opacity:.35" title="Cumartesi: —"></div>
-      <div class="cb" style="height:15%;opacity:.35" title="Pazar: —"></div>
+      <div class="cb" style="height:10%;opacity:.3" title="Pzt"></div>
+      <div class="cb" style="height:10%;opacity:.3" title="Sal"></div>
+      <div class="cb" style="height:10%;opacity:.3" title="Çar"></div>
+      <div class="cb" style="height:10%;opacity:.3" title="Per"></div>
+      <div class="cb today" style="height:10%;opacity:.3" title="Cum"></div>
+      <div class="cb" style="height:10%;opacity:.3" title="Cmt"></div>
+      <div class="cb" style="height:10%;opacity:.3" title="Paz"></div>
     </div>
-    <div class="chart-xlbl"><span>Pzt</span><span>Sal</span><span>Çar</span><span>Per</span><span style="color:var(--gold);font-weight:500">Cum ◀</span><span>Cmt</span><span>Paz</span></div>
+    <div class="chart-xlbl"><span>Pzt</span><span>Sal</span><span>Çar</span><span>Per</span><span style="color:var(--gold)">Cum</span><span>Cmt</span><span>Paz</span></div>
   </div>
 </div>
-
 <!-- ── ORDERS ── -->
 <div id="ap-orders" class="ap">
   <div class="topbar">
@@ -358,14 +321,7 @@ img{display:block;object-fit:cover}
       <table class="tbl">
         <thead><tr><th>Sipariş No</th><th>Müşteri</th><th>Ürünler</th><th>Tutar</th><th>Ödeme</th><th>Durum</th><th>Tarih</th><th></th></tr></thead>
         <tbody>
-          <tr><td style="font-family:var(--fd)">#HYZ-0851</td><td>Zeynep K.</td><td style="color:var(--ink3)">Medine Abaya x1</td><td style="font-family:var(--fd);font-size:16px">₺4.850</td><td><span class="badge b-done">Ödendi</span></td><td><span class="badge b-new">Yeni</span></td><td style="color:var(--ink3)">15.05.25</td><td><button class="btn btn-o btn-sm" onclick="openOrderDetail(this.closest('tr').cells[0].textContent.trim(), this.closest('tr').cells[1].textContent.trim())">Detay</button></td></tr>
-          <tr><td style="font-family:var(--fd)">#HYZ-0850</td><td>Hafsa M.</td><td style="color:var(--ink3)">Nour Elbise x2</td><td style="font-family:var(--fd);font-size:16px">₺6.400</td><td><span class="badge b-done">Ödendi</span></td><td><span class="badge b-prep">Hazırlan.</span></td><td style="color:var(--ink3)">15.05.25</td><td><button class="btn btn-o btn-sm" onclick="openOrderDetail(this.closest('tr').cells[0].textContent.trim(), this.closest('tr').cells[1].textContent.trim())">Detay</button></td></tr>
-          <tr><td style="font-family:var(--fd)">#HYZ-0849</td><td>Fatma Y.</td><td style="color:var(--ink3)">Serenity Tunik x1</td><td style="font-family:var(--fd);font-size:16px">₺1.890</td><td><span class="badge b-prep">Bekliyor</span></td><td><span class="badge b-prep">Hazırlan.</span></td><td style="color:var(--ink3)">14.05.25</td><td><button class="btn btn-o btn-sm" onclick="openOrderDetail(this.closest('tr').cells[0].textContent.trim(), this.closest('tr').cells[1].textContent.trim())">Detay</button></td></tr>
-          <tr><td style="font-family:var(--fd)">#HYZ-0848</td><td>Rania A.</td><td style="color:var(--ink3)">Hira Set M + Akses.</td><td style="font-family:var(--fd);font-size:16px">₺8.200</td><td><span class="badge b-done">Ödendi</span></td><td><span class="badge b-ship">Kargoda</span></td><td style="color:var(--ink3)">13.05.25</td><td><button class="btn btn-o btn-sm" onclick="openOrderDetail(this.closest('tr').cells[0].textContent.trim(), this.closest('tr').cells[1].textContent.trim())">Detay</button></td></tr>
-          <tr><td style="font-family:var(--fd)">#HYZ-0847</td><td>Ayşe H.</td><td style="color:var(--ink3)">Medine + Nour Elbise</td><td style="font-family:var(--fd);font-size:16px">₺6.700</td><td><span class="badge b-done">Ödendi</span></td><td><span class="badge b-ship">Kargoda</span></td><td style="color:var(--ink3)">12.05.25</td><td><button class="btn btn-o btn-sm" onclick="openOrderDetail(this.closest('tr').cells[0].textContent.trim(), this.closest('tr').cells[1].textContent.trim())">Detay</button></td></tr>
-          <tr><td style="font-family:var(--fd)">#HYZ-0846</td><td>Meryem A.</td><td style="color:var(--ink3)">Rahel Palto x1</td><td style="font-family:var(--fd);font-size:16px">₺8.950</td><td><span class="badge b-done">Ödendi</span></td><td><span class="badge b-done">Teslim Edildi</span></td><td style="color:var(--ink3)">10.05.25</td><td><button class="btn btn-o btn-sm" onclick="toast('İade formu')">İade</button></td></tr>
-          <tr><td style="font-family:var(--fd)">#HYZ-0845</td><td>Sara L.</td><td style="color:var(--ink3)">Zeynep Kaban x1</td><td style="font-family:var(--fd);font-size:16px">₺12.500</td><td><span class="badge b-done">Ödendi</span></td><td><span class="badge b-done">Teslim Edildi</span></td><td style="color:var(--ink3)">9.05.25</td><td><button class="btn btn-o btn-sm" onclick="openOrderDetail(this.closest('tr').cells[0].textContent.trim(), this.closest('tr').cells[1].textContent.trim())">Detay</button></td></tr>
-          <tr><td style="font-family:var(--fd)">#HYZ-0844</td><td>Nadia K.</td><td style="color:var(--ink3)">Leyla Elbise x2</td><td style="font-family:var(--fd);font-size:16px">₺7.700</td><td><span class="badge b-prep">Bekliyor</span></td><td><span class="badge b-low">İptal</span></td><td style="color:var(--ink3)">8.05.25</td><td><button class="btn btn-o btn-sm" onclick="toast('İptal detayı')">İptal</button></td></tr>
+          <tr><td colspan="8" style="text-align:center;padding:24px;color:var(--ink3)">Yükleniyor…</td></tr>
         </tbody>
       </table>
     </div>
@@ -393,47 +349,7 @@ img{display:block;object-fit:cover}
       <table class="tbl">
         <thead><tr><th>Görsel</th><th>Ürün Adı</th><th>SKU</th><th>Kategori</th><th>Fiyat</th><th>Stok</th><th>Durum</th><th></th></tr></thead>
         <tbody>
-          <tr>
-            <td><img src="https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=80&q=60" alt="" style="width:48px;height:60px"></td>
-            <td><div style="font-size:14px;font-weight:500">Medine İpek Abaya</div><div style="font-size:11px;color:var(--ink3)">5 renk · 7 beden</div></td>
-            <td style="color:var(--ink3);font-size:12px">HYZ-001</td><td style="color:var(--ink3)">Abayalar</td>
-            <td style="font-family:var(--fd);font-size:16px">₺4.850</td>
-            <td><span style="color:var(--warn)">↓ 127</span></td>
-            <td><span class="badge b-done">Yayında</span></td>
-            <td style="display:flex;gap:6px"><button class="btn btn-o btn-sm" onclick="showAP('addprod',null)">Düzenle</button><button class="btn-ico" onclick="toast('Ürün silindi')">✕</button></td>
-          </tr>
-          <tr>
-            <td><img src="https://images.unsplash.com/photo-1537984822441-cff330075342?w=80&q=60" alt="" style="width:48px;height:60px"></td>
-            <td><div style="font-size:14px;font-weight:500">Nour Keten Elbise</div><div style="font-size:11px;color:var(--ink3)">3 renk · 6 beden</div></td>
-            <td style="color:var(--ink3);font-size:12px">HYZ-002</td><td style="color:var(--ink3)">Elbiseler</td>
-            <td style="font-family:var(--fd);font-size:16px">₺3.200</td>
-            <td>89</td><td><span class="badge b-done">Yayında</span></td>
-            <td style="display:flex;gap:6px"><button class="btn btn-o btn-sm" onclick="showAP('addprod',null)">Düzenle</button><button class="btn-ico" onclick="toast('Ürün silindi')">✕</button></td>
-          </tr>
-          <tr>
-            <td><img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=80&q=60" alt="" style="width:48px;height:60px"></td>
-            <td><div style="font-size:14px;font-weight:500">Serenity Şifon Tunik</div><div style="font-size:11px;color:var(--ink3)">6 renk · 7 beden</div></td>
-            <td style="color:var(--ink3);font-size:12px">HYZ-003</td><td style="color:var(--ink3)">Tunikler</td>
-            <td style="font-family:var(--fd);font-size:16px">₺1.890</td>
-            <td><span style="color:var(--err)">↓ 12</span></td><td><span class="badge b-done">Yayında</span></td>
-            <td style="display:flex;gap:6px"><button class="btn btn-o btn-sm" onclick="showAP('addprod',null)">Düzenle</button><button class="btn-ico" onclick="toast('Ürün silindi')">✕</button></td>
-          </tr>
-          <tr>
-            <td><img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=80&q=60" alt="" style="width:48px;height:60px"></td>
-            <td><div style="font-size:14px;font-weight:500">Rahel Jacquard Palto</div><div style="font-size:11px;color:var(--ink3)">2 renk · 5 beden</div></td>
-            <td style="color:var(--ink3);font-size:12px">HYZ-004</td><td style="color:var(--ink3)">Paltolar</td>
-            <td style="font-family:var(--fd);font-size:16px">₺8.950</td>
-            <td>44</td><td><span class="badge b-done">Yayında</span></td>
-            <td style="display:flex;gap:6px"><button class="btn btn-o btn-sm" onclick="showAP('addprod',null)">Düzenle</button><button class="btn-ico" onclick="toast('Ürün silindi')">✕</button></td>
-          </tr>
-          <tr>
-            <td><div style="width:48px;height:60px;background:var(--stone)"></div></td>
-            <td><div style="font-size:14px;font-weight:500">Hira Jakarlı Set</div><div style="font-size:11px;color:var(--ink3)">2 renk · 5 beden</div></td>
-            <td style="color:var(--ink3);font-size:12px">HYZ-007</td><td style="color:var(--ink3)">Setler</td>
-            <td style="font-family:var(--fd);font-size:16px">₺6.750</td>
-            <td style="color:var(--ink3)">—</td><td><span class="badge b-prep">Taslak</span></td>
-            <td style="display:flex;gap:6px"><button class="btn btn-o btn-sm" onclick="showAP('addprod',null)">Düzenle</button><button class="btn-ico" onclick="toast('Ürün silindi')">✕</button></td>
-          </tr>
+          <tr><td colspan="5" style="text-align:center;padding:24px;color:var(--ink3)">Yükleniyor…</td></tr>
         </tbody>
       </table>
     </div>
@@ -618,10 +534,10 @@ img{display:block;object-fit:cover}
 
   <!-- Özet kartlar -->
   <div class="metrics">
-    <div class="mc"><div class="mc-lbl">Aylık Ciro</div><div class="mc-val" id="acc-ciro">₺1.24M</div><div class="mc-ch pos">↑ +28%</div></div>
-    <div class="mc"><div class="mc-lbl">Toplam Gider</div><div class="mc-val" id="acc-gider" style="color:var(--err)">₺348K</div><div class="mc-ch neg">↑ +8%</div></div>
-    <div class="mc"><div class="mc-lbl">Alacaklar</div><div class="mc-val" id="acc-alacak" style="color:var(--gold-dk)">₺124K</div></div>
-    <div class="mc"><div class="mc-lbl">Net Kar</div><div class="mc-val" id="acc-kar" style="color:var(--ok)">₺544K</div><div class="mc-ch pos">Marj: %44</div></div>
+    <div class="mc"><div class="mc-lbl">Aylık Ciro</div><div class="mc-val" id="acc-ciro">₺0</div><div class="mc-ch pos">—</div></div>
+    <div class="mc"><div class="mc-lbl">Toplam Gider</div><div class="mc-val" id="acc-gider" style="color:var(--err)">₺0</div><div class="mc-ch neg">—</div></div>
+    <div class="mc"><div class="mc-lbl">Alacaklar</div><div class="mc-val" id="acc-alacak" style="color:var(--gold-dk)">₺0</div></div>
+    <div class="mc"><div class="mc-lbl">Net Kar</div><div class="mc-val" id="acc-kar" style="color:var(--ok)">₺0</div><div class="mc-ch pos">—</div></div>
   </div>
 
   <!-- Gelir grafiği -->
@@ -745,7 +661,7 @@ img{display:block;object-fit:cover}
   </div>
   <div class="metrics">
     <div class="mc"><div class="mc-lbl">Aktif Kampanya</div><div class="mc-val">3</div></div>
-    <div class="mc"><div class="mc-lbl">Bu Ay Kullanım</div><div class="mc-val">1.247</div><div class="mc-ch pos">↑ +34%</div></div>
+    <div class="mc"><div class="mc-lbl">Bu Ay Kullanım</div><div class="mc-val">0</div><div class="mc-ch pos">↑ +34%</div></div>
     <div class="mc"><div class="mc-lbl">Kampanya Geliri</div><div class="mc-val">₺186K</div></div>
     <div class="mc"><div class="mc-lbl">Ort. İndirim</div><div class="mc-val">%18</div></div>
   </div>
@@ -905,18 +821,18 @@ img{display:block;object-fit:cover}
   </div>
   <div class="metrics">
     <div class="mc"><div class="mc-lbl">Aylık Sipariş</div><div class="mc-val">847</div><div class="mc-ch pos">↑ +34% geçen ay</div></div>
-    <div class="mc"><div class="mc-lbl">Aylık Ciro</div><div class="mc-val">₺1.24M</div><div class="mc-ch pos">↑ +28% geçen ay</div></div>
+    <div class="mc"><div class="mc-lbl">Aylık Ciro</div><div class="mc-val">₺0</div><div class="mc-ch pos">— geçen ay</div></div>
     <div class="mc"><div class="mc-lbl">İade Oranı</div><div class="mc-val">%2.3</div><div class="mc-ch pos">Sektör ort. %5.1</div></div>
     <div class="mc"><div class="mc-lbl">Aktif Müşteri</div><div class="mc-val">3.842</div><div class="mc-ch pos">↑ +12%</div></div>
   </div>
   <div class="card">
     <div class="card-title">En Çok Satan Ürünler — Gelir Payı</div>
     <div style="margin-top:8px">
-      <div class="inv-bar-row"><span class="inv-bar-lbl">Medine İpek Abaya</span><div class="inv-bar-track"><div class="inv-bar-fill" style="width:41%"></div></div><span class="inv-bar-val">₺513K</span></div>
-      <div class="inv-bar-row"><span class="inv-bar-lbl">Rahel Jacquard Palto</span><div class="inv-bar-track"><div class="inv-bar-fill" style="width:34%"></div></div><span class="inv-bar-val">₺418K</span></div>
-      <div class="inv-bar-row"><span class="inv-bar-lbl">Nour Keten Elbise</span><div class="inv-bar-track"><div class="inv-bar-fill" style="width:25%"></div></div><span class="inv-bar-val">₺312K</span></div>
-      <div class="inv-bar-row"><span class="inv-bar-lbl">Hira Jakarlı Set</span><div class="inv-bar-track"><div class="inv-bar-fill" style="width:18%"></div></div><span class="inv-bar-val">₺228K</span></div>
-      <div class="inv-bar-row"><span class="inv-bar-lbl">Serenity Tunik</span><div class="inv-bar-track"><div class="inv-bar-fill" style="width:14%"></div></div><span class="inv-bar-val">₺174K</span></div>
+      <div class="inv-bar-row"><span class="inv-bar-lbl">—</span><div class="inv-bar-track"><div class="inv-bar-fill" style="width:0%"></div></div><span class="inv-bar-val">₺0</span></div>
+      <div class="inv-bar-row"><span class="inv-bar-lbl">—</span><div class="inv-bar-track"><div class="inv-bar-fill" style="width:0%"></div></div><span class="inv-bar-val">₺0</span></div>
+      <div class="inv-bar-row"><span class="inv-bar-lbl">—</span><div class="inv-bar-track"><div class="inv-bar-fill" style="width:0%"></div></div><span class="inv-bar-val">₺0</span></div>
+      <div class="inv-bar-row"><span class="inv-bar-lbl">—</span><div class="inv-bar-track"><div class="inv-bar-fill" style="width:0%"></div></div><span class="inv-bar-val">₺0</span></div>
+      <div class="inv-bar-row"><span class="inv-bar-lbl">—</span><div class="inv-bar-track"><div class="inv-bar-fill" style="width:0%"></div></div><span class="inv-bar-val">₺0</span></div>
     </div>
   </div>
   <div class="g2">
@@ -1240,7 +1156,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     }
     const nameEl=document.getElementById('admin-user-name');
     if(nameEl)nameEl.textContent=session.user.user_metadata?.full_name||session.user.email;
-    loadProducts();loadOrders();
+    loadProducts();loadOrders();loadDashboard();
   }
 });
 </script>
@@ -1478,7 +1394,7 @@ function toast(msg){
   </div>
   <div class="metrics">
     <div class="mc"><div class="mc-lbl">Toplam Müşteri</div><div class="mc-val">3.842</div><div class="mc-ch pos">↑ +12% bu ay</div></div>
-    <div class="mc"><div class="mc-lbl">Yeni (30 gün)</div><div class="mc-val">284</div><div class="mc-ch pos">↑ +8%</div></div>
+    <div class="mc"><div class="mc-lbl">Yeni (30 gün)</div><div class="mc-val">284</div><div class="mc-ch pos">—</div></div>
     <div class="mc"><div class="mc-lbl">Tekrar Alışveriş</div><div class="mc-val">%34</div><div class="mc-ch pos">Sektör ort. %22</div></div>
     <div class="mc"><div class="mc-lbl">Ort. Müşteri Değeri</div><div class="mc-val">₺8.420</div></div>
   </div>
