@@ -1020,8 +1020,8 @@ async function loadOrders(){
       <td style="color:var(--ink3)">${dt}</td>
       <td><span class="badge ${bm[st]||'b-pend'}">${sm[st]||st}</span></td>
       <td style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn btn-o btn-sm" onclick="openOrderDetail('#HYZ-${o.id.slice(0,8).toUpperCase()}')">Detay</button>
-        <button class="btn btn-o btn-sm" onclick="printCargoLabel('#HYZ-${o.id.slice(0,8).toUpperCase()}')">🖨</button>
+        <button class="btn btn-o btn-sm" onclick="openOrderDetail('#HYZ-${o.id.slice(0,8).toUpperCase()}','${o.id}')">Detay</button>
+        <button class="btn btn-o btn-sm" onclick="printCargoLabel('#HYZ-${o.id.slice(0,8).toUpperCase()}','${o.id}')">🖨</button>
         <select class="afs" style="padding:6px 8px;font-size:11px;margin:0;height:32px" onchange="updateOrderStatus('${o.id}',this.value,this)">
           <option value="">Durum ▾</option>
           <option value="confirmed">Onayla</option><option value="shipped">Kargoya Ver</option>
@@ -1188,18 +1188,16 @@ function toast(msg){
       <!-- Items -->
       <div style="border-top:1px solid var(--stone);padding-top:18px;margin-bottom:18px">
         <div class="odm-section-title" style="margin-bottom:12px">Ürünler</div>
-        <div style="display:flex;gap:14px;margin-bottom:12px;align-items:center">
-          <img src="https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=100&q=70" alt="" style="width:52px;height:66px">
-          <div style="flex:1"><div style="font-size:14px;font-weight:500">Medine İpek Abaya</div><div style="font-size:12px;color:var(--ink3)">HYZ-001 · Krem Bej / M · x1</div></div>
-          <div style="font-family:var(--fd);font-size:18px">₺4.850</div>
+        <div id="odm-products">
+          <div style="color:var(--ink3);font-size:13px">Yükleniyor…</div>
         </div>
       </div>
 
       <!-- Totals -->
       <div style="background:var(--bone);padding:16px;margin-bottom:18px">
-        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px"><span>Ara Toplam</span><span>₺4.850</span></div>
-        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px"><span>Kargo</span><span style="color:var(--ok)">Ücretsiz</span></div>
-        <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:500;padding-top:10px;border-top:1px solid var(--stone)"><span>Toplam</span><span style="font-family:var(--fd);font-size:22px">₺4.850</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px"><span>Ara Toplam</span><span id="odm-subtotal">—</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px"><span>Kargo</span><span style="color:var(--ok)" id="odm-shipping">—</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:500;padding-top:10px;border-top:1px solid var(--stone)"><span>Toplam</span><span style="font-family:var(--fd);font-size:22px" id="odm-total">—</span></div>
       </div>
 
       <!-- Admin notes -->
@@ -1393,13 +1391,141 @@ function toast(msg){
 ════════════════════════════════════════ */
 
 /* ── Sipariş Detay Modal ── */
-function openOrderDetail(orderNo, customer){
+/* ── Dashboard Yükle ── */
+async function loadDashboard(){
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const todayISO = today.toISOString();
+
+  // Tüm siparişler
+  const {data:allOrders} = await _sb.from('orders').select('total,status,created_at');
+  if(!allOrders) return;
+
+  const todayOrders = allOrders.filter(o => new Date(o.created_at) >= today);
+  const pendingOrders = allOrders.filter(o => o.status === 'pending' || o.status === 'confirmed');
+  const todayRevenue = todayOrders.reduce((s,o) => s + (o.total||0), 0);
+
+  const el = (id, val) => { const e = document.getElementById(id); if(e) e.textContent = val; };
+  el('dash-orders', todayOrders.length);
+  el('dash-revenue', '₺' + todayRevenue.toLocaleString('tr-TR'));
+  el('dash-pending', pendingOrders.length);
+
+  // Son siparişler
+  const {data:recentOrders} = await _sb.from('orders').select('*').order('created_at',{ascending:false}).limit(5);
+  const recentEl = document.getElementById('dash-recent-orders');
+  if(recentEl && recentOrders){
+    if(recentOrders.length === 0){
+      recentEl.innerHTML = '<div style="color:var(--ink3);font-size:13px">Henüz sipariş yok</div>';
+    } else {
+      const sm = {pending:'Bekliyor',confirmed:'Onaylandı',shipped:'Kargoda',delivered:'Teslim',cancelled:'İptal'};
+      const bm = {pending:'b-pend',confirmed:'b-ship',shipped:'b-ship',delivered:'b-done',cancelled:'b-cancel'};
+      recentEl.innerHTML = recentOrders.map(o => {
+        const items = Array.isArray(o.items) ? o.items : [];
+        const name = items.map(i=>i.name_tr||i.name||'Ürün').join(', ').slice(0,30) || '—';
+        const st = o.status||'pending';
+        return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--stone);font-size:13px">
+          <div>
+            <div style="font-weight:500">#HYZ-${o.id.slice(0,8).toUpperCase()}</div>
+            <div style="color:var(--ink3);font-size:11px">${name}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="font-family:var(--fd)">₺${(o.total||0).toLocaleString('tr-TR')}</span>
+            <span class="badge ${bm[st]||'b-pend'}">${sm[st]||st}</span>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  // Düşük stok
+  const {data:lowStock} = await _sb.from('products').select('name_tr,stock').lt('stock',10).limit(5);
+  const stockEl = document.getElementById('dash-low-stock');
+  if(stockEl){
+    if(!lowStock || lowStock.length === 0){
+      stockEl.innerHTML = '<div style="color:var(--ink3);font-size:13px">Stok sorunu yok ✓</div>';
+    } else {
+      stockEl.innerHTML = lowStock.map(p => `
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--stone);font-size:13px">
+          <span>${p.name_tr||'Ürün'}</span>
+          <span style="color:var(--err);font-weight:500">${p.stock} adet</span>
+        </div>`).join('');
+    }
+  }
+}
+
+/* ── Sipariş Detay ── */
+async function openOrderDetail(orderNo, orderId){
   const m = document.getElementById('order-detail-modal');
   if(!m) return;
-  const title = m.querySelector('.odm-title');
-  if(title && orderNo) title.textContent = orderNo;
+
+  // Önce yükleniyor göster
   m.style.display = 'flex';
   document.body.style.overflow='hidden';
+
+  // Sipariş verisini çek
+  let order = null;
+  if(orderId){
+    const {data} = await _sb.from('orders').select('*').eq('id', orderId).single();
+    order = data;
+  }
+
+  if(!order){
+    // orderId yoksa orderNo'dan bul
+    const {data:allOrders} = await _sb.from('orders').select('*').order('created_at',{ascending:false}).limit(100);
+    if(allOrders) order = allOrders.find(o => '#HYZ-'+o.id.slice(0,8).toUpperCase() === orderNo);
+  }
+
+  const title = m.querySelector('.odm-title');
+  if(title) title.textContent = orderNo;
+
+  if(!order){ return; }
+
+  // Müşteri bilgileri
+  const addr = order.shipping_address || {};
+  const custEl = m.querySelector('.odm-grid .odm-val');
+  const allVals = m.querySelectorAll('.odm-val');
+
+  // Müşteri
+  if(allVals[0]) allVals[0].innerHTML = `${addr.full_name||order.guest_email||'—'}<br>${order.guest_email||addr.email||'—'}<br>${addr.phone||'—'}`;
+  // Adres
+  if(allVals[1]) allVals[1].innerHTML = `${addr.address||''}<br>${addr.district||''} / ${addr.city||''} ${addr.zip||''}`.trim();
+  // Ödeme
+  if(allVals[2]) allVals[2].innerHTML = `Kapıda/Online Ödeme<br><span class="badge b-done" style="margin-top:4px">Ödendi</span>`;
+  // Kargo
+  if(allVals[3]) allVals[3].innerHTML = `Standart Kargo<br>—`;
+
+  // Ürünler
+  const items = Array.isArray(order.items) ? order.items : [];
+  const itemsEl = m.querySelector('.odm-body .odm-section-title + div') || m.querySelectorAll('.odm-section-title')[4]?.nextElementSibling;
+  const prodContainer = m.querySelector('#odm-products');
+  if(prodContainer){
+    prodContainer.innerHTML = items.map(i => `
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--stone)">
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:500">${i.name_tr||i.name||'Ürün'}</div>
+          <div style="font-size:12px;color:var(--ink3)">${i.sku||''} · ${i.color||''} / ${i.size||''} · x${i.qty||1}</div>
+        </div>
+        <div style="font-family:var(--fd)">₺${((i.price||0)*(i.qty||1)).toLocaleString('tr-TR')}</div>
+      </div>`).join('') || '<div style="color:var(--ink3);font-size:13px">Ürün bilgisi yok</div>';
+  }
+
+  // Toplam
+  const totalEl = document.getElementById('odm-total');
+  if(totalEl) totalEl.textContent = '₺'+(order.total||0).toLocaleString('tr-TR');
+  const subtotalEl = document.getElementById('odm-subtotal');
+  if(subtotalEl) subtotalEl.textContent = '₺'+(order.subtotal||order.total||0).toLocaleString('tr-TR');
+  const shippingEl = document.getElementById('odm-shipping');
+  if(shippingEl) shippingEl.textContent = (order.shipping||0) === 0 ? 'Ücretsiz' : '₺'+(order.shipping||0).toLocaleString('tr-TR');
+
+  // Durum butonları
+  const statusBtns = m.querySelectorAll('.od-status-btn');
+  statusBtns.forEach(btn => {
+    btn.classList.remove('active');
+    if(btn.dataset.status === order.status) btn.classList.add('active');
+  });
+
+  // orderId'yi modal'a kaydet
+  m.dataset.orderId = order.id;
 }
 function showCustomerDetail(name, email){
   const m = document.getElementById('customer-detail-modal');
@@ -1421,15 +1547,40 @@ function setOdStatus(btn){
 }
 
 /* ── Kargo Etiketi ── */
-function printCargoLabel(orderNo){
-  const w = window.open('','_blank','width=400,height=300');
-  w.document.write(`<html><body style="font-family:monospace;padding:20px">
-    <h2>KARGO ETİKETİ</h2>
-    <p><b>Sipariş:</b> ${orderNo||'#HYZ-XXXX'}</p>
-    <p><b>Gönderen:</b> HAYAZEEEM</p>
-    <p><b>Kargo:</b> MNG Kargo</p>
-    <hr>
-    <p style="font-size:32px;text-align:center">|||||||||||||||</p>
+async function printCargoLabel(orderNo, orderId){
+  let order = null;
+  if(orderId){
+    const {data} = await _sb.from('orders').select('*').eq('id', orderId).single();
+    order = data;
+  }
+  if(!order){
+    const {data:allOrders} = await _sb.from('orders').select('*').order('created_at',{ascending:false}).limit(200);
+    if(allOrders) order = allOrders.find(o => '#HYZ-'+o.id.slice(0,8).toUpperCase() === orderNo);
+  }
+  const addr = order?.shipping_address || {};
+  const items = Array.isArray(order?.items) ? order.items : [];
+  const itemList = items.map(i=>`${i.name_tr||i.name||'Ürün'} x${i.qty||1}`).join('<br>');
+  const alici = addr.full_name || order?.guest_email || '—';
+  const adres = [addr.address, addr.district, addr.city, addr.zip].filter(Boolean).join(', ') || '—';
+  const tel = addr.phone || '—';
+  const w = window.open('','_blank','width=500,height=500');
+  w.document.write(`<html><body style="font-family:monospace;padding:24px;font-size:14px">
+    <h2 style="margin:0 0 16px">KARGO ETİKETİ</h2>
+    <table style="width:100%;border-collapse:collapse">
+      <tr><td style="padding:4px 0"><b>Sipariş No:</b></td><td>${orderNo||'#HYZ-XXXX'}</td></tr>
+      <tr><td style="padding:4px 0"><b>Tarih:</b></td><td>${new Date().toLocaleDateString('tr-TR')}</td></tr>
+      <tr><td colspan="2"><hr style="margin:8px 0"></td></tr>
+      <tr><td style="padding:4px 0"><b>Gönderen:</b></td><td>HAYAZEEEM</td></tr>
+      <tr><td colspan="2"><hr style="margin:8px 0"></td></tr>
+      <tr><td style="padding:4px 0"><b>Alıcı:</b></td><td>${alici}</td></tr>
+      <tr><td style="padding:4px 0"><b>Adres:</b></td><td>${adres}</td></tr>
+      <tr><td style="padding:4px 0"><b>Telefon:</b></td><td>${tel}</td></tr>
+      <tr><td colspan="2"><hr style="margin:8px 0"></td></tr>
+      <tr><td style="padding:4px 0"><b>Ürünler:</b></td><td>${itemList||'—'}</td></tr>
+      <tr><td style="padding:4px 0"><b>Toplam:</b></td><td>₺${(order?.total||0).toLocaleString('tr-TR')}</td></tr>
+      <tr><td style="padding:4px 0"><b>Kargo:</b></td><td>MNG Kargo · Standart</td></tr>
+    </table>
+    <p style="font-size:28px;text-align:center;margin-top:16px;letter-spacing:4px">|||||||||||||||</p>
     <script>window.print();<\/script>
   </body></html>`);
   toast('Kargo etiketi yazdırılıyor ✓');
