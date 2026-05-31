@@ -48,6 +48,13 @@ const SB = {
   async getSession() {
     const { data: { session } } = await _sbClient.auth.getSession();
     this.user = session?.user || null;
+    // Adresleri profiles'dan yükle
+    if(this.user){
+      const {data:prof} = await _sbClient.from('profiles').select('addresses').eq('id',this.user.id).single();
+      if(prof?.addresses){
+        try{ Store._d.addresses = JSON.parse(prof.addresses)||[]; Store.save(); }catch(e){}
+      }
+    }
     return this.user;
   },
 
@@ -1539,25 +1546,37 @@ img{display:block;max-width:100%;object-fit:cover}
         <div id="acc-addr" style="display:none">
           <h1 class="acc-title">Adreslerim</h1>
           <p class="acc-sub">Kayıtlı teslimat adresleriniz</p>
-          <div class="addr-card def">
-            <div class="addr-def-tag">✓ Varsayılan Adres</div>
-            <div class="addr-acts">
-              <button class="btn btn-o btn-sm" onclick="toast('Düzenleme modu')">✎</button>
-              <button class="btn btn-o btn-sm" onclick="toast('Adres silindi')">✕</button>
+          <div id="addr-list"></div>
+          <button class="btn btn-o" style="margin-top:8px" onclick="openAddrForm()">+ Yeni Adres Ekle</button>
+          <!-- Adres Formu -->
+          <div id="addr-form" style="display:none;margin-top:20px;background:#fff;border:1px solid var(--stone);padding:20px">
+            <h3 style="font-size:14px;font-weight:600;letter-spacing:.08em;margin-bottom:16px">YENİ ADRES</h3>
+            <div class="frow">
+              <div class="fg"><label class="fl">Adres Başlığı</label><input class="fi" id="af-title" placeholder="Ev, İş vb." type="text"></div>
+              <div class="fg"><label class="fl">Ad Soyad</label><input class="fi" id="af-name" placeholder="Adınız Soyadınız" type="text"></div>
             </div>
-            <div style="font-size:15px;font-weight:500;margin-bottom:4px">Ev Adresi</div>
-            <div style="font-size:14px;color:var(--ink2);line-height:1.7">Örnek Mah. Güzel Sok. No:5/3<br>Kadıköy / İstanbul 34710</div>
-            <div style="font-size:13px;color:var(--ink3);margin-top:6px">+90 532 000 0000</div>
-          </div>
-          <div class="addr-card">
-            <div class="addr-acts">
-              <button class="btn btn-o btn-sm" onclick="toast('Düzenleme modu')">✎</button>
-              <button class="btn btn-o btn-sm" onclick="toast('Adres silindi')">✕</button>
+            <div class="fg"><label class="fl">Adres</label><input class="fi" id="af-line" placeholder="Sokak, mahalle, numara" type="text"></div>
+            <div class="frow">
+              <div class="fg"><label class="fl">Şehir</label><input class="fi" id="af-city" placeholder="Şehir" type="text"></div>
+              <div class="fg"><label class="fl">Ülke</label>
+                <select class="fs" id="af-country">
+                  <option value="TR">🇹🇷 Türkiye</option>
+                  <option value="DE">🇩🇪 Almanya</option>
+                  <option value="NL">🇳🇱 Hollanda</option>
+                  <option value="FR">🇫🇷 Fransa</option>
+                  <option value="GB">🇬🇧 İngiltere</option>
+                  <option value="AE">🇦🇪 BAE</option>
+                  <option value="SA">🇸🇦 Suudi Arabistan</option>
+                  <option value="OTHER">🌍 Diğer</option>
+                </select>
+              </div>
             </div>
-            <div style="font-size:15px;font-weight:500;margin-bottom:4px">İş Adresi</div>
-            <div style="font-size:14px;color:var(--ink2);line-height:1.7">Levent İş Merkezi, Kat:4<br>Beşiktaş / İstanbul 34330</div>
+            <div class="fg"><label class="fl">Telefon</label><input class="fi" id="af-phone" placeholder="+90 5__ ___ __ __" type="tel"></div>
+            <div style="display:flex;gap:10px;margin-top:16px">
+              <button class="btn btn-p btn-sm" onclick="saveAddress()">Kaydet</button>
+              <button class="btn btn-o btn-sm" onclick="document.getElementById('addr-form').style.display='none'">İptal</button>
+            </div>
           </div>
-          <button class="btn btn-o" onclick="toast('Yeni adres formu')">+ Yeni Adres Ekle</button>
         </div>
 
         <!-- Notifications -->
@@ -2271,6 +2290,73 @@ function selPay(el){
 function showAccTab(id,btn){
   Store.setAccTab(id);
   renderAccTab();
+  if(id==='acc-addr') renderAddressList();
+}
+
+/* ── Adres Yönetimi ── */
+function renderAddressList(){
+  const list = document.getElementById('addr-list');
+  if(!list) return;
+  const addresses = Store._d?.addresses || [];
+  if(addresses.length === 0){
+    list.innerHTML = '<div style="color:var(--ink3);font-size:14px;padding:16px 0">Henüz kayıtlı adresiniz yok.</div>';
+    return;
+  }
+  list.innerHTML = addresses.map((addr,i) => `
+    <div class="addr-card${i===0?' def':''}">
+      ${i===0?'<div class="addr-def-tag">✓ Varsayılan Adres</div>':''}
+      <div class="addr-acts">
+        <button class="btn btn-o btn-sm" onclick="deleteAddress(${i})">✕</button>
+      </div>
+      <div style="font-size:15px;font-weight:500;margin-bottom:4px">${addr.title||'Adres'}</div>
+      <div style="font-size:14px;color:var(--ink2);line-height:1.7">${addr.name||''}<br>${addr.line||''}<br>${addr.city||''} ${addr.country||''}</div>
+      ${addr.phone?`<div style="font-size:13px;color:var(--ink3);margin-top:6px">${addr.phone}</div>`:''}
+    </div>`).join('');
+}
+
+function openAddrForm(){
+  const form = document.getElementById('addr-form');
+  if(form) form.style.display = form.style.display==='none' ? 'block' : 'none';
+}
+
+async function saveAddress(){
+  const get = id => document.getElementById(id)?.value?.trim()||'';
+  const newAddr = {
+    title: get('af-title') || 'Adres',
+    name: get('af-name'),
+    line: get('af-line'),
+    city: get('af-city'),
+    country: get('af-country'),
+    phone: get('af-phone')
+  };
+  if(!newAddr.line){ toast('Lütfen adres girin'); return; }
+  const addresses = [...(Store._d?.addresses||[]), newAddr];
+  // Supabase'e kaydet
+  if(SB.user){
+    const {error} = await _sbClient.from('profiles').update({addresses: JSON.stringify(addresses)}).eq('id', SB.user.id);
+    if(error){ toast('Kayıt hatası'); return; }
+  }
+  Store._d.addresses = addresses;
+  Store.save();
+  document.getElementById('addr-form').style.display='none';
+  // Formu temizle
+  ['af-title','af-name','af-line','af-city','af-phone'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  renderAddressList();
+  toast('Adres kaydedildi ✓');
+}
+
+async function deleteAddress(idx){
+  const addresses = [...(Store._d?.addresses||[])];
+  addresses.splice(idx,1);
+  if(SB.user){
+    await _sbClient.from('profiles').update({addresses: JSON.stringify(addresses)}).eq('id', SB.user.id);
+  }
+  Store._d.addresses = addresses;
+  Store.save();
+  renderAddressList();
+  toast('Adres silindi');
 }
 
 /* ─── SEARCH ─── */
@@ -3284,10 +3370,58 @@ async function trackOrder(){
   const isEmail = input.includes('@');
   let query = _sbClient.from('orders').select('*');
   if(isEmail){
-    query = query.eq('guest_email', input);
+    query = query.or('guest_email.eq.'+input+',shipping_address->>email.eq.'+input);
   } else {
     const shortId = input.replace(/^#?HYZ-/i,'').toLowerCase();
-    query = query.ilike('id', shortId+'%');
+    // Önce tam UUID eşleşmesi dene, sonra başlangıç eşleşmesi
+    const {data:allOrders} = await _sbClient.from('orders').select('*');
+    const found = (allOrders||[]).find(o => o.id.toLowerCase().startsWith(shortId));
+    if(found){
+      const resultEl2 = document.getElementById('track-result');
+      const emptyEl2  = document.getElementById('track-empty');
+      // found'u data olarak kullan
+      const data = found; const error = null;
+      // devam et
+      const sm={pending:'Bekliyor',confirmed:'Onaylandı',shipped:'Kargoda',delivered:'Teslim Edildi',cancelled:'İptal'};
+      const bm={pending:'b-pend',confirmed:'b-ship',shipped:'b-ship',delivered:'b-done',cancelled:'b-cancel'};
+      const steps=['pending','confirmed','shipped','delivered'];
+      const curStep=steps.indexOf(data.status);
+      const items=Array.isArray(data.items)?data.items:[];
+      const date=new Date(data.created_at).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
+      const orderNo='#HYZ-'+data.id.slice(0,8).toUpperCase();
+      if(resultEl2){
+        resultEl2.style.display='block';
+        resultEl2.innerHTML=`<div class="track-card">
+          <div class="track-hdr">
+            <div><div style="font-size:12px;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Sipariş No</div>
+            <div class="track-onum">${orderNo}</div>
+            <div style="font-size:12px;color:var(--ink3);margin-top:4px">${date}</div></div>
+            <span class="badge ${bm[data.status]||'b-pend'}">${sm[data.status]||data.status}</span>
+          </div>
+          <div class="track-steps">
+            <div class="ts"><div class="ts-c ${curStep>=0?'done':''}">✓</div><div class="ts-n">Sipariş<br>Alındı</div></div>
+            <div class="ts"><div class="ts-c ${curStep>=1?'done':curStep===0?'active':''}">✓</div><div class="ts-n ${curStep===1?'active':''}">Onaylandı</div></div>
+            <div class="ts"><div class="ts-c ${curStep>=2?'done':curStep===1?'active':''}">◎</div><div class="ts-n ${curStep===2?'active':''}">Kargoya<br>Verildi</div></div>
+            <div class="ts"><div class="ts-c ${curStep>=3?'done':''}">4</div><div class="ts-n ${curStep===3?'active':''}">Teslim<br>Edildi</div></div>
+          </div>
+          <div style="margin-top:20px">
+            <div style="font-size:11px;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px">Sipariş İçeriği</div>
+            ${items.map(item=>`<div class="track-item">
+              <div style="background:var(--bone);width:56px;height:56px;flex-shrink:0;border-radius:2px"></div>
+              <div style="flex:1"><div style="font-size:14px">${item.name_tr||item.name||'Ürün'}</div>
+              <div style="font-size:12px;color:var(--ink3)">${[item.color,item.size?'/ '+item.size:''].filter(Boolean).join(' ')} · x${item.qty||1}</div></div>
+              <div style="font-family:var(--fd);font-size:18px">₺${((item.price||0)*(item.qty||1)).toLocaleString('tr-TR')}</div>
+            </div>`).join('')}
+          </div>
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--stone);display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:15px;font-weight:500">Toplam: <span style="font-family:var(--fd);font-size:20px">₺${(data.total||0).toLocaleString('tr-TR')}</span></div>
+          </div>
+        </div>`;
+      }
+      return;
+    }
+    if(emptyEl) emptyEl.style.display='block';
+    return;
   }
   const {data, error} = await query.limit(1).maybeSingle();
   if(error || !data){
