@@ -1256,6 +1256,15 @@ img{display:block;max-width:100%;object-fit:cover}
         <!-- STEP 2: Delivery -->
         <div id="ck-delivery">
           <h2 class="fst">Teslimat Bilgileri</h2>
+          <!-- Kayıtlı adres seçimi - JS ile doldurulur -->
+          <div id="ck-saved-addrs" style="display:none;margin-bottom:20px">
+            <div style="font-size:12px;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:10px">Kayıtlı Adreslerim</div>
+            <div id="ck-addr-list" style="display:flex;flex-direction:column;gap:8px"></div>
+            <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--stone)">
+              <button class="btn btn-o btn-sm" onclick="document.getElementById('ck-saved-addrs').style.display='none';document.getElementById('ck-form-wrap').style.display='block'" style="font-size:12px">+ Farklı Adres Gir</button>
+            </div>
+          </div>
+          <div id="ck-form-wrap">
           <div class="frow" id="ck-address">
             <div class="fg"><label class="fl">Ad</label><input class="fi" name="first_name" placeholder="Adınız" type="text" autocomplete="given-name"></div>
             <div class="fg"><label class="fl">Soyad</label><input class="fi" name="last_name" placeholder="Soyadınız" type="text" autocomplete="family-name"></div>
@@ -1312,6 +1321,7 @@ img{display:block;max-width:100%;object-fit:cover}
             <div class="ship-price">₺180</div>
           </label>
 
+          </div><!-- /ck-form-wrap -->
           <button class="btn btn-p btn-full btn-lg" style="margin-top:24px" onclick="goPayment()">Ödemeye Devam Et →</button>
         </div>
 
@@ -2111,7 +2121,7 @@ function go(name){
     if(!Store.isLoggedIn){ go('login'); return; }
     renderAccTab();
   }
-  if(name==='checkout'){renderCartSummary();renderCheckoutItems();}
+  if(name==='checkout'){renderCartSummary();renderCheckoutItems();renderSavedAddresses();}
   renderNavBadge();
 }
 
@@ -2287,6 +2297,56 @@ function selPay(el){
 }
 
 /* ─── ACCOUNT ─── */
+/* ── Checkout: Kayıtlı Adres Seçimi ── */
+function renderSavedAddresses(){
+  const addresses = Store._d?.addresses || [];
+  const savedDiv = document.getElementById('ck-saved-addrs');
+  const formWrap = document.getElementById('ck-form-wrap');
+  const listDiv  = document.getElementById('ck-addr-list');
+  if(!savedDiv || !formWrap || !listDiv) return;
+
+  if(addresses.length === 0 || !SB.user){
+    savedDiv.style.display = 'none';
+    formWrap.style.display = 'block';
+    return;
+  }
+
+  savedDiv.style.display = 'block';
+  formWrap.style.display = 'none';
+
+  listDiv.innerHTML = addresses.map((addr,i) => `
+    <label style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:1px solid var(--stone);cursor:pointer;transition:border-color 150ms" onclick="selectSavedAddress(${i})">
+      <input type="radio" name="saved-addr" value="${i}" ${i===0?'checked':''} style="accent-color:var(--gold);margin-top:3px;flex-shrink:0">
+      <div>
+        <div style="font-size:14px;font-weight:500;margin-bottom:2px">${addr.title||'Adres '+(i+1)}</div>
+        <div style="font-size:13px;color:var(--ink2);line-height:1.6">${addr.name||''}<br>${addr.line||''}<br>${addr.city||''} ${addr.country||''}</div>
+        ${addr.phone?`<div style="font-size:12px;color:var(--ink3);margin-top:4px">${addr.phone}</div>`:''}
+      </div>
+    </label>`).join('');
+
+  // İlk adresi seçili yap
+  selectSavedAddress(0);
+}
+
+function selectSavedAddress(idx){
+  const addresses = Store._d?.addresses || [];
+  const addr = addresses[idx];
+  if(!addr) return;
+  // Formdaki alanları doldur (gizli olsa da değerleri set et)
+  const set = (name, val) => {
+    const el = document.querySelector(`#ck-delivery input[name="${name}"], #ck-delivery select[name="${name}"]`);
+    if(el) el.value = val||'';
+  };
+  const nameParts = (addr.name||'').split(' ');
+  set('first_name', nameParts[0]||'');
+  set('last_name', nameParts.slice(1).join(' ')||'');
+  set('phone', addr.phone||'');
+  set('address', addr.line||'');
+  set('city', addr.city||'');
+  set('country', addr.country||'TR');
+  set('zip', addr.zip||'');
+}
+
 function showAccTab(id,btn){
   Store.setAccTab(id);
   renderAccTab();
