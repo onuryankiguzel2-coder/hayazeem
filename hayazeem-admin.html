@@ -1098,10 +1098,12 @@ async function saveStock(btn, productId){
 async function loadAccounting(){
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-  const monthEnd = new Date(now.getFullYear(), now.getMonth()+1, 0, 23, 59, 59).toISOString();
+  const monthEnd = new Date(now.getFullYear(), now.getMonth()+1, 1).toISOString();
 
   // Sipariş geliri
   const {data:orders} = await _sb.from('orders').select('total,created_at,status').neq('status','cancelled');
+  // Manuel işlemler
+  const {data:txList} = await _sb.from('transactions').select('*').order('created_at',{ascending:false});
   const monthOrders = (orders||[]).filter(o => o.created_at >= monthStart && o.created_at <= monthEnd);
   const monthRevenue = monthOrders.reduce((s,o) => s+(o.total||0), 0);
   const totalRevenue = (orders||[]).reduce((s,o) => s+(o.total||0), 0);
@@ -1140,19 +1142,30 @@ async function loadAccounting(){
     }).join('');
   }
 
-  // İşlem geçmişi — siparişler
+  // İşlem geçmişi — siparişler + manuel işlemler
   const txEl = document.getElementById('acc-transactions');
-  if(txEl && orders){
-    const recent = [...orders].sort((a,b) => new Date(b.created_at)-new Date(a.created_at)).slice(0,20);
-    if(recent.length === 0){
-      txEl.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--ink3)">İşlem bulunamadı</td></tr>';
+  if(txEl){
+    const orderRows = (orders||[]).map(o => ({
+      date: new Date(o.created_at), type:'gelir', desc:'Sipariş Geliri',
+      amount: o.total||0, badge:'b-done', label:'Gelir', sign:'+'
+    }));
+    const manualRows = (txList||[]).map(t => ({
+      date: new Date(t.date||t.created_at), type:t.type, desc:t.description||t.category||'İşlem',
+      amount: t.amount||0,
+      badge: t.type==='gelir'?'b-done':t.type==='alacak'?'b-ship':'b-cancel',
+      label: t.type==='gelir'?'Gelir':t.type==='alacak'?'Alacak':'Gider',
+      sign: t.type==='gelir'||t.type==='alacak'?'+':'-'
+    }));
+    const allRows = [...orderRows,...manualRows].sort((a,b)=>b.date-a.date).slice(0,30);
+    if(allRows.length===0){
+      txEl.innerHTML='<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--ink3)">İşlem bulunamadı</td></tr>';
     } else {
-      txEl.innerHTML = recent.map(o => `<tr>
-        <td style="font-size:13px">${new Date(o.created_at).toLocaleDateString('tr-TR')}</td>
-        <td><span class="badge b-done" style="font-size:10px">Gelir</span></td>
-        <td style="font-size:13px">Sipariş Geliri</td>
-        <td style="font-family:var(--fd);color:var(--ok)">+₺${(o.total||0).toLocaleString('tr-TR')}</td>
-        <td style="font-size:12px;color:var(--ink3)">${o.status||'—'}</td>
+      txEl.innerHTML = allRows.map(r=>`<tr>
+        <td style="font-size:13px">${r.date.toLocaleDateString('tr-TR')}</td>
+        <td><span class="badge ${r.badge}" style="font-size:10px">${r.label}</span></td>
+        <td style="font-size:13px">${r.desc}</td>
+        <td style="font-family:var(--fd);color:${r.sign==='+'?'var(--ok)':'var(--err)'}">${r.sign}₺${r.amount.toLocaleString('tr-TR')}</td>
+        <td></td>
       </tr>`).join('');
     }
   }
@@ -2054,15 +2067,24 @@ function openTransactionModal(type){
   document.body.appendChild(m);
   m.addEventListener('click',e=>{if(e.target===m)closeModal('tx-modal');});
 }
-function saveTx(type){
+async function saveTx(type){
   const cat=document.getElementById('tx-cat')?.value;
   const desc=document.getElementById('tx-desc')?.value?.trim()||cat;
   const amount=parseFloat(document.getElementById('tx-amount')?.value)||0;
-  const date=document.getElementById('tx-date')?.value||'';
+  const date=document.getElementById('tx-date')?.value||new Date().toISOString().split('T')[0];
   if(!amount){toast('Tutar giriniz');return;}
-  const d=date?new Date(date).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit',year:'2-digit'}):'';
-  txData.unshift({type,cat,desc,amount,date:d+' Manuel'});
-  renderTxList('hepsi');
+  // Supabase'e kaydet
+  const {error} = await _sb.from('transactions').insert([{
+    type, category:cat, description:desc, amount, date, created_at: new Date().toISOString()
+  }]);
+  if(error){
+    // Tablo yoksa local'e ekle
+    const d=new Date(date).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit',year:'2-digit'});
+    txData.unshift({type,cat,desc,amount,date:d+' Manuel'});
+    renderTxList('hepsi');
+  } else {
+    await loadAccounting();
+  }
   closeModal('tx-modal');
   toast(`Kaydedildi: ${type==='gelir'?'+':'-'}₺${amount.toLocaleString('tr-TR')} ✓`);
 }
