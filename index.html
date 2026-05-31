@@ -1257,14 +1257,36 @@ img{display:block;max-width:100%;object-fit:cover}
           <div class="fg"><label class="fl">E-posta</label><input class="fi" name="email" placeholder="ornek@email.com" type="email" autocomplete="email"></div>
           <div class="fg"><label class="fl">Adres</label><input class="fi" name="address" placeholder="Sokak, mahalle, numara" type="text" autocomplete="street-address"></div>
           <div class="frow">
-            <div class="fg"><label class="fl">İl</label>
-              <select class="fs" name="city" autocomplete="address-level1">
-                <option value="">İl seçiniz</option>
-                <option>İstanbul</option><option>Ankara</option><option>İzmir</option><option>Bursa</option><option>Hatay</option>
+            <div class="fg"><label class="fl">Ülke</label>
+              <select class="fs" name="country" autocomplete="country">
+                <option value="TR">🇹🇷 Türkiye</option>
+                <option value="DE">🇩🇪 Almanya</option>
+                <option value="NL">🇳🇱 Hollanda</option>
+                <option value="FR">🇫🇷 Fransa</option>
+                <option value="GB">🇬🇧 İngiltere</option>
+                <option value="BE">🇧🇪 Belçika</option>
+                <option value="AT">🇦🇹 Avusturya</option>
+                <option value="CH">🇨🇭 İsviçre</option>
+                <option value="SE">🇸🇪 İsveç</option>
+                <option value="NO">🇳🇴 Norveç</option>
+                <option value="DK">🇩🇰 Danimarka</option>
+                <option value="US">🇺🇸 Amerika</option>
+                <option value="CA">🇨🇦 Kanada</option>
+                <option value="AU">🇦🇺 Avustralya</option>
+                <option value="AE">🇦🇪 BAE</option>
+                <option value="SA">🇸🇦 Suudi Arabistan</option>
+                <option value="QA">🇶🇦 Katar</option>
+                <option value="KW">🇰🇼 Kuveyt</option>
+                <option value="BH">🇧🇭 Bahreyn</option>
+                <option value="OM">🇴🇲 Umman</option>
+                <option value="JO">🇯🇴 Ürdün</option>
+                <option value="MA">🇲🇦 Fas</option>
+                <option value="OTHER">🌍 Diğer</option>
               </select>
             </div>
-            <div class="fg"><label class="fl">Posta Kodu</label><input class="fi" name="zip" placeholder="31000" type="text" maxlength="5"></div>
+            <div class="fg"><label class="fl">Şehir</label><input class="fi" name="city" placeholder="Şehriniz" type="text" autocomplete="address-level2"></div>
           </div>
+          <div class="fg"><label class="fl">Posta Kodu</label><input class="fi" name="zip" placeholder="31000" type="text" maxlength="10"></div>
 
           <h2 class="fst">Kargo Seçimi</h2>
           <label class="ship-opt sel" onclick="updateShippingCost(0)">
