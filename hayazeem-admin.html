@@ -492,7 +492,7 @@ img{display:block;object-fit:cover}
 
   <!-- Gelir grafiği -->
   <div class="card">
-    <div class="card-title">Aylık Ciro (2025)</div>
+    <div class="card-title" id="acc-chart-title">Aylık Ciro</div>
     <div id="acc-chart-bars" style="height:140px;display:flex;align-items:flex-end;gap:4px;padding:0 8px">
       <div style="color:var(--ink3);font-size:12px;padding:8px">Yükleniyor…</div>
     </div>
@@ -1017,6 +1017,7 @@ function showAP(name, btn){
   document.getElementById('sb-tog').textContent='☰';
   if(name === 'stock') loadStock();
   if(name === 'accounting'){ loadAccounting(); loadSuppliers(); }
+  if(name === 'customers') loadCustomers();
 }
 
 /* ── Stok Yönetimi ── */
@@ -1109,10 +1110,16 @@ async function loadAccounting(){
   const el = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
   el('acc-revenue', '₺'+monthRevenue.toLocaleString('tr-TR'));
   el('acc-total-revenue', '₺'+totalRevenue.toLocaleString('tr-TR'));
+  // Aylık ciro metric kartı
+  const ciroEl = document.getElementById('acc-ciro') || document.getElementById('acc-revenue');
+  if(document.getElementById('acc-ciro')) document.getElementById('acc-ciro').textContent = '₺'+monthRevenue.toLocaleString('tr-TR');
+  if(document.getElementById('acc-kar')) document.getElementById('acc-kar').textContent = '₺'+monthRevenue.toLocaleString('tr-TR');
 
   // Grafik verisi — son 12 ay
   const months = ['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
   const monthlyData = new Array(12).fill(0);
+  const titleEl = document.getElementById('acc-chart-title');
+  if(titleEl) titleEl.textContent = 'Aylık Ciro (' + now.getFullYear() + ')';
   (orders||[]).forEach(o => {
     const d = new Date(o.created_at);
     if(d.getFullYear() === now.getFullYear()){
@@ -1156,6 +1163,67 @@ async function loadAccounting(){
 }
 
 /* ── Tedarikçiler ── */
+async function loadCustomers(){
+  const tbody = document.getElementById('customers-tbody');
+  if(!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--ink3)">Yükleniyor…</td></tr>';
+
+  // Profilleri ve siparişleri çek
+  const [{data:profiles},{data:orders}] = await Promise.all([
+    _sb.from('profiles').select('id,full_name,created_at').order('created_at',{ascending:false}),
+    _sb.from('orders').select('user_id,total,created_at,status').neq('status','cancelled')
+  ]);
+
+  if(!profiles || profiles.length === 0){
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--ink3)">Henüz kayıtlı müşteri yok</td></tr>';
+    return;
+  }
+
+  // Siparişleri kullanıcıya göre grupla
+  const orderMap = {};
+  (orders||[]).forEach(o => {
+    if(!o.user_id) return;
+    if(!orderMap[o.user_id]) orderMap[o.user_id] = {count:0, total:0, last:null};
+    orderMap[o.user_id].count++;
+    orderMap[o.user_id].total += (o.total||0);
+    if(!orderMap[o.user_id].last || o.created_at > orderMap[o.user_id].last)
+      orderMap[o.user_id].last = o.created_at;
+  });
+
+  // Metrikleri hesapla
+  const thirtyDaysAgo = new Date(); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate()-30);
+  const newCustomers = profiles.filter(p => new Date(p.created_at) >= thirtyDaysAgo).length;
+  const orderedCount = profiles.filter(p => orderMap[p.id]?.count > 0).length;
+  const totalSpend = (orders||[]).reduce((s,o)=>s+(o.total||0),0);
+  const avgOrder = orderedCount > 0 ? Math.round(totalSpend / orderedCount) : 0;
+
+  const el = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  el('cust-total', profiles.length);
+  el('cust-new', newCustomers);
+  el('cust-ordered', orderedCount);
+  el('cust-avg', '₺'+avgOrder.toLocaleString('tr-TR'));
+
+  tbody.innerHTML = profiles.map(p => {
+    const ord = orderMap[p.id] || {count:0, total:0, last:null};
+    const lastDate = ord.last ? new Date(ord.last).toLocaleDateString('tr-TR') : '—';
+    const segment = ord.total > 10000 ? 'VIP' : ord.count > 1 ? 'Tekrar' : ord.count === 1 ? 'Yeni' : 'Pasif';
+    const segColor = segment==='VIP'?'b-ship':segment==='Tekrar'?'b-done':segment==='Yeni'?'b-pend':'b-cancel';
+    const initials = (p.full_name||'?').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:10px">
+        <div class="av" style="width:32px;height:32px;font-size:12px;background:#e8d5a3;flex-shrink:0">${initials}</div>
+        <span style="font-size:13px;font-weight:500">${p.full_name||'—'}</span>
+      </div></td>
+      <td style="font-size:12px;color:var(--ink3)">—</td>
+      <td style="font-size:13px">${ord.count}</td>
+      <td style="font-family:var(--fd)">₺${ord.total.toLocaleString('tr-TR')}</td>
+      <td style="font-size:12px;color:var(--ink3)">${lastDate}</td>
+      <td><span class="badge ${segColor}">${segment}</span></td>
+      <td><button class="btn btn-o btn-sm" onclick="toast('Müşteri detayı')">Detay</button></td>
+    </tr>`;
+  }).join('');
+}
+
 async function loadSuppliers(){
   const tbody = document.getElementById('supplier-tbody');
   if(!tbody) return;
@@ -1335,17 +1403,17 @@ function toast(msg){
     </div>
   </div>
   <div class="metrics">
-    <div class="mc"><div class="mc-lbl">Toplam Müşteri</div><div class="mc-val">0</div><div class="mc-ch">—</div></div>
-    <div class="mc"><div class="mc-lbl">Yeni (30 gün)</div><div class="mc-val">0</div><div class="mc-ch">—</div></div>
-    <div class="mc"><div class="mc-lbl">Tekrar Alışveriş</div><div class="mc-val">%0</div><div class="mc-ch pos">Sektör ort. %22</div></div>
-    <div class="mc"><div class="mc-lbl">Ort. Müşteri Değeri</div><div class="mc-val">₺8.420</div></div>
+    <div class="mc"><div class="mc-lbl">Toplam Müşteri</div><div class="mc-val" id="cust-total">—</div><div class="mc-ch">—</div></div>
+    <div class="mc"><div class="mc-lbl">Yeni (30 gün)</div><div class="mc-val" id="cust-new">—</div><div class="mc-ch">—</div></div>
+    <div class="mc"><div class="mc-lbl">Sipariş Veren</div><div class="mc-val" id="cust-ordered">—</div><div class="mc-ch pos">—</div></div>
+    <div class="mc"><div class="mc-lbl">Ort. Sipariş Değeri</div><div class="mc-val" id="cust-avg">—</div></div>
   </div>
   <div class="card" style="padding:0;overflow:hidden">
     <div class="tw">
       <table class="tbl">
         <thead><tr><th>Müşteri</th><th>E-posta</th><th>Sipariş</th><th>Toplam Harcama</th><th>Son Sipariş</th><th>Segment</th><th></th></tr></thead>
-        <tbody>
-          <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--ink3)">Henüz müşteri verisi yok</td></tr>
+        <tbody id="customers-tbody">
+          <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--ink3)">Yükleniyor…</td></tr>
         </tbody>
       </table>
     </div>
@@ -1481,7 +1549,7 @@ async function loadDashboard(){
   if(!allOrders) return;
 
   const todayOrders = allOrders.filter(o => new Date(o.created_at) >= today);
-  const pendingOrders = allOrders.filter(o => o.status === 'pending' || o.status === 'confirmed');
+  const pendingOrders = allOrders.filter(o => !['delivered','cancelled'].includes(o.status||'pending'));
   const todayRevenue = todayOrders.reduce((s,o) => s + (o.total||0), 0);
 
   const el = (id, val) => { const e = document.getElementById(id); if(e) e.textContent = val; };
