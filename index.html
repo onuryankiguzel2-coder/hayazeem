@@ -3427,67 +3427,28 @@ async function trackOrder(){
   if(resultEl) resultEl.style.display='none';
   if(emptyEl)  emptyEl.style.display='none';
   toast('Sorgulanıyor…');
-  const isEmail = input.includes('@');
-  let query = _sbClient.from('orders').select('*');
-  if(isEmail){
-    query = query.or('guest_email.eq.'+input+',shipping_address->>email.eq.'+input);
+
+  let found = null;
+
+  if(input.includes('@')){
+    // E-posta ile sorgula
+    const {data} = await _sbClient.from('orders').select('*')
+      .or(`guest_email.eq.${input},shipping_address->>email.eq.${input}`)
+      .limit(1).maybeSingle();
+    found = data;
   } else {
+    // Sipariş numarası: HYZ-XXXXXXXX → ilk 8 karakter UUID'nin başı
     const shortId = input.replace(/^#?HYZ-/i,'').toLowerCase();
-    // Önce tam UUID eşleşmesi dene, sonra başlangıç eşleşmesi
     const {data:allOrders} = await _sbClient.from('orders').select('*');
-    const found = (allOrders||[]).find(o => o.id.toLowerCase().startsWith(shortId));
-    if(found){
-      const resultEl2 = document.getElementById('track-result');
-      const emptyEl2  = document.getElementById('track-empty');
-      // found'u data olarak kullan
-      const data = found; const error = null;
-      // devam et
-      const sm={pending:'Bekliyor',confirmed:'Onaylandı',shipped:'Kargoda',delivered:'Teslim Edildi',cancelled:'İptal'};
-      const bm={pending:'b-pend',confirmed:'b-ship',shipped:'b-ship',delivered:'b-done',cancelled:'b-cancel'};
-      const steps=['pending','confirmed','shipped','delivered'];
-      const curStep=steps.indexOf(data.status);
-      const items=Array.isArray(data.items)?data.items:[];
-      const date=new Date(data.created_at).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
-      const orderNo='#HYZ-'+data.id.slice(0,8).toUpperCase();
-      if(resultEl2){
-        resultEl2.style.display='block';
-        resultEl2.innerHTML=`<div class="track-card">
-          <div class="track-hdr">
-            <div><div style="font-size:12px;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Sipariş No</div>
-            <div class="track-onum">${orderNo}</div>
-            <div style="font-size:12px;color:var(--ink3);margin-top:4px">${date}</div></div>
-            <span class="badge ${bm[data.status]||'b-pend'}">${sm[data.status]||data.status}</span>
-          </div>
-          <div class="track-steps">
-            <div class="ts"><div class="ts-c ${curStep>=0?'done':''}">✓</div><div class="ts-n">Sipariş<br>Alındı</div></div>
-            <div class="ts"><div class="ts-c ${curStep>=1?'done':curStep===0?'active':''}">✓</div><div class="ts-n ${curStep===1?'active':''}">Onaylandı</div></div>
-            <div class="ts"><div class="ts-c ${curStep>=2?'done':curStep===1?'active':''}">◎</div><div class="ts-n ${curStep===2?'active':''}">Kargoya<br>Verildi</div></div>
-            <div class="ts"><div class="ts-c ${curStep>=3?'done':''}">4</div><div class="ts-n ${curStep===3?'active':''}">Teslim<br>Edildi</div></div>
-          </div>
-          <div style="margin-top:20px">
-            <div style="font-size:11px;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px">Sipariş İçeriği</div>
-            ${items.map(item=>`<div class="track-item">
-              <div style="background:var(--bone);width:56px;height:56px;flex-shrink:0;border-radius:2px"></div>
-              <div style="flex:1"><div style="font-size:14px">${item.name_tr||item.name||'Ürün'}</div>
-              <div style="font-size:12px;color:var(--ink3)">${[item.color,item.size?'/ '+item.size:''].filter(Boolean).join(' ')} · x${item.qty||1}</div></div>
-              <div style="font-family:var(--fd);font-size:18px">₺${((item.price||0)*(item.qty||1)).toLocaleString('tr-TR')}</div>
-            </div>`).join('')}
-          </div>
-          <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--stone);display:flex;justify-content:space-between;align-items:center">
-            <div style="font-size:15px;font-weight:500">Toplam: <span style="font-family:var(--fd);font-size:20px">₺${(data.total||0).toLocaleString('tr-TR')}</span></div>
-          </div>
-        </div>`;
-      }
-      return;
-    }
+    found = (allOrders||[]).find(o => o.id.replace(/-/g,'').toLowerCase().startsWith(shortId.replace(/-/g,'')) || o.id.toLowerCase().startsWith(shortId));
+  }
+
+  if(!found){
     if(emptyEl) emptyEl.style.display='block';
     return;
   }
-  const {data, error} = await query.limit(1).maybeSingle();
-  if(error || !data){
-    if(emptyEl) emptyEl.style.display='block';
-    return;
-  }
+
+  const data = found;
   const sm={pending:'Bekliyor',confirmed:'Onaylandı',shipped:'Kargoda',delivered:'Teslim Edildi',cancelled:'İptal'};
   const bm={pending:'b-pend',confirmed:'b-ship',shipped:'b-ship',delivered:'b-done',cancelled:'b-cancel'};
   const steps=['pending','confirmed','shipped','delivered'];
@@ -3495,13 +3456,16 @@ async function trackOrder(){
   const items=Array.isArray(data.items)?data.items:[];
   const date=new Date(data.created_at).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
   const orderNo='#HYZ-'+data.id.slice(0,8).toUpperCase();
+
   if(resultEl){
     resultEl.style.display='block';
     resultEl.innerHTML=`<div class="track-card">
       <div class="track-hdr">
-        <div><div style="font-size:12px;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Sipariş No</div>
-        <div class="track-onum">${orderNo}</div>
-        <div style="font-size:12px;color:var(--ink3);margin-top:4px">${date}</div></div>
+        <div>
+          <div style="font-size:12px;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Sipariş No</div>
+          <div class="track-onum">${orderNo}</div>
+          <div style="font-size:12px;color:var(--ink3);margin-top:4px">${date}</div>
+        </div>
         <span class="badge ${bm[data.status]||'b-pend'}">${sm[data.status]||data.status}</span>
       </div>
       <div class="track-steps">
@@ -3513,24 +3477,22 @@ async function trackOrder(){
       <div style="margin-top:20px">
         <div style="font-size:11px;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px">Sipariş İçeriği</div>
         ${items.map(item=>`<div class="track-item">
-          <div class="ti-img" style="background:var(--bone);width:56px;height:56px;flex-shrink:0;border-radius:2px"></div>
-          <div style="flex:1"><div style="font-size:14px">${item.name_tr||item.name||'Ürün'}</div>
-          <div style="font-size:12px;color:var(--ink3)">${[item.color,item.size?'/ '+item.size:''].filter(Boolean).join(' ')} · x${item.qty||1}</div></div>
-          <div class="d" style="font-size:18px">₺${((item.price||0)*(item.qty||1)).toLocaleString('tr-TR')}</div>
+          <div style="background:var(--bone);width:56px;height:56px;flex-shrink:0;border-radius:2px"></div>
+          <div style="flex:1">
+            <div style="font-size:14px">${item.name_tr||item.name||'Ürün'}</div>
+            <div style="font-size:12px;color:var(--ink3)">${[item.color,item.size?'/ '+item.size:''].filter(Boolean).join(' ')} · x${item.qty||1}</div>
+          </div>
+          <div style="font-family:var(--fd);font-size:18px">₺${((item.price||0)*(item.qty||1)).toLocaleString('tr-TR')}</div>
         </div>`).join('')}
       </div>
-      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--stone);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--stone);display:flex;justify-content:space-between;align-items:center">
         <div style="font-size:15px;font-weight:500">Toplam: <span style="font-family:var(--fd);font-size:20px">₺${(data.total||0).toLocaleString('tr-TR')}</span></div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-o btn-sm" onclick="go('returns')">↩ İade Talebi</button>
-          <button class="btn btn-p btn-sm" onclick="go('account')">Hesabıma Git</button>
-        </div>
       </div>
     </div>`;
   }
 }
 
-/* ── Sipariş Tamamla ── */
+
 async function confirmOrder(){
   const cartItems = Store._d?.cart || [];
   const total = cartItems.reduce((s,i)=>s+(i.price*i.qty),0);
