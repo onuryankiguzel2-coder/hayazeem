@@ -930,7 +930,7 @@ async function loadOrders(){
     const st=o.status||'pending';
     return `<tr>
       <td style="font-weight:500">#HYZ-${o.id.slice(0,8).toUpperCase()}</td>
-      <td>${o.guest_email||'—'}</td>
+      <td>${(o.shipping_address?.full_name)||o.guest_email||'—'}</td>
       <td style="color:var(--ink3);font-size:12px">${sum}</td>
       <td style="font-family:var(--fd);font-size:16px">₺${(o.total||0).toLocaleString('tr-TR')}</td>
       <td style="color:var(--ink3)">${dt}</td>
