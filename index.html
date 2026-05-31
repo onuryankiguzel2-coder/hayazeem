@@ -1249,36 +1249,36 @@ img{display:block;max-width:100%;object-fit:cover}
         <!-- STEP 2: Delivery -->
         <div id="ck-delivery">
           <h2 class="fst">Teslimat Bilgileri</h2>
-          <div class="frow">
-            <div class="fg"><label class="fl">Ad</label><input class="fi" placeholder="Adınız" type="text" autocomplete="given-name"></div>
-            <div class="fg"><label class="fl">Soyad</label><input class="fi" placeholder="Soyadınız" type="text" autocomplete="family-name"></div>
+          <div class="frow" id="ck-address">
+            <div class="fg"><label class="fl">Ad</label><input class="fi" name="first_name" placeholder="Adınız" type="text" autocomplete="given-name"></div>
+            <div class="fg"><label class="fl">Soyad</label><input class="fi" name="last_name" placeholder="Soyadınız" type="text" autocomplete="family-name"></div>
           </div>
-          <div class="fg"><label class="fl">Telefon</label><input class="fi" placeholder="+90 5__ ___ __ __" type="tel" autocomplete="tel"></div>
-          <div class="fg"><label class="fl">E-posta</label><input class="fi" placeholder="ornek@email.com" type="email" autocomplete="email"></div>
-          <div class="fg"><label class="fl">Adres</label><input class="fi" placeholder="Sokak, mahalle, numara" type="text" autocomplete="street-address"></div>
+          <div class="fg"><label class="fl">Telefon</label><input class="fi" name="phone" placeholder="+90 5__ ___ __ __" type="tel" autocomplete="tel"></div>
+          <div class="fg"><label class="fl">E-posta</label><input class="fi" name="email" placeholder="ornek@email.com" type="email" autocomplete="email"></div>
+          <div class="fg"><label class="fl">Adres</label><input class="fi" name="address" placeholder="Sokak, mahalle, numara" type="text" autocomplete="street-address"></div>
           <div class="frow">
             <div class="fg"><label class="fl">İl</label>
-              <select class="fs" autocomplete="address-level1">
+              <select class="fs" name="city" autocomplete="address-level1">
                 <option value="">İl seçiniz</option>
                 <option>İstanbul</option><option>Ankara</option><option>İzmir</option><option>Bursa</option><option>Hatay</option>
               </select>
             </div>
-            <div class="fg"><label class="fl">Posta Kodu</label><input class="fi" placeholder="31000" type="text" maxlength="5"></div>
+            <div class="fg"><label class="fl">Posta Kodu</label><input class="fi" name="zip" placeholder="31000" type="text" maxlength="5"></div>
           </div>
 
           <h2 class="fst">Kargo Seçimi</h2>
-          <label class="ship-opt sel">
-            <input type="radio" name="ship" checked style="accent-color:var(--gold)">
+          <label class="ship-opt sel" onclick="updateShippingCost(0)">
+            <input type="radio" name="ship" value="0" checked style="accent-color:var(--gold)">
             <div style="flex:1"><div style="font-size:14px;font-weight:500">Standart Kargo</div><div style="font-size:12px;color:var(--ink3)">2-4 İş Günü · MNG Kargo</div></div>
             <div class="ship-price" style="color:var(--ok)">Ücretsiz</div>
           </label>
-          <label class="ship-opt">
-            <input type="radio" name="ship" style="accent-color:var(--gold)">
+          <label class="ship-opt" onclick="updateShippingCost(49)">
+            <input type="radio" name="ship" value="49" style="accent-color:var(--gold)">
             <div style="flex:1"><div style="font-size:14px;font-weight:500">Ekspres Kargo</div><div style="font-size:12px;color:var(--ink3)">Aynı/Ertesi Gün</div></div>
             <div class="ship-price">₺49</div>
           </label>
-          <label class="ship-opt">
-            <input type="radio" name="ship" style="accent-color:var(--gold)">
+          <label class="ship-opt" onclick="updateShippingCost(180)">
+            <input type="radio" name="ship" value="180" style="accent-color:var(--gold)">
             <div style="flex:1"><div style="font-size:14px;font-weight:500">Uluslararası · DHL</div><div style="font-size:12px;color:var(--ink3)">7-14 İş Günü</div></div>
             <div class="ship-price">₺180</div>
           </label>
@@ -1745,8 +1745,8 @@ const Store = {
     const sub=this._d.cart.reduce((s,i)=>s+i.price*i.qty,0);
     const pct=this._d.appliedPromo?(this._d.promos[this._d.appliedPromo]||0):0;
     const disc=Math.round(sub*pct/100);
-    const ship=sub>=500?0:49;
-    return{sub,disc,ship,total:sub-disc+ship};
+    const ship=0; // Kargo checkout'ta seçiliyor
+    return{sub,disc,ship,total:sub-disc};
   },
 
   /* Favorites */
@@ -2213,6 +2213,23 @@ function favRemove(productId){
 }
 
 /* ─── CHECKOUT FLOW ─── */
+/* Kargo seçimi güncelle */
+function updateShippingCost(cost){
+  document.querySelectorAll('.ship-opt').forEach(el=>el.classList.remove('sel'));
+  event.currentTarget.classList.add('sel');
+  // Özet fiyatları güncelle
+  const cartItems = Store._d?.cart || [];
+  const sub = cartItems.reduce((s,i)=>s+(i.price*i.qty),0);
+  const pct = Store._d?.appliedPromo ? (Store._d.promos[Store._d.appliedPromo]||0) : 0;
+  const disc = Math.round(sub*pct/100);
+  const total = sub - disc + cost;
+  const fmt = v => '₺'+v.toLocaleString('tr-TR');
+  const el = id => document.getElementById(id);
+  if(el('om-shipping')) el('om-shipping').innerHTML = cost===0 ? '<span style="color:var(--ok)">Ücretsiz</span>' : fmt(cost);
+  if(el('om-total')) el('om-total').textContent = fmt(total);
+  if(el('ck-pay-btn')) el('ck-pay-btn').textContent = 'Siparişi Tamamla — ' + fmt(total);
+}
+
 function goPayment(){
   document.getElementById('ck-delivery').style.display='none';
   document.getElementById('ck-payment').style.display='block';
@@ -3301,10 +3318,16 @@ async function trackOrder(){
 async function confirmOrder(){
   const cartItems = Store._d?.cart || [];
   const total = cartItems.reduce((s,i)=>s+(i.price*i.qty),0);
-  const shipping = total >= 500 ? 0 : 49.90;
-  const addrInputs = document.querySelectorAll('#ck-address input, #ck-address select');
+  // Seçili kargoyu oku
+  const selectedShip = document.querySelector('input[name="ship"]:checked');
+  const shipping = selectedShip ? parseFloat(selectedShip.value) : (total >= 500 ? 0 : 49.90);
+  const addrInputs = document.querySelectorAll('#ck-delivery input[name], #ck-delivery select[name]');
   const address = {};
   addrInputs.forEach(inp=>{if(inp.name) address[inp.name]=inp.value;});
+  // Ad soyad birleştir
+  if(address.first_name || address.last_name){
+    address.full_name = ((address.first_name||'') + ' ' + (address.last_name||'')).trim();
+  }
   const orderData = {
     user_id: SB.user?.id||null,
     guest_email: !SB.user?(document.getElementById('ck-email')?.value||null):null,
