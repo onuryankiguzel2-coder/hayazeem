@@ -1108,14 +1108,26 @@ async function loadAccounting(){
   const monthRevenue = monthOrders.reduce((s,o) => s+(o.total||0), 0);
   const totalRevenue = (orders||[]).reduce((s,o) => s+(o.total||0), 0);
 
+  // Gider hesabı — transactions tablosundan
+  const giderler = (txList||[]).filter(t => t.type==='gider' || t.type==='harcama');
+  const monthGider = giderler
+    .filter(t => { const d=t.date||t.created_at; return d >= monthStart && d <= monthEnd; })
+    .reduce((s,t) => s+(parseFloat(t.amount)||0), 0);
+  const totalGider = giderler.reduce((s,t) => s+(parseFloat(t.amount)||0), 0);
+  const monthNet = monthRevenue - monthGider;
+  const totalNet = totalRevenue - totalGider;
+
+  // Alacaklar
+  const alacaklar = (txList||[]).filter(t => t.type==='alacak');
+  const totalAlacak = alacaklar.reduce((s,t) => s+(parseFloat(t.amount)||0), 0);
+
   // Metrik güncelle
   const el = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
   el('acc-revenue', '₺'+monthRevenue.toLocaleString('tr-TR'));
   el('acc-total-revenue', '₺'+totalRevenue.toLocaleString('tr-TR'));
-  // Aylık ciro metric kartı
-  const ciroEl = document.getElementById('acc-ciro') || document.getElementById('acc-revenue');
+  el('acc-gider', '₺'+totalGider.toLocaleString('tr-TR'));
   if(document.getElementById('acc-ciro')) document.getElementById('acc-ciro').textContent = '₺'+monthRevenue.toLocaleString('tr-TR');
-  if(document.getElementById('acc-kar')) document.getElementById('acc-kar').textContent = '₺'+monthRevenue.toLocaleString('tr-TR');
+  if(document.getElementById('acc-kar')) document.getElementById('acc-kar').textContent = '₺'+monthNet.toLocaleString('tr-TR');
 
   // Grafik verisi — son 12 ay
   const months = ['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
@@ -1131,13 +1143,19 @@ async function loadAccounting(){
   const maxVal = Math.max(...monthlyData, 1);
   const chartEl = document.getElementById('acc-chart-bars');
   if(chartEl){
+    const maxVal2 = Math.max(...monthlyData, 1);
+    chartEl.style.display = 'flex';
+    chartEl.style.alignItems = 'flex-end';
+    chartEl.style.height = '160px';
+    chartEl.style.gap = '4px';
     chartEl.innerHTML = monthlyData.map((v,i) => {
-      const h = Math.round((v/maxVal)*100);
+      const h = Math.max(Math.round((v/maxVal2)*140), v>0?8:3);
       const isCurrentMonth = i === now.getMonth();
-      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:4px">
-        <div style="font-size:10px;color:var(--ink3)">₺${v>0?Math.round(v/1000)+'K':''}</div>
-        <div style="width:100%;height:${Math.max(h,2)}%;background:${isCurrentMonth?'var(--gold)':'var(--warm)'};border-radius:2px 2px 0 0;min-height:4px"></div>
-        <div style="font-size:10px;color:var(--ink3)">${months[i]}</div>
+      const label = v>0 ? (v>=1000?Math.round(v/1000)+'K':Math.round(v)) : '';
+      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;height:100%;justify-content:flex-end">
+        <div style="font-size:9px;color:var(--ink3)">${label?'₺'+label:''}</div>
+        <div style="width:100%;height:${h}px;background:${isCurrentMonth?'var(--gold)':'var(--warm)'};border-radius:2px 2px 0 0" title="${months[i]}: ₺${v.toLocaleString('tr-TR')}"></div>
+        <div style="font-size:9px;color:var(--ink3)">${months[i]}</div>
       </div>`;
     }).join('');
   }
@@ -1148,7 +1166,10 @@ async function loadAccounting(){
 
   // Dönem özeti
   el('acc-period-revenue', '+₺'+monthRevenue.toLocaleString('tr-TR'));
-  el('acc-net', '₺'+monthRevenue.toLocaleString('tr-TR'));
+  el('acc-net', '₺'+monthNet.toLocaleString('tr-TR'));
+  // Net kar kart rengi
+  const netEl = document.getElementById('acc-net');
+  if(netEl) netEl.style.color = monthNet >= 0 ? 'var(--ok)' : 'var(--err)';
 }
 
 /* ── Tedarikçiler ── */
