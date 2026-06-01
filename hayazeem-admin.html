@@ -1305,8 +1305,8 @@ function toast(msg){
   <div class="odm">
     <div class="odm-head">
       <div>
-        <div class="odm-title">#HYZ-2025-0851</div>
-        <div style="font-size:12px;color:var(--ink3);margin-top:2px">15 Mayıs 2025 · 14:32</div>
+        <div class="odm-title">#HYZ---------</div>
+        <div style="font-size:12px;color:var(--ink3);margin-top:2px" id="odm-date">—</div>
       </div>
       <button class="odm-close" onclick="closeModal('order-detail-modal')">✕</button>
     </div>
@@ -1664,6 +1664,11 @@ async function openOrderDetail(orderNo, orderId){
 
   const title = m.querySelector('.odm-title');
   if(title) title.textContent = orderNo;
+  const dateEl = document.getElementById('odm-date');
+  if(dateEl && order?.created_at){
+    const d = new Date(order.created_at);
+    dateEl.textContent = d.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'}) + ' · ' + d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+  }
 
   if(!order){ return; }
 
