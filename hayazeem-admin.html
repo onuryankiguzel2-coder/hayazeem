@@ -1142,33 +1142,9 @@ async function loadAccounting(){
     }).join('');
   }
 
-  // İşlem geçmişi — siparişler + manuel işlemler
-  const txEl = document.getElementById('acc-transactions');
-  if(txEl){
-    const orderRows = (orders||[]).map(o => ({
-      date: new Date(o.created_at), type:'gelir', desc:'Sipariş Geliri',
-      amount: o.total||0, badge:'b-done', label:'Gelir', sign:'+'
-    }));
-    const manualRows = (txList||[]).map(t => ({
-      date: new Date(t.date||t.created_at), type:t.type, desc:t.description||t.category||'İşlem',
-      amount: t.amount||0,
-      badge: t.type==='gelir'?'b-done':t.type==='alacak'?'b-ship':'b-cancel',
-      label: t.type==='gelir'?'Gelir':t.type==='alacak'?'Alacak':'Gider',
-      sign: t.type==='gelir'||t.type==='alacak'?'+':'-'
-    }));
-    const allRows = [...orderRows,...manualRows].sort((a,b)=>b.date-a.date).slice(0,30);
-    if(allRows.length===0){
-      txEl.innerHTML='<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--ink3)">İşlem bulunamadı</td></tr>';
-    } else {
-      txEl.innerHTML = allRows.map(r=>`<tr>
-        <td style="font-size:13px">${r.date.toLocaleDateString('tr-TR')}</td>
-        <td><span class="badge ${r.badge}" style="font-size:10px">${r.label}</span></td>
-        <td style="font-size:13px">${r.desc}</td>
-        <td style="font-family:var(--fd);color:${r.sign==='+'?'var(--ok)':'var(--err)'}">${r.sign}₺${r.amount.toLocaleString('tr-TR')}</td>
-        <td></td>
-      </tr>`).join('');
-    }
-  }
+  // İşlem geçmişi — cache'e yaz, renderAccTransactions ile göster
+  window._txCache = { orders: orders||[], manual: txList||[] };
+  renderAccTransactions('hepsi');
 
   // Dönem özeti
   el('acc-period-revenue', '+₺'+monthRevenue.toLocaleString('tr-TR'));
@@ -2024,6 +2000,41 @@ const txTypes = {
   alacak: {label:'Alacak Ekle', color:'var(--gold-dk)', icon:'!', cats:['Müşteri Alacağı','Sigorta Alacağı','KDV İadesi','Diğer Alacak']}
 };
 const txData = [];
+// Global transaction cache
+window._txCache = { orders: [], manual: [] };
+
+function renderAccTransactions(filter){
+  const txEl = document.getElementById('acc-transactions');
+  if(!txEl) return;
+  const orders = window._txCache.orders || [];
+  const manual = window._txCache.manual || [];
+  const orderRows = orders.map(o => ({
+    date: new Date(o.created_at), type:'gelir', desc:'Sipariş Geliri',
+    amount: o.total||0, badge:'b-done', label:'Gelir', sign:'+'
+  }));
+  const manualRows = manual.map(t => ({
+    date: new Date(t.date||t.created_at), type:t.type, desc:t.description||t.category||'İşlem',
+    amount: t.amount||0,
+    badge: t.type==='gelir'?'b-done':t.type==='alacak'?'b-ship':'b-cancel',
+    label: t.type==='gelir'?'Gelir':t.type==='alacak'?'Alacak':'Gider',
+    sign: t.type==='gelir'||t.type==='alacak'?'+':'-'
+  }));
+  let allRows = [...orderRows,...manualRows].sort((a,b)=>b.date-a.date);
+  if(filter && filter!=='hepsi') allRows = allRows.filter(r=>r.type===filter);
+  allRows = allRows.slice(0,50);
+  if(allRows.length===0){
+    txEl.innerHTML='<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--ink3)">İşlem bulunamadı</td></tr>';
+  } else {
+    txEl.innerHTML = allRows.map(r=>`<tr>
+      <td style="font-size:13px">${r.date.toLocaleDateString('tr-TR')}</td>
+      <td><span class="badge ${r.badge}" style="font-size:10px">${r.label}</span></td>
+      <td style="font-size:13px">${r.desc}</td>
+      <td style="font-family:var(--fd);color:${r.sign==='+'?'var(--ok)':'var(--err)'}">${r.sign}₺${r.amount.toLocaleString('tr-TR')}</td>
+      <td></td>
+    </tr>`).join('');
+  }
+}
+
 function renderTxList(filter){
   const list = document.getElementById('tx-list');
   if(!list) return;
@@ -2041,7 +2052,7 @@ function renderTxList(filter){
 function filterTx(type,btn){
   document.querySelectorAll('.acc-filter-btn').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
-  renderTxList(type);
+  renderAccTransactions(type);
 }
 function openTransactionModal(type){
   const cfg=txTypes[type]||txTypes.gelir;
@@ -2185,7 +2196,7 @@ function confirmPayment(){
   closeModal('pay-modal');
   toast('Ödeme kaydedildi: ₺'+amount.toLocaleString('tr-TR')+' ✓');
 }
-setTimeout(()=>renderTxList('hepsi'),100);
+// renderTxList kaldırıldı - loadAccounting kullanılıyor
 
 /* ── Toptancı / Tedarikçi Ekle ── */
 function openSupplierModal(editData){
