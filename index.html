@@ -41,6 +41,17 @@ const SB = {
   async createOrder(orderData) {
     const { data, error } = await _sbClient.from('orders').insert([orderData]).select().single();
     if (error) { console.error('Sipariş hatası:', error); return null; }
+    // Stok düş
+    if(data && Array.isArray(orderData.items)){
+      for(const item of orderData.items){
+        if(!item.product_id) continue;
+        const {data:prod} = await _sbClient.from('products').select('stock').eq('id', item.product_id).single();
+        if(prod && typeof prod.stock === 'number'){
+          const newStock = Math.max(0, prod.stock - (item.qty||1));
+          await _sbClient.from('products').update({stock: newStock}).eq('id', item.product_id);
+        }
+      }
+    }
     return data;
   },
 
@@ -3473,6 +3484,7 @@ async function trackOrder(){
 
   if(resultEl){
     resultEl.style.display='block';
+    setTimeout(()=>resultEl.scrollIntoView({behavior:'smooth',block:'start'}),100);
     resultEl.innerHTML=`<div class="track-card">
       <div class="track-hdr">
         <div>
@@ -3520,10 +3532,15 @@ async function confirmOrder(){
   if(address.first_name || address.last_name){
     address.full_name = ((address.first_name||'') + ' ' + (address.last_name||'')).trim();
   }
+  // Cart items'a product_id ekle
+  const enrichedItems = cartItems.map(item => ({
+    ...item,
+    product_id: item.id || item.product_id || null
+  }));
   const orderData = {
     user_id: SB.user?.id||null,
     guest_email: !SB.user?(document.getElementById('ck-email')?.value||null):null,
-    items: cartItems, subtotal: total, shipping: shipping,
+    items: enrichedItems, subtotal: total, shipping: shipping,
     total: total+shipping, status: 'pending', shipping_address: address
   };
   const order = await SB.createOrder(orderData);
