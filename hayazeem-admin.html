@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HAYAZEEM — Admin Panel</title>
+<title>HAYAZEEEM — Admin Panel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -233,7 +233,7 @@ img{display:block;object-fit:cover}
 <!-- ═══════ SIDEBAR ═══════ -->
 <aside class="sb" id="sb">
   <div class="sb-logo">
-    <div class="sb-logo-name">HAYAZEEM</div>
+    <div class="sb-logo-name">HAYAZEEEM</div>
     <div class="sb-logo-tag">Admin Panel</div>
   </div>
   <nav style="flex:1">
@@ -573,7 +573,7 @@ img{display:block;object-fit:cover}
 <div id="ap-campaigns" class="ap">
   <div class="topbar">
     <div class="page-title">Kampanyalar</div>
-    <button class="btn btn-p btn-sm" onclick="toast('Kampanya oluşturma yakında')">+ Yeni Kampanya</button>
+    <button class="btn btn-p btn-sm" onclick="openCampaignModal()">+ Yeni Kampanya</button>
   </div>
   <div class="metrics">
     <div class="mc"><div class="mc-lbl">Aktif Kampanya</div><div class="mc-val">0</div></div>
@@ -581,11 +581,11 @@ img{display:block;object-fit:cover}
     <div class="mc"><div class="mc-lbl">Kampanya Geliri</div><div class="mc-val">₺0</div></div>
     <div class="mc"><div class="mc-lbl">Ort. İndirim</div><div class="mc-val">%0</div></div>
   </div>
-  <div class="card" style="text-align:center;padding:48px 20px">
+  <div id="campaign-list" class="card" style="text-align:center;padding:48px 20px">
     <div style="font-size:48px;margin-bottom:12px">🎁</div>
     <div style="font-size:15px;font-weight:500;margin-bottom:8px">Henüz kampanya yok</div>
     <div style="font-size:13px;color:var(--ink3);margin-bottom:20px">Yeni kampanya veya indirim kodu oluşturmak için butona tıklayın.</div>
-    <button class="btn btn-p btn-sm" onclick="toast('Kampanya oluşturma yakında')">+ Yeni Kampanya</button>
+    <button class="btn btn-p btn-sm" onclick="openCampaignModal()">+ Yeni Kampanya</button>
   </div>
 </div>
 <!-- ── USERS ── -->
@@ -652,7 +652,7 @@ img{display:block;object-fit:cover}
 <!-- ── INVESTOR ── -->
 <div id="ap-investor" class="ap">
   <div class="topbar">
-    <div><div class="page-title">Yatırımcı Paneli</div><div style="font-size:13px;color:var(--ink3)">Sadece görüntüleme — Mayıs 2025</div></div>
+    <div><div class="page-title">Yatırımcı Paneli</div><div style="font-size:13px;color:var(--ink3)">Sadece görüntüleme — Canlı</div></div>
     <span class="badge b-sale" style="padding:6px 14px;font-size:11px">📈 Yatırımcı Görünümü</span>
   </div>
   <div class="metrics">
@@ -691,13 +691,36 @@ img{display:block;object-fit:cover}
   </div>
 </div>
 
+<!-- ── KAMPANYA MODAL ── -->
+<div id="campaign-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('campaign-modal')">
+  <div class="modal-box" style="max-width:480px">
+    <div class="modal-head"><div style="font-weight:600;font-size:16px">Yeni Kampanya</div><button class="odm-close" onclick="closeModal('campaign-modal')">✕</button></div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+      <div><label class="afl">Kampanya Adı</label><input class="afi" id="camp-name" placeholder="Yaz İndirimi 2026"></div>
+      <div><label class="afl">İndirim Kodu</label><input class="afi" id="camp-code" placeholder="YAZ2026" style="text-transform:uppercase"></div>
+      <div class="g2" style="gap:10px">
+        <div><label class="afl">İndirim (%)</label><input class="afi" id="camp-pct" type="number" min="1" max="90" placeholder="20"></div>
+        <div><label class="afl">Min. Sepet (₺)</label><input class="afi" id="camp-min" type="number" min="0" placeholder="0"></div>
+      </div>
+      <div class="g2" style="gap:10px">
+        <div><label class="afl">Başlangıç</label><input class="afi" id="camp-start" type="date"></div>
+        <div><label class="afl">Bitiş</label><input class="afi" id="camp-end" type="date"></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:6px">
+        <button class="btn btn-p btn-sm" onclick="saveCampaign()">Kaydet</button>
+        <button class="btn btn-o btn-sm" onclick="closeModal('campaign-modal')">İptal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ── SETTINGS ── -->
 <div id="ap-settings" class="ap">
   <div class="topbar"><div class="page-title">Sistem Ayarları</div></div>
   <div class="g2">
     <div class="af-card">
       <div class="af-title">Site Bilgileri</div>
-      <label class="afl">Site Adı</label><input class="afi" value="HAYAZEEM" type="text">
+      <label class="afl">Site Adı</label><input class="afi" value="HAYAZEEEM" type="text">
       <label class="afl">Slogan</label><input class="afi" value="Zarafetin En Saf Hali" type="text">
       <label class="afl">E-posta</label><input class="afi" value="info@hayazeem.com" type="email">
       <label class="afl">Telefon</label><input class="afi" value="+90 326 000 0000" type="tel">
@@ -1007,6 +1030,119 @@ function toggleSB(){
 }
 
 /* ADMIN PAGES */
+/* ── Kampanya Modal ── */
+function openCampaignModal(){
+  // Bugünün tarihini varsayılan başlangıç yap
+  const today = new Date().toISOString().split('T')[0];
+  const end = new Date(); end.setMonth(end.getMonth()+1);
+  const endStr = end.toISOString().split('T')[0];
+  const si = document.getElementById('camp-start'); if(si) si.value = today;
+  const ei = document.getElementById('camp-end'); if(ei) ei.value = endStr;
+  document.getElementById('campaign-modal').style.display = 'flex';
+}
+
+async function saveCampaign(){
+  const name = document.getElementById('camp-name')?.value?.trim();
+  const code = document.getElementById('camp-code')?.value?.trim().toUpperCase();
+  const pct  = parseFloat(document.getElementById('camp-pct')?.value)||0;
+  const min  = parseFloat(document.getElementById('camp-min')?.value)||0;
+  const start= document.getElementById('camp-start')?.value;
+  const end  = document.getElementById('camp-end')?.value;
+  if(!name||!code||!pct){ toast('Kampanya adı, kod ve indirim oranı zorunlu'); return; }
+  const {error} = await _sb.from('campaigns').insert([{name, code, discount_pct:pct, min_cart:min, start_date:start, end_date:end, active:true}]);
+  if(error){
+    // Tablo yoksa yerel göster
+    toast('Kampanya kaydedilemedi: '+error.message);
+  } else {
+    closeModal('campaign-modal');
+    toast('Kampanya oluşturuldu ✓');
+    loadCampaigns();
+  }
+}
+
+async function loadCampaigns(){
+  const {data} = await _sb.from('campaigns').select('*').order('created_at',{ascending:false});
+  const container = document.getElementById('campaign-list');
+  if(!container) return;
+  if(!data||data.length===0){
+    container.innerHTML = '<div style="text-align:center;padding:40px"><div style="font-size:32px">🎁</div><div style="font-size:16px;font-weight:500;margin:12px 0">Henüz kampanya yok</div><div style="font-size:13px;color:var(--ink3)">Yeni kampanya veya indirim kodu oluşturmak için butona tıklayın.</div></div>';
+    return;
+  }
+  container.innerHTML = data.map(c => `
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-weight:600;font-size:15px">${c.name}</div>
+          <div style="font-size:13px;color:var(--ink3);margin-top:2px">Kod: <strong>${c.code}</strong> · %${c.discount_pct} indirim · Min ₺${c.min_cart||0}</div>
+          <div style="font-size:12px;color:var(--ink3);margin-top:2px">${c.start_date||''} — ${c.end_date||''}</div>
+        </div>
+        <span class="badge ${c.active?'b-done':'b-cancel'}">${c.active?'Aktif':'Pasif'}</span>
+      </div>
+    </div>`).join('');
+}
+
+/* ── Yatırımcı Paneli ── */
+async function loadInvestor(){
+  const {data:orders} = await _sb.from('orders').select('total,created_at,status,items,shipping_address').neq('status','cancelled');
+  if(!orders) return;
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const monthOrders = orders.filter(o => o.created_at >= monthStart);
+  const monthRevenue = monthOrders.reduce((s,o)=>s+(o.total||0),0);
+  const totalOrders = monthOrders.length;
+  const avgCart = totalOrders > 0 ? Math.round(monthRevenue/totalOrders) : 0;
+  // Aktif müşteri (unique user/email bu ay)
+  const activeCustomers = new Set(monthOrders.map(o=>o.shipping_address?.email||o.user_id)).size;
+  // Ülke bazlı satış
+  const countryMap = {};
+  orders.forEach(o => {
+    const c = o.shipping_address?.country||'TR';
+    countryMap[c] = (countryMap[c]||0) + (o.total||0);
+  });
+  const totalRev = orders.reduce((s,o)=>s+(o.total||0),0);
+  // En çok satan ürünler
+  const productMap = {};
+  orders.forEach(o => {
+    (o.items||[]).forEach(i => {
+      const name = i.name_tr||i.name||'Ürün';
+      productMap[name] = (productMap[name]||0) + (i.price||0)*(i.qty||1);
+    });
+  });
+  const topProducts = Object.entries(productMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const maxProd = topProducts[0]?.[1]||1;
+  const fmt = v => '₺'+v.toLocaleString('tr-TR');
+  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  // Metrikler (sabit id'li elementlere yaz)
+  const mcs = document.querySelectorAll('#ap-investor .mc-val');
+  if(mcs[0]) mcs[0].textContent = totalOrders;
+  if(mcs[1]) mcs[1].textContent = fmt(monthRevenue);
+  if(mcs[3]) mcs[3].textContent = activeCustomers;
+  // KPI
+  const arows = document.querySelectorAll('#ap-investor .arow strong');
+  if(arows[5]) arows[5].textContent = fmt(avgCart);
+  // Ürün barları
+  const bars = document.querySelectorAll('#ap-investor .inv-bar-row');
+  topProducts.forEach((p,i) => {
+    if(!bars[i]) return;
+    const pct = Math.round((p[1]/maxProd)*100);
+    bars[i].querySelector('.inv-bar-lbl').textContent = p[0];
+    bars[i].querySelector('.inv-bar-fill').style.width = pct+'%';
+    bars[i].querySelector('.inv-bar-val').textContent = fmt(p[1]);
+  });
+  // Ülke barları
+  const countryFlags = {TR:'🇹🇷 Türkiye',SA:'🇸🇦 Suudi Arabistan',AE:'🇦🇪 BAE',DE:'🇩🇪 Almanya'};
+  const countryRows = document.querySelectorAll('#ap-investor .g2 .card:first-child .arow strong');
+  const countrySorted = Object.entries(countryMap).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  const countryLabels = document.querySelectorAll('#ap-investor .g2 .card:first-child .arow span');
+  countrySorted.forEach((c,i) => {
+    if(countryLabels[i]) countryLabels[i].textContent = countryFlags[c[0]]||'🌍 '+c[0];
+    if(countryRows[i]) countryRows[i].textContent = '%'+Math.round((c[1]/totalRev)*100)+' · '+fmt(c[1]);
+  });
+  // Yatırımcı başlık tarih
+  const invDate = document.querySelector('#ap-investor .topbar div div:last-child');
+  if(invDate) invDate.textContent = 'Sadece görüntüleme — '+now.toLocaleDateString('tr-TR',{month:'long',year:'numeric'});
+}
+
 function showAP(name, btn){
   document.querySelectorAll('.ap').forEach(p=>p.classList.remove('active'));
   const el = document.getElementById('ap-'+name);
@@ -1018,6 +1154,7 @@ function showAP(name, btn){
   if(name === 'stock') loadStock();
   if(name === 'accounting'){ loadAccounting(); loadSuppliers(); }
   if(name === 'customers') loadCustomers();
+  if(name === 'investor') loadInvestor();
 }
 
 /* ── Stok Yönetimi ── */
