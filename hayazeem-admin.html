@@ -820,7 +820,8 @@ async function adminLogin(){
   const nameEl=document.getElementById('admin-user-name');
   if(nameEl)nameEl.textContent=data.user.user_metadata?.full_name||data.user.email;
   toast('Hoş geldiniz ✓');
-  loadProducts();loadOrders();
+  loadProducts();loadOrders();loadDashboard();
+  showAP('dashboard', document.querySelector('[onclick*="\'dashboard\'"]'));
 }
 async function adminLogout(){
   await _sb.auth.signOut();showAdminLogin();
@@ -1016,6 +1017,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     const nameEl=document.getElementById('admin-user-name');
     if(nameEl)nameEl.textContent=session.user.user_metadata?.full_name||session.user.email;
     loadProducts();loadOrders();loadDashboard();
+    showAP('dashboard', document.querySelector('[onclick*="\'dashboard\'"]'));
   }
 });
 </script>
