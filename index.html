@@ -1316,17 +1316,17 @@ img{display:block;max-width:100%;object-fit:cover}
           <div class="fg"><label class="fl">Posta Kodu</label><input class="fi" name="zip" placeholder="31000" type="text" maxlength="10"></div>
 
           <h2 class="fst">Kargo Seçimi</h2>
-          <label class="ship-opt sel" onclick="updateShippingCost(0)">
+          <label class="ship-opt sel" onclick="updateShippingCost(0,this)">
             <input type="radio" name="ship" value="0" checked style="accent-color:var(--gold)">
             <div style="flex:1"><div style="font-size:14px;font-weight:500">Standart Kargo</div><div style="font-size:12px;color:var(--ink3)">2-4 İş Günü · MNG Kargo</div></div>
             <div class="ship-price" style="color:var(--ok)">Ücretsiz</div>
           </label>
-          <label class="ship-opt" onclick="updateShippingCost(49)">
+          <label class="ship-opt" onclick="updateShippingCost(49,this)">
             <input type="radio" name="ship" value="49" style="accent-color:var(--gold)">
             <div style="flex:1"><div style="font-size:14px;font-weight:500">Ekspres Kargo</div><div style="font-size:12px;color:var(--ink3)">Aynı/Ertesi Gün</div></div>
             <div class="ship-price">₺49</div>
           </label>
-          <label class="ship-opt" onclick="updateShippingCost(180)">
+          <label class="ship-opt" onclick="updateShippingCost(180,this)">
             <input type="radio" name="ship" value="180" style="accent-color:var(--gold)">
             <div style="flex:1"><div style="font-size:14px;font-weight:500">Uluslararası · DHL</div><div style="font-size:12px;color:var(--ink3)">7-14 İş Günü</div></div>
             <div class="ship-price">₺180</div>
@@ -2290,9 +2290,9 @@ function favRemove(productId){
 
 /* ─── CHECKOUT FLOW ─── */
 /* Kargo seçimi güncelle */
-function updateShippingCost(cost){
-  document.querySelectorAll('.ship-opt').forEach(el=>el.classList.remove('sel'));
-  event.currentTarget.classList.add('sel');
+function updateShippingCost(cost,el){
+  document.querySelectorAll('.ship-opt').forEach(e=>e.classList.remove('sel'));
+  if(el) el.classList.add('sel');
   // Özet fiyatları güncelle
   const cartItems = Store._d?.cart || [];
   const sub = cartItems.reduce((s,i)=>s+(i.price*i.qty),0);
