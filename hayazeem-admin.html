@@ -760,6 +760,176 @@ img{display:block;object-fit:cover}
   </div>
 </div>
 
+<!-- ══ RETURNS MANAGEMENT PAGE ══ -->
+<div id="ap-returns" class="ap">
+  <div class="topbar">
+    <div class="page-title">İade Yönetimi</div>
+    <div style="display:flex;gap:8px">
+      <select class="afs" style="width:auto;min-width:160px;margin:0;padding:9px 12px">
+        <option>Tüm Talepler</option><option>Bekliyor</option><option>Onaylandı</option><option>Reddedildi</option><option>Tamamlandı</option>
+      </select>
+      <button class="btn btn-p btn-sm" onclick="toast('İade raporu indirildi')">Rapor İndir</button>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="mc"><div class="mc-lbl">Bekleyen Talepler</div><div class="mc-val">0</div><div class="mc-ch neg">—</div></div>
+    <div class="mc"><div class="mc-lbl">Bu Ay İade</div><div class="mc-val">0</div><div class="mc-ch pos">İade oranı %2.3</div></div>
+    <div class="mc"><div class="mc-lbl">Onay Bekleyen</div><div class="mc-val">₺0</div></div>
+    <div class="mc"><div class="mc-lbl">Ort. İşlem Süresi</div><div class="mc-val">—</div><div class="mc-ch pos">Hedef: 2 gün</div></div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="tw">
+      <table class="tbl">
+        <thead><tr><th>Talep No</th><th>Sipariş</th><th>Müşteri</th><th>Ürün</th><th>Neden</th><th>Tutar</th><th>Durum</th><th></th></tr></thead>
+        <tbody>
+          <tr><td colspan="8" style="text-align:center;padding:24px;color:var(--ink3)">İade talebi bulunmuyor</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CUSTOMERS PAGE ══ -->
+<div id="ap-customers" class="ap">
+  <div class="topbar">
+    <div class="page-title">Müşteriler</div>
+    <div style="display:flex;gap:8px">
+      <input class="afi" placeholder="İsim, e-posta ara…" style="width:220px;margin:0;padding:9px 12px" type="search">
+      <select class="afs" style="width:auto;min-width:140px;margin:0;padding:9px 12px">
+        <option>Tüm Müşteriler</option><option>VIP</option><option>Yeni (30 gün)</option><option>Pasif</option>
+      </select>
+      <button class="btn btn-p btn-sm" onclick="toast('Müşteri listesi indirildi')">Export CSV</button>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="mc"><div class="mc-lbl">Toplam Müşteri</div><div class="mc-val" id="cust-total">—</div><div class="mc-ch">—</div></div>
+    <div class="mc"><div class="mc-lbl">Yeni (30 gün)</div><div class="mc-val" id="cust-new">—</div><div class="mc-ch">—</div></div>
+    <div class="mc"><div class="mc-lbl">Sipariş Veren</div><div class="mc-val" id="cust-ordered">—</div><div class="mc-ch pos">—</div></div>
+    <div class="mc"><div class="mc-lbl">Ort. Sipariş Değeri</div><div class="mc-val" id="cust-avg">—</div></div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="tw">
+      <table class="tbl">
+        <thead><tr><th>Müşteri</th><th>E-posta</th><th>Sipariş</th><th>Toplam Harcama</th><th>Son Sipariş</th><th>Segment</th><th></th></tr></thead>
+        <tbody id="customers-tbody">
+          <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--ink3)">Yükleniyor…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CUSTOMER DETAIL MODAL ══ -->
+<div id="customer-detail-modal" style="display:none;position:fixed;inset:0;z-index:400;background:rgba(44,36,32,.55);backdrop-filter:blur(4px);align-items:flex-start;justify-content:center;padding:24px;overflow-y:auto">
+  <div class="odm">
+    <div class="odm-head">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div class="av" style="width:44px;height:44px;font-size:16px;background:#e8d5a3;flex-shrink:0">AY</div>
+        <div><div class="odm-title">Ayşe Yıldız</div><div style="font-size:12px;color:var(--ink3)">Üye: Ocak 2024 · VIP Müşteri</div></div>
+      </div>
+      <button class="odm-close" onclick="closeModal('customer-detail-modal')">✕</button>
+    </div>
+    <div class="odm-body">
+      <div class="odm-grid">
+        <div>
+          <div class="odm-section-title">İletişim</div>
+          <div class="odm-val">ayse@email.com<br>+90 532 000 0000</div>
+        </div>
+        <div>
+          <div class="odm-section-title">Adres</div>
+          <div class="odm-val">Örnek Mah. No:5/3<br>Kadıköy / İstanbul</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+        <div style="padding:14px;background:var(--bone);text-align:center">
+          <div style="font-family:var(--fd);font-size:24px">3</div>
+          <div style="font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.1em">Sipariş</div>
+        </div>
+        <div style="padding:14px;background:var(--bone);text-align:center">
+          <div style="font-family:var(--fd);font-size:24px">₺17.6K</div>
+          <div style="font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.1em">Toplam</div>
+        </div>
+        <div style="padding:14px;background:var(--bone);text-align:center">
+          <div style="font-family:var(--fd);font-size:24px">₺5.880</div>
+          <div style="font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.1em">Ort. Sipariş</div>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--stone);padding-top:18px;margin-bottom:18px">
+        <div class="odm-section-title" style="margin-bottom:12px">Sipariş Geçmişi</div>
+        <div class="arow"><div><div style="font-size:13px;font-weight:500">#HYZ-2025-0847</div><div style="font-size:12px;color:var(--ink3)">12 Mayıs 2025</div></div><span class="badge b-ship">Kargoda</span><div style="font-family:var(--fd)">₺6.700</div></div>
+        <div class="arow"><div><div style="font-size:13px;font-weight:500">#HYZ-2025-0621</div><div style="font-size:12px;color:var(--ink3)">28 Nisan 2025</div></div><span class="badge b-done">Teslim</span><div style="font-family:var(--fd)">₺1.890</div></div>
+        <div class="arow"><div><div style="font-size:13px;font-weight:500">#HYZ-2025-0388</div><div style="font-size:12px;color:var(--ink3)">3 Mart 2025</div></div><span class="badge b-done">Teslim</span><div style="font-family:var(--fd)">₺8.950</div></div>
+      </div>
+
+      <div>
+        <div class="odm-section-title">Müşteri Notu</div>
+        <textarea class="afta" placeholder="Müşteri hakkında not ekleyin…" style="min-height:72px;margin-bottom:12px">VIP müşteri, abaya koleksiyonunu tercih ediyor. Ekspres kargo talep ediyor.</textarea>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-p btn-sm" onclick="toast('Not kaydedildi ✓');closeModal('customer-detail-modal')">Kaydet</button>
+          <button class="btn btn-o btn-sm" onclick="toast('E-posta gönderildi')">📧 E-posta Gönder</button>
+          <button class="btn btn-o btn-sm" onclick="toast('Özel indirim kodu oluşturuldu')">🏷 Özel İndirim Ver</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ANALYTICS PAGE ══ -->
+<div id="ap-analytics" class="ap">
+  <div class="topbar">
+    <div class="page-title">Analitik & Raporlar</div>
+    <div style="display:flex;gap:8px">
+      <select class="afs" style="width:auto;min-width:150px;margin:0;padding:9px 12px">
+        <option>Son 30 Gün</option><option>Son 7 Gün</option><option>Bu Yıl</option><option>Özel Tarih</option>
+      </select>
+      <button class="btn btn-p btn-sm" onclick="toast('Rapor PDF indirildi')">PDF İndir</button>
+    </div>
+  </div>
+
+  <div class="metrics">
+    <div class="mc"><div class="mc-lbl">Sayfa Görüntülemesi</div><div class="mc-val">0</div><div class="mc-ch pos">—</div></div>
+    <div class="mc"><div class="mc-lbl">Dönüşüm Oranı</div><div class="mc-val">%0</div><div class="mc-ch pos">↑ Sektör: %2.1</div></div>
+    <div class="mc"><div class="mc-lbl">Sepeti Terk</div><div class="mc-val">%0</div><div class="mc-ch neg">Hedef: %55</div></div>
+    <div class="mc"><div class="mc-lbl">Mobil Trafik</div><div class="mc-val">%0</div><div class="mc-ch pos">—</div></div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-title">En Çok Ziyaret Edilen Sayfalar</div>
+      <div class="arow"><span>Ana Sayfa</span><div style="display:flex;align-items:center;gap:10px"><div style="width:100px;height:6px;background:var(--stone);border-radius:3px;position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:100%;background:var(--gold);border-radius:3px"></div></div><span style="font-family:var(--fd);font-size:16px">18.4K</span></div></div>
+      <div class="arow"><span>Medine Abaya Detay</span><div style="display:flex;align-items:center;gap:10px"><div style="width:100px;height:6px;background:var(--stone);border-radius:3px"><div style="height:100%;width:72%;background:var(--gold);border-radius:3px"></div></div><span style="font-family:var(--fd);font-size:16px">13.2K</span></div></div>
+      <div class="arow"><span>Koleksiyonlar</span><div style="display:flex;align-items:center;gap:10px"><div style="width:100px;height:6px;background:var(--stone);border-radius:3px"><div style="height:100%;width:60%;background:var(--gold);border-radius:3px"></div></div><span style="font-family:var(--fd);font-size:16px">11.0K</span></div></div>
+      <div class="arow"><span>Sepet</span><div style="display:flex;align-items:center;gap:10px"><div style="width:100px;height:6px;background:var(--stone);border-radius:3px"><div style="height:100%;width:45%;background:var(--gold);border-radius:3px"></div></div><span style="font-family:var(--fd);font-size:16px">8.2K</span></div></div>
+      <div class="arow"><span>Hakkımızda</span><div style="display:flex;align-items:center;gap:10px"><div style="width:100px;height:6px;background:var(--stone);border-radius:3px"><div style="height:100%;width:22%;background:var(--gold);border-radius:3px"></div></div><span style="font-family:var(--fd);font-size:16px">4.0K</span></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Trafik Kaynakları</div>
+      <div class="arow"><span>🔍 Organik Arama</span><strong>%38 · 18.3K</strong></div>
+      <div class="arow"><span>📱 Instagram</span><strong>%24 · 11.6K</strong></div>
+      <div class="arow"><span>🔗 Direkt</span><strong>%18 · 8.7K</strong></div>
+      <div class="arow"><span>📧 E-posta</span><strong>%12 · 5.8K</strong></div>
+      <div class="arow"><span>🎵 TikTok</span><strong>%5 · 2.4K</strong></div>
+      <div class="arow"><span>🌍 Diğer</span><strong>%3 · 1.4K</strong></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Cihaz Dağılımı</div>
+    <div style="display:flex;gap:0;height:24px;border-radius:2px;overflow:hidden;margin-bottom:12px">
+      <div style="width:71%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:500">Mobil %71</div>
+      <div style="width:22%;background:var(--olive);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff">Masaüstü %22</div>
+      <div style="width:7%;background:var(--taupe);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">%7</div>
+    </div>
+    <div style="display:flex;gap:16px;font-size:12px;color:var(--ink3)">
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;background:var(--gold);display:inline-block"></span>Mobil (71%)</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;background:var(--olive);display:inline-block"></span>Masaüstü (22%)</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;background:var(--taupe);display:inline-block"></span>Tablet (7%)</span>
+    </div>
+  </div>
+</div>
 </div><!-- /content -->
 </div><!-- /wrap -->
 
@@ -1157,8 +1327,6 @@ function showAP(name, btn){
   if(name === 'accounting'){ loadAccounting(); loadSuppliers(); }
   if(name === 'customers') loadCustomers();
   if(name === 'investor') loadInvestor();
-  if(name === 'analytics') loadAnalytics();
-  if(name === 'returns') loadReturns();
 }
 
 /* ── Stok Yönetimi ── */
@@ -1400,62 +1568,6 @@ async function loadSuppliers(){
   }).join('');
 }
 
-/* ── Analitik ── */
-async function loadAnalytics(){
-  const [{data:orders},{data:profiles}] = await Promise.all([
-    _sb.from('orders').select('total,created_at,status'),
-    _sb.from('profiles').select('id,created_at')
-  ]);
-  const allOrders = orders||[];
-  const allProfiles = profiles||[];
-  const now = new Date();
-  const thirtyDaysAgo = new Date(); thirtyDaysAgo.setDate(now.getDate()-30);
-  const recentOrders = allOrders.filter(o=>new Date(o.created_at)>=thirtyDaysAgo);
-  const totalRevenue = allOrders.reduce((s,o)=>s+(o.total||0),0);
-  const convRate = allProfiles.length > 0 ? ((allOrders.length/allProfiles.length)*100).toFixed(1) : 0;
-  const el = (id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
-  el('an-views', allProfiles.length * 12);
-  el('an-conv', '%'+convRate);
-  el('an-abandon', '%'+(68 - Math.min(convRate,18)).toFixed(0));
-  el('an-mobile', '%71');
-  // Metrikleri güncelle
-  const metrics = document.querySelectorAll('#ap-analytics .mc-val');
-  if(metrics[0]) metrics[0].textContent = (allProfiles.length * 12).toLocaleString('tr-TR');
-  if(metrics[1]) metrics[1].textContent = '%' + convRate;
-  if(metrics[2]) metrics[2].textContent = '%' + (68 - Math.min(parseFloat(convRate),18)).toFixed(0);
-  if(metrics[3]) metrics[3].textContent = '%71';
-}
-
-/* ── İade Yönetimi ── */
-async function loadReturns(){
-  const tbody = document.querySelector('#ap-returns tbody');
-  if(!tbody) return;
-  const {data:returns} = await _sb.from('returns').select('*').order('created_at',{ascending:false});
-  const metrics = document.querySelectorAll('#ap-returns .mc-val');
-  if(!returns || returns.length === 0){
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--ink3)">İade talebi bulunmuyor</td></tr>';
-    if(metrics[0]) metrics[0].textContent = '0';
-    if(metrics[1]) metrics[1].textContent = '0';
-    if(metrics[2]) metrics[2].textContent = '₺0';
-    return;
-  }
-  const pending = returns.filter(r=>r.status==='bekliyor').length;
-  const totalAmt = returns.reduce((s,r)=>s+(r.amount||0),0);
-  if(metrics[0]) metrics[0].textContent = pending;
-  if(metrics[1]) metrics[1].textContent = returns.length;
-  if(metrics[2]) metrics[2].textContent = '₺'+totalAmt.toLocaleString('tr-TR');
-  tbody.innerHTML = returns.map(r=>`<tr>
-    <td style="font-size:12px;color:var(--ink3)">#RET-${r.id?.slice(0,6).toUpperCase()||'—'}</td>
-    <td style="font-size:12px">${r.order_id||'—'}</td>
-    <td style="font-size:12px">${r.customer_name||'—'}</td>
-    <td style="font-size:12px">${r.product_name||'—'}</td>
-    <td style="font-size:12px">${r.reason||'—'}</td>
-    <td style="font-family:var(--fd)">₺${(r.amount||0).toLocaleString('tr-TR')}</td>
-    <td><span class="badge ${r.status==='onaylandi'?'b-done':r.status==='reddedildi'?'b-cancel':'b-pend'}">${r.status||'bekliyor'}</span></td>
-    <td><button class="btn btn-o btn-sm" onclick="toast('İade işlendi ✓')">İşle</button></td>
-  </tr>`).join('');
-}
-
 /* CHIPS */
 function rmChip(btn){ btn.closest('.v-chip').remove(); }
 function addChip(e, containerId){
@@ -1568,176 +1680,6 @@ function toast(msg){
   </div>
 </div>
 
-<!-- ══ RETURNS MANAGEMENT PAGE ══ -->
-<div id="ap-returns" class="ap">
-  <div class="topbar">
-    <div class="page-title">İade Yönetimi</div>
-    <div style="display:flex;gap:8px">
-      <select class="afs" style="width:auto;min-width:160px;margin:0;padding:9px 12px">
-        <option>Tüm Talepler</option><option>Bekliyor</option><option>Onaylandı</option><option>Reddedildi</option><option>Tamamlandı</option>
-      </select>
-      <button class="btn btn-p btn-sm" onclick="toast('İade raporu indirildi')">Rapor İndir</button>
-    </div>
-  </div>
-  <div class="metrics">
-    <div class="mc"><div class="mc-lbl">Bekleyen Talepler</div><div class="mc-val">0</div><div class="mc-ch neg">—</div></div>
-    <div class="mc"><div class="mc-lbl">Bu Ay İade</div><div class="mc-val">0</div><div class="mc-ch pos">İade oranı %2.3</div></div>
-    <div class="mc"><div class="mc-lbl">Onay Bekleyen</div><div class="mc-val">₺0</div></div>
-    <div class="mc"><div class="mc-lbl">Ort. İşlem Süresi</div><div class="mc-val">—</div><div class="mc-ch pos">Hedef: 2 gün</div></div>
-  </div>
-  <div class="card" style="padding:0;overflow:hidden">
-    <div class="tw">
-      <table class="tbl">
-        <thead><tr><th>Talep No</th><th>Sipariş</th><th>Müşteri</th><th>Ürün</th><th>Neden</th><th>Tutar</th><th>Durum</th><th></th></tr></thead>
-        <tbody>
-          <tr><td colspan="8" style="text-align:center;padding:24px;color:var(--ink3)">İade talebi bulunmuyor</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- ══ CUSTOMERS PAGE ══ -->
-<div id="ap-customers" class="ap">
-  <div class="topbar">
-    <div class="page-title">Müşteriler</div>
-    <div style="display:flex;gap:8px">
-      <input class="afi" placeholder="İsim, e-posta ara…" style="width:220px;margin:0;padding:9px 12px" type="search">
-      <select class="afs" style="width:auto;min-width:140px;margin:0;padding:9px 12px">
-        <option>Tüm Müşteriler</option><option>VIP</option><option>Yeni (30 gün)</option><option>Pasif</option>
-      </select>
-      <button class="btn btn-p btn-sm" onclick="toast('Müşteri listesi indirildi')">Export CSV</button>
-    </div>
-  </div>
-  <div class="metrics">
-    <div class="mc"><div class="mc-lbl">Toplam Müşteri</div><div class="mc-val" id="cust-total">—</div><div class="mc-ch">—</div></div>
-    <div class="mc"><div class="mc-lbl">Yeni (30 gün)</div><div class="mc-val" id="cust-new">—</div><div class="mc-ch">—</div></div>
-    <div class="mc"><div class="mc-lbl">Sipariş Veren</div><div class="mc-val" id="cust-ordered">—</div><div class="mc-ch pos">—</div></div>
-    <div class="mc"><div class="mc-lbl">Ort. Sipariş Değeri</div><div class="mc-val" id="cust-avg">—</div></div>
-  </div>
-  <div class="card" style="padding:0;overflow:hidden">
-    <div class="tw">
-      <table class="tbl">
-        <thead><tr><th>Müşteri</th><th>E-posta</th><th>Sipariş</th><th>Toplam Harcama</th><th>Son Sipariş</th><th>Segment</th><th></th></tr></thead>
-        <tbody id="customers-tbody">
-          <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--ink3)">Yükleniyor…</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- ══ CUSTOMER DETAIL MODAL ══ -->
-<div id="customer-detail-modal" style="display:none;position:fixed;inset:0;z-index:400;background:rgba(44,36,32,.55);backdrop-filter:blur(4px);align-items:flex-start;justify-content:center;padding:24px;overflow-y:auto">
-  <div class="odm">
-    <div class="odm-head">
-      <div style="display:flex;align-items:center;gap:14px">
-        <div class="av" style="width:44px;height:44px;font-size:16px;background:#e8d5a3;flex-shrink:0">AY</div>
-        <div><div class="odm-title">Ayşe Yıldız</div><div style="font-size:12px;color:var(--ink3)">Üye: Ocak 2024 · VIP Müşteri</div></div>
-      </div>
-      <button class="odm-close" onclick="closeModal('customer-detail-modal')">✕</button>
-    </div>
-    <div class="odm-body">
-      <div class="odm-grid">
-        <div>
-          <div class="odm-section-title">İletişim</div>
-          <div class="odm-val">ayse@email.com<br>+90 532 000 0000</div>
-        </div>
-        <div>
-          <div class="odm-section-title">Adres</div>
-          <div class="odm-val">Örnek Mah. No:5/3<br>Kadıköy / İstanbul</div>
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
-        <div style="padding:14px;background:var(--bone);text-align:center">
-          <div style="font-family:var(--fd);font-size:24px">3</div>
-          <div style="font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.1em">Sipariş</div>
-        </div>
-        <div style="padding:14px;background:var(--bone);text-align:center">
-          <div style="font-family:var(--fd);font-size:24px">₺17.6K</div>
-          <div style="font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.1em">Toplam</div>
-        </div>
-        <div style="padding:14px;background:var(--bone);text-align:center">
-          <div style="font-family:var(--fd);font-size:24px">₺5.880</div>
-          <div style="font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.1em">Ort. Sipariş</div>
-        </div>
-      </div>
-
-      <div style="border-top:1px solid var(--stone);padding-top:18px;margin-bottom:18px">
-        <div class="odm-section-title" style="margin-bottom:12px">Sipariş Geçmişi</div>
-        <div class="arow"><div><div style="font-size:13px;font-weight:500">#HYZ-2025-0847</div><div style="font-size:12px;color:var(--ink3)">12 Mayıs 2025</div></div><span class="badge b-ship">Kargoda</span><div style="font-family:var(--fd)">₺6.700</div></div>
-        <div class="arow"><div><div style="font-size:13px;font-weight:500">#HYZ-2025-0621</div><div style="font-size:12px;color:var(--ink3)">28 Nisan 2025</div></div><span class="badge b-done">Teslim</span><div style="font-family:var(--fd)">₺1.890</div></div>
-        <div class="arow"><div><div style="font-size:13px;font-weight:500">#HYZ-2025-0388</div><div style="font-size:12px;color:var(--ink3)">3 Mart 2025</div></div><span class="badge b-done">Teslim</span><div style="font-family:var(--fd)">₺8.950</div></div>
-      </div>
-
-      <div>
-        <div class="odm-section-title">Müşteri Notu</div>
-        <textarea class="afta" placeholder="Müşteri hakkında not ekleyin…" style="min-height:72px;margin-bottom:12px">VIP müşteri, abaya koleksiyonunu tercih ediyor. Ekspres kargo talep ediyor.</textarea>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn btn-p btn-sm" onclick="toast('Not kaydedildi ✓');closeModal('customer-detail-modal')">Kaydet</button>
-          <button class="btn btn-o btn-sm" onclick="toast('E-posta gönderildi')">📧 E-posta Gönder</button>
-          <button class="btn btn-o btn-sm" onclick="toast('Özel indirim kodu oluşturuldu')">🏷 Özel İndirim Ver</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ ANALYTICS PAGE ══ -->
-<div id="ap-analytics" class="ap">
-  <div class="topbar">
-    <div class="page-title">Analitik & Raporlar</div>
-    <div style="display:flex;gap:8px">
-      <select class="afs" style="width:auto;min-width:150px;margin:0;padding:9px 12px">
-        <option>Son 30 Gün</option><option>Son 7 Gün</option><option>Bu Yıl</option><option>Özel Tarih</option>
-      </select>
-      <button class="btn btn-p btn-sm" onclick="toast('Rapor PDF indirildi')">PDF İndir</button>
-    </div>
-  </div>
-
-  <div class="metrics">
-    <div class="mc"><div class="mc-lbl">Sayfa Görüntülemesi</div><div class="mc-val">0</div><div class="mc-ch pos">—</div></div>
-    <div class="mc"><div class="mc-lbl">Dönüşüm Oranı</div><div class="mc-val">%0</div><div class="mc-ch pos">↑ Sektör: %2.1</div></div>
-    <div class="mc"><div class="mc-lbl">Sepeti Terk</div><div class="mc-val">%0</div><div class="mc-ch neg">Hedef: %55</div></div>
-    <div class="mc"><div class="mc-lbl">Mobil Trafik</div><div class="mc-val">%0</div><div class="mc-ch pos">—</div></div>
-  </div>
-
-  <div class="g2">
-    <div class="card">
-      <div class="card-title">En Çok Ziyaret Edilen Sayfalar</div>
-      <div class="arow"><span>Ana Sayfa</span><div style="display:flex;align-items:center;gap:10px"><div style="width:100px;height:6px;background:var(--stone);border-radius:3px;position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:100%;background:var(--gold);border-radius:3px"></div></div><span style="font-family:var(--fd);font-size:16px">18.4K</span></div></div>
-      <div class="arow"><span>Medine Abaya Detay</span><div style="display:flex;align-items:center;gap:10px"><div style="width:100px;height:6px;background:var(--stone);border-radius:3px"><div style="height:100%;width:72%;background:var(--gold);border-radius:3px"></div></div><span style="font-family:var(--fd);font-size:16px">13.2K</span></div></div>
-      <div class="arow"><span>Koleksiyonlar</span><div style="display:flex;align-items:center;gap:10px"><div style="width:100px;height:6px;background:var(--stone);border-radius:3px"><div style="height:100%;width:60%;background:var(--gold);border-radius:3px"></div></div><span style="font-family:var(--fd);font-size:16px">11.0K</span></div></div>
-      <div class="arow"><span>Sepet</span><div style="display:flex;align-items:center;gap:10px"><div style="width:100px;height:6px;background:var(--stone);border-radius:3px"><div style="height:100%;width:45%;background:var(--gold);border-radius:3px"></div></div><span style="font-family:var(--fd);font-size:16px">8.2K</span></div></div>
-      <div class="arow"><span>Hakkımızda</span><div style="display:flex;align-items:center;gap:10px"><div style="width:100px;height:6px;background:var(--stone);border-radius:3px"><div style="height:100%;width:22%;background:var(--gold);border-radius:3px"></div></div><span style="font-family:var(--fd);font-size:16px">4.0K</span></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Trafik Kaynakları</div>
-      <div class="arow"><span>🔍 Organik Arama</span><strong>%38 · 18.3K</strong></div>
-      <div class="arow"><span>📱 Instagram</span><strong>%24 · 11.6K</strong></div>
-      <div class="arow"><span>🔗 Direkt</span><strong>%18 · 8.7K</strong></div>
-      <div class="arow"><span>📧 E-posta</span><strong>%12 · 5.8K</strong></div>
-      <div class="arow"><span>🎵 TikTok</span><strong>%5 · 2.4K</strong></div>
-      <div class="arow"><span>🌍 Diğer</span><strong>%3 · 1.4K</strong></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Cihaz Dağılımı</div>
-    <div style="display:flex;gap:0;height:24px;border-radius:2px;overflow:hidden;margin-bottom:12px">
-      <div style="width:71%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:500">Mobil %71</div>
-      <div style="width:22%;background:var(--olive);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff">Masaüstü %22</div>
-      <div style="width:7%;background:var(--taupe);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">%7</div>
-    </div>
-    <div style="display:flex;gap:16px;font-size:12px;color:var(--ink3)">
-      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;background:var(--gold);display:inline-block"></span>Mobil (71%)</span>
-      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;background:var(--olive);display:inline-block"></span>Masaüstü (22%)</span>
-      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;background:var(--taupe);display:inline-block"></span>Tablet (7%)</span>
-    </div>
-  </div>
-</div>
 
 <script>
 /* ════════════════════════════════════════
