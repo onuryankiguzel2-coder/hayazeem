@@ -2290,9 +2290,9 @@ function favRemove(productId){
 
 /* ─── CHECKOUT FLOW ─── */
 /* Kargo seçimi güncelle */
-function updateShippingCost(cost,el){
+function updateShippingCost(cost,labelEl){
   document.querySelectorAll('.ship-opt').forEach(e=>e.classList.remove('sel'));
-  if(el) el.classList.add('sel');
+  if(labelEl) labelEl.classList.add('sel');
   // Özet fiyatları güncelle
   const cartItems = Store._d?.cart || [];
   const sub = cartItems.reduce((s,i)=>s+(i.price*i.qty),0);
