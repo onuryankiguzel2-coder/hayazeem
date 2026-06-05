@@ -1896,7 +1896,11 @@ const fmt = n => '₺'+Number(n).toLocaleString('tr-TR');
 function getFiltered(){
   let ps=[...PRODUCTS];
   const f=Store.filters;
-  if(f.cats.length) ps=ps.filter(p=>f.cats.includes(p.cat));
+  if(f.cats.length) ps=ps.filter(p=>{
+    // p.cat UUID ise isim map'inden çevir
+    const catName = (window._CATMAP && window._CATMAP[p.cat]) || p.cat;
+    return f.cats.includes(catName);
+  });
   if(f.sizes.length) ps=ps; // variant-level; pass-through for now
   ps=ps.filter(p=>p.price<=f.maxPrice);
   if(f.sort==='Fiyat: Artan') ps.sort((a,b)=>a.price-b.price);
