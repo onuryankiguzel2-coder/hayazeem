@@ -1027,10 +1027,6 @@ async function saveProd(statusOverride){
     name_ar:document.getElementById('prod-name-ar')?.value?.trim()||'',
     description_tr:document.getElementById('prod-desc-tr')?.value?.trim()||'',
     fabric:document.getElementById('prod-fabric')?.value?.trim()||'',
-    composition:document.getElementById('prod-composition')?.value?.trim()||'',
-    weight:document.getElementById('prod-weight')?.value?.trim()||'',
-    origin:document.getElementById('prod-origin')?.value?.trim()||'',
-    care:document.getElementById('prod-care')?.value?.trim()||'',
     price:price,
     original_price:parseFloat(document.getElementById('prod-orig-price')?.value)||null,
     stock:parseInt(document.getElementById('prod-stock')?.value)||0,
@@ -1103,10 +1099,24 @@ async function updateProduct(id){
   const name=document.getElementById('prod-name-tr')?.value?.trim();
   const price=parseFloat(document.getElementById('prod-price')?.value)||0;
   if(!name||!price){toast('Ad ve fiyat zorunlu');return;}
+  const sizes=[...document.querySelectorAll('#size-chips .v-chip')].map(c=>c.textContent.replace('×','').trim());
+  const colors=[...document.querySelectorAll('#color-chips .v-chip')].map(c=>c.textContent.replace('×','').trim());
   const {error}=await _sb.from('products').update({
-    name_tr:name,name_en:document.getElementById('prod-name-en')?.value||'',
-    price:price,stock:parseInt(document.getElementById('prod-stock')?.value)||0,
-    images:_imgs,is_featured:document.getElementById('prod-featured')?.checked||false,is_active:true
+    name_tr:name,
+    name_en:document.getElementById('prod-name-en')?.value?.trim()||'',
+    name_ar:document.getElementById('prod-name-ar')?.value?.trim()||'',
+    description_tr:document.getElementById('prod-desc-tr')?.value?.trim()||'',
+    fabric:document.getElementById('prod-fabric')?.value?.trim()||'',
+    composition:document.getElementById('prod-composition')?.value?.trim()||'',
+    weight:document.getElementById('prod-weight')?.value?.trim()||'',
+    origin:document.getElementById('prod-origin')?.value?.trim()||'',
+    care:document.getElementById('prod-care')?.value?.trim()||'',
+    price:price,
+    original_price:parseFloat(document.getElementById('prod-orig-price')?.value)||null,
+    stock:parseInt(document.getElementById('prod-stock')?.value)||0,
+    sizes:sizes,colors:colors,images:_imgs,
+    is_featured:document.getElementById('prod-featured')?.checked||false,
+    is_active:true
   }).eq('id',id);
   if(error){toast('Hata: '+error.message);return;}
   toast('Ürün güncellendi ✓');
