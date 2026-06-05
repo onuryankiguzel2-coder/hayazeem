@@ -390,11 +390,12 @@ img{display:block;object-fit:cover}
         <div class="af-title">Varyantlar <span style="font-size:11px;font-weight:400;color:var(--ink3)">Otomatik kombinasyon oluşturulur</span></div>
         <label class="afl">Bedenler</label>
         <div class="v-chips" id="size-chips">
-          <span class="v-chip">XS <button class="v-chip-x" onclick="rmChip(this)">×</button></span>
-          <span class="v-chip">S <button class="v-chip-x" onclick="rmChip(this)">×</button></span>
-          <span class="v-chip">M <button class="v-chip-x" onclick="rmChip(this)">×</button></span>
-          <span class="v-chip">L <button class="v-chip-x" onclick="rmChip(this)">×</button></span>
-          <span class="v-chip">XL <button class="v-chip-x" onclick="rmChip(this)">×</button></span>
+          <span class="v-chip">38 <button class="v-chip-x" onclick="rmChip(this)">×</button></span>
+          <span class="v-chip">40 <button class="v-chip-x" onclick="rmChip(this)">×</button></span>
+          <span class="v-chip">42 <button class="v-chip-x" onclick="rmChip(this)">×</button></span>
+          <span class="v-chip">44 <button class="v-chip-x" onclick="rmChip(this)">×</button></span>
+          <span class="v-chip">46 <button class="v-chip-x" onclick="rmChip(this)">×</button></span>
+          <span class="v-chip">48 <button class="v-chip-x" onclick="rmChip(this)">×</button></span>
           <input class="add-chip" placeholder="+ Ekle" onkeydown="addChip(event,'size-chips')">
         </div>
         <label class="afl" style="margin-top:8px">Renkler</label>
@@ -1025,6 +1026,7 @@ async function saveProd(statusOverride){
     name_en:document.getElementById('prod-name-en')?.value?.trim()||'',
     name_ar:document.getElementById('prod-name-ar')?.value?.trim()||'',
     description_tr:document.getElementById('prod-desc-tr')?.value?.trim()||'',
+    fabric:document.getElementById('prod-fabric')?.value?.trim()||'',
     price:price,
     original_price:parseFloat(document.getElementById('prod-orig-price')?.value)||null,
     stock:parseInt(document.getElementById('prod-stock')?.value)||0,
