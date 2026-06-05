@@ -1655,6 +1655,11 @@ const _PER_PAGE = 12;
 
 // Supabase'den ürünleri çek ve UI'ı güncelle
 async function loadProductsFromDB(){
+  // Önce kategorileri yükle
+  const {data:cats} = await _sbClient.from('categories').select('id,name_tr');
+  window._CATMAP = {};
+  if(cats) cats.forEach(c=>{ window._CATMAP[c.id] = c.name_tr; });
+
   const {data, error} = await _sbClient.from('products').select('*').eq('is_active', true).order('created_at', {ascending:false});
   
   if(error || !data || data.length === 0){
