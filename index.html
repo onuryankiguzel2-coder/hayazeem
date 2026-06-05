@@ -1653,6 +1653,11 @@ let PRODUCTS = [];
 
 // Supabase'den ürünleri çek ve UI'ı güncelle
 async function loadProductsFromDB(){
+  // Önce kategorileri yükle
+  const {data:cats} = await _sbClient.from('categories').select('id,name_tr');
+  window._CATMAP = {};
+  if(cats) cats.forEach(c=>{ window._CATMAP[c.id] = c.name_tr; });
+
   const {data, error} = await _sbClient.from('products').select('*').eq('is_active', true).order('created_at', {ascending:false});
   
   if(error || !data || data.length === 0){
@@ -1701,7 +1706,7 @@ async function loadProductsFromDB(){
         name_ar: p.name_ar || '',
         description_tr: p.description_tr || '',
         sub: sub,
-        cat: p.category_id || 'Genel',
+        cat: (window._CATMAP && window._CATMAP[p.category_id]) || p.category_id || 'Genel',
         fabric: p.fabric || '',
         composition: p.composition || '',
         weight: p.weight || '',
@@ -2233,6 +2238,16 @@ function go(name){
 function openProduct(id){
   Store.openProduct(id);
   go('product');
+  // Ürün henüz yüklenmediyse bekle
+  if(PRODUCTS.length === 0){
+    const wait = setInterval(()=>{
+      if(PRODUCTS.length > 0){
+        clearInterval(wait);
+        Store.openProduct(id);
+        renderPdDetail();
+      }
+    }, 150);
+  }
 }
 
 /* ─── MOBILE DRAWER ─── */
