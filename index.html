@@ -1733,7 +1733,8 @@ async function loadProductsFromDB(){
   const catCounts = {};
   const fabricCounts = {};
   PRODUCTS.forEach(p=>{
-    if(p.cat){ catCounts[p.cat] = (catCounts[p.cat]||0)+1; }
+    const catName = (window._CATMAP && window._CATMAP[p.cat]) || p.cat;
+    if(catName){ catCounts[catName] = (catCounts[catName]||0)+1; }
     if(p.fabric){ fabricCounts[p.fabric] = (fabricCounts[p.fabric]||0)+1; }
   });
   document.querySelectorAll('#filter-sb .f-check').forEach(label=>{
@@ -1760,6 +1761,7 @@ async function loadProductsFromDB(){
   if(rp) rp.innerHTML = PRODUCTS.filter(p=>p.id!==Store.currentProductId).slice(0,4).map(p=>makeCard(p)).join('');
   if(sp) sp.innerHTML = PRODUCTS.map(p=>makeCard(p)).join('');
   Store.emit('filters'); // Ürün listesini de güncelle
+  renderCatGrid(true); // Kategori sayfasını da güncelle
 }
 
 
