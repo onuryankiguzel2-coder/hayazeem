@@ -1703,6 +1703,10 @@ async function loadProductsFromDB(){
         sub: sub,
         cat: p.category_id || 'Genel',
         fabric: p.fabric || '',
+        composition: p.composition || '',
+        weight: p.weight || '',
+        origin: p.origin || '',
+        care: p.care || '',
         price: p.price || 0,
         was: p.original_price || null,
         badge: p.is_featured ? 'Öne Çıkan' : null,
@@ -2121,15 +2125,16 @@ function renderPdDetail(){
 
   // Kumaş
   const fabricEl=document.getElementById('pd-fabric');
-  if(fabricEl && p.fabric){
-    const rows=fabricEl.querySelectorAll('.spec-row');
-    if(rows.length && rows[0].querySelector('.spec-val')){
-      rows[0].querySelector('.spec-val').textContent=p.fabric;
-    } else {
-      const existing=fabricEl.querySelector('p.fabric-text');
-      if(existing) existing.textContent=p.fabric;
-      else fabricEl.insertAdjacentHTML('afterbegin',`<p class="fabric-text" style="font-size:14px;color:var(--ink2);line-height:1.8;margin-bottom:12px">${p.fabric}</p>`);
-    }
+  if(fabricEl){
+    const lines = [];
+    if(p.composition) lines.push(p.composition);
+    if(p.weight) lines.push('Ağırlık: '+p.weight);
+    if(p.origin) lines.push('Menşei: '+p.origin);
+    if(p.fabric) lines.push(p.fabric);
+    const pTag = fabricEl.querySelector('p');
+    if(pTag) pTag.innerHTML = lines.length
+      ? lines.map(l=>`<span style="display:block;margin-bottom:6px">— ${l}</span>`).join('')
+      : '';
   }
 
   // Beden butonları
