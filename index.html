@@ -963,7 +963,7 @@ img{display:block;max-width:100%;object-fit:cover}
       <aside class="filter-sb" id="filter-sb">
         <div class="f-sec">
           <div class="f-title">Kategori</div>
-          <label class="f-check"><input type="checkbox" checked style="accent-color:var(--gold)"> Abayalar</label>
+          <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Abayalar</label>
           <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Tunikler</label>
           <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Elbiseler</label>
           <label class="f-check"><input type="checkbox" style="accent-color:var(--gold)"> Paltolar</label>
@@ -1782,7 +1782,7 @@ const Store = {
     user:{name:'',email:''},
     currentProductId:1,
     activeAccTab:'acc-orders',
-    filters:{cats:[],sizes:[],maxPrice:12000,sort:'Önerilen'},
+    filters:{cats:[],sizes:[],maxPrice:25000,sort:'Önerilen'},
     promos:{ANNE25:25,WELCOME10:10,RAMAZAN30:30},
     appliedPromo:null,
     pdState:{colorIdx:0,colorName:'Krem Bej',size:'',qty:1},
@@ -1890,7 +1890,7 @@ const Store = {
   toggleCat(c){const f=this._d.filters.cats,i=f.indexOf(c);i===-1?f.push(c):f.splice(i,1);this.emit('filters');},
   toggleSize(s){const f=this._d.filters.sizes,i=f.indexOf(s);i===-1?f.push(s):f.splice(i,1);this.emit('filters');},
   setMaxPrice(v){this._d.filters.maxPrice=v;this.emit('filters');},
-  clearFilters(){this._d.filters={cats:[],sizes:[],maxPrice:12000,sort:'Önerilen'};this.emit('filters');},
+  clearFilters(){this._d.filters={cats:[],sizes:[],maxPrice:25000,sort:'Önerilen'};this.emit('filters');},
 
   /* Account tab */
   setAccTab(id){this._d.activeAccTab=id;},
@@ -2301,7 +2301,7 @@ function clearFilters(){
   document.querySelectorAll('#filter-sb input[type=checkbox]').forEach(cb=>cb.checked=false);
   document.querySelectorAll('.sf-btn').forEach(b=>b.classList.remove('active'));
   const pr=document.querySelector('#filter-sb input[type=range]');
-  if(pr) pr.value=12000;
+  if(pr) pr.value=25000;
   document.getElementById('pr-txt')&&(document.getElementById('pr-txt').textContent='₺500 — ₺25.000');
   renderCatGrid();
   toast(Store.t('clear_filter'));
