@@ -407,7 +407,7 @@ img{display:block;max-width:100%;object-fit:cover}
 .pd-layout{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - var(--nav-h))}
 .pd-gal{position:sticky;top:var(--nav-h);height:calc(100vh - var(--nav-h));overflow:hidden;display:flex;flex-direction:column;gap:6px;padding:20px;background:var(--bone)}
 .pd-main{flex:1;overflow:hidden;position:relative;background:var(--stone);cursor:zoom-in}
-.pd-main img{width:100%;height:100%;object-fit:cover;object-position:top center;transition:transform .4s var(--ease)}
+.pd-main img{width:100%;height:100%;object-fit:contain;transition:transform .4s var(--ease)}
 .pd-main:hover img{transform:scale(1.03)}
 .pd-thumbs{display:flex;gap:6px;height:88px}
 .pd-thumb{flex:1;overflow:hidden;cursor:pointer;opacity:.6;transition:opacity 150ms;background:var(--warm);border:2px solid transparent}
@@ -2047,21 +2047,69 @@ function renderPdDetail(){
   const p=PRODUCTS.find(x=>String(x.id)===String(Store.currentProductId));
   if(!p) return;
   const st=Store.pdState;
-  const img=document.getElementById('pd-main-img');
-  if(img) img.src=p.img.replace('w=400','w=800');
+
+  // Ana fotoğraf
+  const imgs = p.images && p.images.length ? p.images : [p.img];
+  const mainImg=document.getElementById('pd-main-img');
+  if(mainImg) mainImg.src=imgs[0];
+
+  // Thumbnail galerisi
+  const thumbsEl=document.querySelector('.pd-thumbs');
+  if(thumbsEl){
+    thumbsEl.innerHTML=imgs.map((src,i)=>`
+      <div class="pd-thumb${i===0?' active':''}" onclick="changePdImg(this,'${src}')">
+        <img src="${src}" alt="${p.name}">
+      </div>`).join('');
+  }
+
+  // Başlık, fiyat
   const title=document.querySelector('.pd-title');
   if(title) title.textContent=p.name;
   const pr=document.querySelector('.pd-price');
   if(pr) pr.textContent=fmt(p.price);
   const was=document.querySelector('.pd-was');
   if(was){was.textContent=p.was?fmt(p.was):'';was.style.display=p.was?'inline':'none';}
+
+  // Renk, beden, adet
   const colLbl=document.getElementById('sel-color');
   if(colLbl) colLbl.textContent=st.colorName||p.colorNames?.[0]||'';
   const szLbl=document.getElementById('sel-size');
   if(szLbl) szLbl.textContent=st.size||Store.t('select_size');
   const qtyEl=document.getElementById('qty');
   if(qtyEl) qtyEl.textContent=st.qty;
-  // Fav button
+
+  // Açıklama
+  const descEl=document.getElementById('pd-desc');
+  if(descEl && p.description_tr){
+    const pTag = descEl.querySelector('p');
+    if(pTag) pTag.textContent=p.description_tr;
+    else descEl.innerHTML=`<p style="font-size:14px;color:var(--ink2);line-height:1.8">${p.description_tr}</p>`;
+  }
+
+  // Kumaş
+  const fabricEl=document.getElementById('pd-fabric');
+  if(fabricEl && p.fabric){
+    const rows=fabricEl.querySelectorAll('.spec-row');
+    if(rows.length){
+      rows[0].querySelector('.spec-val') && (rows[0].querySelector('.spec-val').textContent=p.fabric);
+    } else {
+      fabricEl.innerHTML=`<p style="font-size:14px;color:var(--ink2);line-height:1.8">${p.fabric}</p>`;
+    }
+  }
+
+  // Beden butonları
+  const szWrap=document.querySelector('.sz-btns');
+  if(szWrap && p.sizes && p.sizes.length){
+    szWrap.innerHTML=p.sizes.map(s=>`<button class="sz-btn" onclick="selSz(this,'${s}')">${s}</button>`).join('');
+  }
+
+  // Renk swatches
+  const colWrap=document.querySelector('.col-swatches');
+  if(colWrap && p.colors && p.colors.length){
+    colWrap.innerHTML=p.colors.map((c,i)=>`<div class="col-sw${i===0?' active':''}" style="background:${c}" onclick="selCol(this,'${p.colorNames?.[i]||c}',${i})" title="${p.colorNames?.[i]||''}"></div>`).join('');
+  }
+
+  // Fav butonu
   const fb=document.getElementById('pd-fav-btn');
   if(fb){
     const f=Store.favHas(p.id);
@@ -2069,14 +2117,6 @@ function renderPdDetail(){
     fb.style.borderColor=f?'var(--gold)':'';
     fb.style.color=f?'var(--gold)':'';
   }
-  // Color swatches
-  document.querySelectorAll('.col-sw').forEach((el,i)=>{
-    el.classList.toggle('active',i===st.colorIdx);
-  });
-  // Size buttons reset
-  document.querySelectorAll('.sz-btn:not(.out)').forEach(b=>{
-    b.classList.toggle('active',b.textContent.trim()===st.size);
-  });
 }
 
 function renderLang(){
@@ -2200,7 +2240,7 @@ function changePdImg(thumb,src){
   document.querySelectorAll('.pd-thumb').forEach(t=>t.classList.remove('active'));
   thumb.classList.add('active');
   const img=document.getElementById('pd-main-img');
-  if(img){img.style.opacity='0';setTimeout(()=>{img.src=src+'&auto=format&fit=crop';img.style.opacity='1';},180);}
+  if(img){img.style.opacity='0';setTimeout(()=>{img.src=src;img.style.opacity='1';},180);}
 }
 function selCol(el,name,idx){
   document.querySelectorAll('.col-sw').forEach(c=>c.classList.remove('active'));
