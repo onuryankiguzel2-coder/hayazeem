@@ -667,6 +667,7 @@ img{display:block;max-width:100%;object-fit:cover}
 [dir=rtl] .hero-story{border-left:none;border-right:1px solid rgba(201,169,110,.5);padding-left:0;padding-right:16px}
 [dir=rtl] .fs{background-position:left 14px center;padding-right:14px;padding-left:36px}
 [dir=rtl] .f-link{text-align:right}
+@keyframes _pulse{0%,100%{opacity:1}50%{opacity:.4}}
 </style>
 </head>
 <body>
@@ -1654,7 +1655,15 @@ let _catPage = 1;
 const _PER_PAGE = 12;
 
 // Supabase'den ürünleri çek ve UI'ı güncelle
+let _dbLoaded = false;
 async function loadProductsFromDB(){
+  // Yüklenirken skeleton göster
+  const cp = document.getElementById('cat-prods');
+  const hp = document.getElementById('home-prods');
+  const skeletonCard = '<div style="background:var(--bone);border-radius:4px;aspect-ratio:3/4;animation:_pulse 1.4s ease-in-out infinite"></div>';
+  if(cp) cp.innerHTML = Array(8).fill(skeletonCard).join('');
+  if(hp) hp.innerHTML = Array(4).fill(skeletonCard).join('');
+
   // Önce kategorileri yükle
   const {data:cats} = await _sbClient.from('categories').select('id,name_tr');
   window._CATMAP = {};
@@ -1754,12 +1763,13 @@ async function loadProductsFromDB(){
 
   // UI'ı güncelle
   window.PRODUCTS = PRODUCTS;
-  const hp = document.getElementById('home-prods');
-  const rp = document.getElementById('rel-prods');
-  const sp = document.getElementById('search-prods');
-  if(hp) hp.innerHTML = PRODUCTS.slice(0,4).map(p=>makeCard(p)).join('');
-  if(rp) rp.innerHTML = PRODUCTS.filter(p=>p.id!==Store.currentProductId).slice(0,4).map(p=>makeCard(p)).join('');
-  if(sp) sp.innerHTML = PRODUCTS.map(p=>makeCard(p)).join('');
+  const hp2 = document.getElementById('home-prods');
+  const rp2 = document.getElementById('rel-prods');
+  const sp2 = document.getElementById('search-prods');
+  if(hp2) hp2.innerHTML = PRODUCTS.slice(0,4).map(p=>makeCard(p)).join('');
+  if(rp2) rp2.innerHTML = PRODUCTS.filter(p=>p.id!==Store.currentProductId).slice(0,4).map(p=>makeCard(p)).join('');
+  if(sp2) sp2.innerHTML = PRODUCTS.map(p=>makeCard(p)).join('');
+  _dbLoaded = true;
   Store.emit('filters'); // Ürün listesini de güncelle
   renderCatGrid(true); // Kategori sayfasını da güncelle
 }
@@ -1960,9 +1970,15 @@ function renderCatGrid(resetPage){
   const pageProds=prods.slice(start,start+_PER_PAGE);
   const countEl=cp.closest('.prods-area')?.querySelector('p');
   if(countEl) countEl.textContent=total+' '+Store.t('showing');
-  cp.innerHTML=pageProds.length
-    ?pageProds.map(p=>makeCard(p)).join('')
-    :`<div style="grid-column:1/-1;text-align:center;padding:48px 0;color:var(--ink3)">Bu kriterlere uygun ürün bulunamadı.</div>`;
+  if(!_dbLoaded && pageProds.length === 0){
+    // DB henüz yüklenmedi, skeleton göster
+    const sk = '<div style="background:var(--bone);border-radius:4px;aspect-ratio:3/4;animation:_pulse 1.4s ease-in-out infinite"></div>';
+    cp.innerHTML = Array(8).fill(sk).join('');
+  } else {
+    cp.innerHTML=pageProds.length
+      ?pageProds.map(p=>makeCard(p)).join('')
+      :`<div style="grid-column:1/-1;text-align:center;padding:48px 0;color:var(--ink3)">Bu kriterlere uygun ürün bulunamadı.</div>`;
+  }
   // Sayfalama butonlarını güncelle
   const pag=document.querySelector('.pag');
   if(pag){
