@@ -1066,7 +1066,7 @@ img{display:block;max-width:100%;object-fit:cover}
 
       <div style="margin-bottom:18px">
         <div class="v-lbl">Renk: <strong id="sel-color" style="font-weight:500">Krem Bej</strong></div>
-        <div class="col-row">
+        <div class="col-swatches">
           <div class="col-sw active" style="background:#FAF7F2;border:1px solid #ddd" title="Krem Bej" onclick="selCol(this,'Krem Bej')"></div>
           <div class="col-sw" style="background:#2C2420" title="Koyu Kahve" onclick="selCol(this,'Koyu Kahve')"></div>
           <div class="col-sw" style="background:#8B8670" title="Zeytin" onclick="selCol(this,'Zeytin')"></div>
@@ -1080,7 +1080,7 @@ img{display:block;max-width:100%;object-fit:cover}
           <span>Beden: <strong id="sel-size" style="font-weight:500">M</strong></span>
           <button class="sz-gl" onclick="toast('Beden rehberi yakında')">Beden Rehberi</button>
         </div>
-        <div class="sz-row">
+        <div class="sz-btns">
           <button class="sz-btn out" disabled title="Stokta yok">XS</button>
           <button class="sz-btn" onclick="selSz(this,'S')">S</button>
           <button class="sz-btn active" onclick="selSz(this,'M')">M</button>
@@ -1091,9 +1091,9 @@ img{display:block;max-width:100%;object-fit:cover}
         </div>
       </div>
 
-      <div class="stock-row">
-        <span class="stock-dot" style="background:var(--warn)"></span>
-        <span>Son <strong>3 ürün</strong> kaldı — Hemen al!</span>
+      <div class="stock-row" id="pd-stock-row">
+        <span class="stock-dot" id="pd-stock-dot" style="background:var(--warn)"></span>
+        <span id="pd-stock-text">Son <strong>3 ürün</strong> kaldı — Hemen al!</span>
       </div>
 
       <div class="qty-wrap">
@@ -2093,10 +2093,22 @@ function renderPdDetail(){
   if(title) title.textContent=p.name;
   const skuEl=document.querySelector('.pd-sku');
   if(skuEl){
-    const parts=[];
-    if(p.colorNames&&p.colorNames.length) parts.push(p.colorNames.length+' Renk');
-    if(p.sizes&&p.sizes.length) parts.push(p.sizes.length+' Beden');
-    skuEl.textContent=(p.sub||'')+( parts.length?' · '+parts.join(', '):'');
+    skuEl.textContent=p.sub||'';
+  }
+  // Stok güncelle
+  const stockText=document.getElementById('pd-stock-text');
+  const stockDot=document.getElementById('pd-stock-dot');
+  if(stockText && p.stock !== undefined){
+    if(p.stock <= 0){
+      stockText.innerHTML='Stokta yok';
+      if(stockDot) stockDot.style.background='var(--err)';
+    } else if(p.stock <= 5){
+      stockText.innerHTML='Son <strong>'+p.stock+' ürün</strong> kaldı — Hemen al!';
+      if(stockDot) stockDot.style.background='var(--warn)';
+    } else {
+      stockText.innerHTML='Stokta <strong>'+p.stock+' ürün</strong> mevcut';
+      if(stockDot) stockDot.style.background='var(--ok,#4CAF50)';
+    }
   }
   const pr=document.querySelector('.pd-price');
   if(pr) pr.textContent=fmt(p.price);
