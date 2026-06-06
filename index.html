@@ -1918,7 +1918,10 @@ function getFiltered(){
     const catName = (window._CATMAP && window._CATMAP[p.cat]) || p.cat;
     return f.cats.includes(catName);
   });
-  if(f.sizes.length) ps=ps; // variant-level; pass-through for now
+  if(f.sizes.length) ps=ps.filter(p=>{
+    if(!p.sizes || !p.sizes.length) return true; // bedeni olmayan ürünleri göster
+    return f.sizes.some(s=>p.sizes.map(x=>String(x).toUpperCase()).includes(String(s).toUpperCase()));
+  });
   ps=ps.filter(p=>p.price<=f.maxPrice);
   if(f.sort==='Fiyat: Artan') ps.sort((a,b)=>a.price-b.price);
   else if(f.sort==='Fiyat: Azalan') ps.sort((a,b)=>b.price-a.price);
