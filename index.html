@@ -2584,7 +2584,7 @@ function handleSearch(val){
   const el=document.getElementById('search-result-txt');
   const sp=document.getElementById('search-prods');
   const q=val.trim().toLowerCase();
-  const res=q?PRODUCTS.filter(p=>p.name.toLowerCase().includes(q)||p.cat.toLowerCase().includes(q)||p.fabric.toLowerCase().includes(q)):PRODUCTS;
+  const res=q?PRODUCTS.filter(p=>{const cn=(window._CATMAP&&window._CATMAP[p.cat])||p.cat;return p.name.toLowerCase().includes(q)||cn.toLowerCase().includes(q)||p.fabric.toLowerCase().includes(q);}):PRODUCTS;
   if(el) el.textContent=q?'"'+val+'" için '+res.length+' sonuç':'Tüm ürünler gösteriliyor';
   if(sp) sp.innerHTML=res.length?res.map(p=>makeCard(p)).join(''):`<div style="grid-column:1/-1;text-align:center;padding:48px 0;color:var(--ink3)">Sonuç bulunamadı.</div>`;
 }
@@ -3293,11 +3293,12 @@ function homeSearch(val){
   if(!drop) return;
   const q = val.trim().toLowerCase();
   if(!q){ drop.innerHTML = ''; document.getElementById('home-search-drop').style.display='none'; return; }
-  const results = PRODUCTS.filter(p =>
-    p.name.toLowerCase().includes(q) ||
-    p.cat.toLowerCase().includes(q) ||
-    p.fabric.toLowerCase().includes(q)
-  ).slice(0,6);
+  const results = PRODUCTS.filter(p => {
+    const catName = (window._CATMAP && window._CATMAP[p.cat]) || p.cat;
+    return p.name.toLowerCase().includes(q) ||
+      catName.toLowerCase().includes(q) ||
+      p.fabric.toLowerCase().includes(q);
+  }).slice(0,6);
   if(!results.length){
     drop.innerHTML = '<div style="padding:12px 16px;font-size:13px;color:var(--ink3)">Sonuç bulunamadı</div>';
     return;
@@ -3309,7 +3310,7 @@ function homeSearch(val){
       <img src="${p.img.replace('w=400','w=80')}" alt="" style="width:40px;height:50px;object-fit:cover;flex-shrink:0">
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
-        <div style="font-size:11px;color:var(--ink3)">${p.cat} · ${p.fabric}</div>
+        <div style="font-size:11px;color:var(--ink3)">${(window._CATMAP && window._CATMAP[p.cat]) || p.cat} · ${p.fabric}</div>
       </div>
       <div style="font-family:var(--fd);font-size:16px;white-space:nowrap;flex-shrink:0">${fmt(p.price)}</div>
     </div>`).join('');
