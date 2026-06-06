@@ -2635,7 +2635,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const path = window.location.pathname.replace(/\/+$/,'') || '/';
     const parts = path.split('/').filter(Boolean);
     const page = parts[0] || 'home';
-    const validPages = ['home','categories','product','cart','favorites','account','checkout','search','about','track','login','register','collections'];
+    const validPages = ['home','categories','product','cart','favorites','account','checkout','search','about','track','login','register','collections','contact','returns','privacy','distance-sales','order-detail','reset'];
     if(page && validPages.includes(page)){
       if(page==='product' && parts[1]){
         // /product/UUID — ürün sayfasını aç
