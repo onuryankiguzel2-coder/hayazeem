@@ -1,20 +1,16 @@
 name: Update Products JSON
-
 on:
   schedule:
     - cron: '*/15 * * * *'
   workflow_dispatch:
-
 jobs:
   update-products:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-
       - name: Fetch products from Supabase
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -23,17 +19,14 @@ jobs:
           PRODUCTS=$(curl -sf \
             -H "apikey: $SUPABASE_ANON_KEY" \
             -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
-            "$SUPABASE_URL/rest/v1/products?is_active=eq.true&order=created_at.desc&select=id,name_tr,name_en,name_ar,description_tr,price,original_price,stock,sizes,colors,images,category_id,fabric,composition,weight,origin,care,is_featured")
-
+            "$SUPABASE_URL/rest/v1/products?is_active=eq.true&order=created_at.desc&select=id,name_tr,name_en,name_ar,description_tr,price,original_price,stock,sizes,colors,category_id,fabric,composition,weight,origin,care,is_featured")
           CATEGORIES=$(curl -sf \
             -H "apikey: $SUPABASE_ANON_KEY" \
             -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
             "$SUPABASE_URL/rest/v1/categories?select=id,name_tr")
-
           TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
           echo "{\"updated_at\":\"$TIMESTAMP\",\"products\":$PRODUCTS,\"categories\":$CATEGORIES}" > products.json
           echo "Done: $TIMESTAMP"
-
       - name: Commit and push if changed
         run: |
           git config user.name "github-actions[bot]"
