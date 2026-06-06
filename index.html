@@ -1700,18 +1700,24 @@ async function loadProductsFromDB(){
   if(cats) cats.forEach(c=>{ window._CATMAP[c.id] = c.name_tr; });
   
   if(error || !data || data.length === 0){
-    // DB'de ürün yoksa demo ürünleri göster
-    PRODUCTS = [
-      {id:1,name:'Medine İpek Abaya',sub:'HYZ-001 · 5 Renk',cat:'Abayalar',fabric:'İpek',price:4850,was:6200,badge:'Yeni',b_cls:'b-lim',img:'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=400&q=80',colors:['#FAF7F2','#2C2420','#8B8670','#D4C5B0','#C9A96E'],colorNames:['Krem Bej','Koyu Kahve','Zeytin','Nude','Altın'],sale:true},
-      {id:2,name:'Nour Keten Elbise',sub:'HYZ-002 · 3 Renk',cat:'Elbiseler',fabric:'Keten',price:3200,was:null,badge:null,img:'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=400&q=80',colors:['#FAF7F2','#D4C5B0','#8B8670'],colorNames:['Krem','Nude','Zeytin']},
-      {id:3,name:'Serenity Şifon Tunik',sub:'HYZ-003 · 6 Renk',cat:'Tunikler',fabric:'Şifon',price:1890,was:2650,badge:'%29',b_cls:'b-sale',img:'https://images.unsplash.com/photo-1512374382149-233c42b6a83b?w=400&q=80',colors:['#FAF7F2','#E8E0D5','#D4C5B0','#C9A96E'],colorNames:['Krem','Taş','Nude','Altın'],sale:true},
-      {id:4,name:'Rahel Palto',sub:'HYZ-004 · 2 Renk',cat:'Paltolar',fabric:'Triko',price:8950,was:null,badge:null,img:'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&q=80',colors:['#E8E0D5','#2C2420'],colorNames:['Taş','Koyu Kahve']},
-      {id:5,name:'Safir Şifon Bluz',sub:'HYZ-005 · 4 Renk',cat:'Tunikler',fabric:'Şifon',price:2150,was:null,badge:null,img:'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=400&q=80',colors:['#FAF7F2','#D4C5B0','#C9A96E','#8B8670'],colorNames:['Krem','Nude','Altın','Zeytin']},
-      {id:6,name:'Zeynep Kaban',sub:'HYZ-006 · 3 Renk',cat:'Paltolar',fabric:'Triko',price:12500,was:null,badge:'Sınırlı',b_cls:'b-lim',img:'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80&grayscale',colors:['#8B8670','#2C2420','#D4C5B0'],colorNames:['Zeytin','Koyu Kahve','Nude']},
-      {id:7,name:'Hira Jakarlı Set',sub:'HYZ-007 · 2 Renk',cat:'Abayalar',fabric:'İpek',price:6750,was:null,badge:null,img:'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&q=80&blur=1',colors:['#E8D5A3','#2C2420'],colorNames:['Altın Krem','Koyu Kahve']},
-      {id:8,name:'Leyla Triko Elbise',sub:'HYZ-008 · 5 Renk',cat:'Elbiseler',fabric:'Triko',price:3850,was:null,badge:null,img:'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&q=80&grayscale',colors:['#FAF7F2','#D4C5B0','#C9A96E','#8B8670','#2C2420'],colorNames:['Krem','Nude','Altın','Zeytin','Koyu Kahve']},
-    ];
-  } else {
+    // Supabase hatası — eski cache varsa onu göster, yoksa boş bırak
+    let staleCache = null;
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if(cached) staleCache = JSON.parse(cached);
+    } catch(e) {}
+    if(staleCache && staleCache.products && staleCache.products.length > 0) {
+      data = staleCache.products;
+      cats = staleCache.cats;
+      window._CATMAP = {};
+      if(cats) cats.forEach(c=>{ window._CATMAP[c.id] = c.name_tr; });
+    } else {
+      // Cache de yok, skeleton göster
+      _dbLoaded = false;
+      return;
+    }
+  }
+  if(false){
     // Supabase verisini PRODUCTS formatına dönüştür
     PRODUCTS = data.map(p => {
       // Renk isimlerinden basit hex üret (yoksa default palet)
