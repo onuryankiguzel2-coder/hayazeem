@@ -1658,154 +1658,141 @@ const _PER_PAGE = 12;
 // Supabase'den ürünleri çek ve UI'ı güncelle
 let _dbLoaded = false;
 async function loadProductsFromDB(){
-  // Yüklenirken skeleton göster
   const cp = document.getElementById('cat-prods');
   const hp = document.getElementById('home-prods');
   const skeletonCard = '<div style="background:var(--bone);border-radius:4px;aspect-ratio:3/4;animation:_pulse 1.4s ease-in-out infinite"></div>';
   if(cp) cp.innerHTML = Array(8).fill(skeletonCard).join('');
   if(hp) hp.innerHTML = Array(4).fill(skeletonCard).join('');
 
-  // Önce kategorileri yükle
   const CACHE_KEY = 'hyz_products_cache';
-  const CACHE_TTL = 10 * 60 * 1000; // 10 dakika
+  const CACHE_TTL = 10 * 60 * 1000;
+
   let cachedData = null;
   try {
     const cached = localStorage.getItem(CACHE_KEY);
     if(cached) {
       const parsed = JSON.parse(cached);
-      if(Date.now() - parsed.ts < CACHE_TTL) {
-        cachedData = parsed;
-      }
+      if(Date.now() - parsed.ts < CACHE_TTL) cachedData = parsed;
     }
   } catch(e) {}
 
-  let cats, data, error;
+  let cats, data;
+
   if(cachedData) {
     cats = cachedData.cats;
     data = cachedData.products;
   } else {
-    const catsRes = await _sbClient.from('categories').select('id,name_tr');
-    cats = catsRes.data;
-    const prodsRes = await _sbClient.from('products').select('*').eq('is_active', true).order('created_at', {ascending:false});
-    data = prodsRes.data;
-    error = prodsRes.error;
-    if(!error && data && data.length > 0) {
+    // --- Önce products.json (hızlı) ---
+    let jsonOk = false;
+    try {
+      const jsonRes = await fetch('/products.json?_=' + Math.floor(Date.now()/60000), {cache:'no-store'});
+      if(jsonRes.ok) {
+        const jsonData = await jsonRes.json();
+        if(jsonData.products && jsonData.products.length > 0) {
+          cats = jsonData.categories || [];
+          data = jsonData.products;
+          jsonOk = true;
+          try { localStorage.setItem(CACHE_KEY, JSON.stringify({ts:Date.now(),cats,products:data,source:'json'})); } catch(e) {}
+        }
+      }
+    } catch(e) { console.warn('[HYZ] products.json yüklenemedi, Supabase fallback...', e.message); }
+
+    // --- Supabase fallback ---
+    if(!jsonOk) {
       try {
-        localStorage.setItem(CACHE_KEY, JSON.stringify({ts: Date.now(), cats, products: data}));
-      } catch(e) {}
+        const catsRes = await _sbClient.from('categories').select('id,name_tr');
+        cats = catsRes.data;
+        const prodsRes = await _sbClient.from('products').select('*').eq('is_active', true).order('created_at', {ascending:false});
+        data = prodsRes.data;
+        if(!prodsRes.error && data && data.length > 0) {
+          try { localStorage.setItem(CACHE_KEY, JSON.stringify({ts:Date.now(),cats,products:data,source:'supabase'})); } catch(e) {}
+        }
+      } catch(sbErr) { console.error('[HYZ] Supabase hatası:', sbErr); }
     }
   }
 
   window._CATMAP = {};
-  if(cats) cats.forEach(c=>{ window._CATMAP[c.id] = c.name_tr; });
-  
-  if(error || !data || data.length === 0){
-    // Supabase hatası — eski cache varsa onu göster, yoksa boş bırak
-    let staleCache = null;
-    try {
-      const cached = localStorage.getItem(CACHE_KEY);
-      if(cached) staleCache = JSON.parse(cached);
-    } catch(e) {}
-    if(staleCache && staleCache.products && staleCache.products.length > 0) {
-      data = staleCache.products;
-      cats = staleCache.cats;
-      window._CATMAP = {};
-      if(cats) cats.forEach(c=>{ window._CATMAP[c.id] = c.name_tr; });
-    } else {
-      // Cache de yok, skeleton göster
-      _dbLoaded = false;
-      return;
-    }
+  if(cats) {
+    const catsArr = Array.isArray(cats) ? cats : (cats.data || []);
+    catsArr.forEach(c=>{ window._CATMAP[c.id] = c.name_tr; });
   }
+
+  if(!data || data.length === 0){
+    let staleCache = null;
+    try { const c = localStorage.getItem(CACHE_KEY); if(c) staleCache = JSON.parse(c); } catch(e) {}
+    if(staleCache && staleCache.products && staleCache.products.length > 0) {
+      data = staleCache.products; cats = staleCache.cats;
+      window._CATMAP = {};
+      const catsArr = Array.isArray(cats) ? cats : (cats?.data || []);
+      if(catsArr) catsArr.forEach(c=>{ window._CATMAP[c.id] = c.name_tr; });
+    } else { _dbLoaded = false; return; }
+  }
+
   {
-    // Supabase verisini PRODUCTS formatına dönüştür
+    const colorNameToHex = {
+      'krem':'#FAF7F2','krem bej':'#FAF7F2','bej':'#F0E6D3','ekru':'#F5F0E8',
+      'siyah':'#1A1A1A','koyu kahve':'#2C2420','kahve':'#5C3D2E',
+      'beyaz':'#FFFFFF','optik beyaz':'#F8F8F8',
+      'zeytin':'#8B8670','haki':'#8B8670','ordu yeşili':'#6B7C5C',
+      'yeşil':'#4A7C59','mint':'#98D8C8','su yeşili':'#7BC8C0',
+      'lacivert':'#1B3A6B','mavi':'#4A7BBF','açık mavi':'#87CEEB',
+      'nude':'#D4C5B0','taş':'#E8E0D5','buz mavisi':'#D4E8F0',
+      'altın':'#C9A96E','gold':'#C9A96E','sarı':'#F0D060',
+      'kırmızı':'#C0392B','bordo':'#7B1F2E','şarap':'#722F37',
+      'pembe':'#F4A7B9','gül kurusu':'#C9877A','somon':'#FA8072',
+      'mor':'#8B5CF6','lila':'#C8A2C8','lavanta':'#C8B2D6',
+      'gri':'#9E9E9E','açık gri':'#D3D3D3','antrasit':'#424242',
+      'turuncu':'#E87C3E','kiremit':'#C0513A',
+    };
     PRODUCTS = data.map(p => {
-      // Renk isimlerinden basit hex üret (yoksa default palet)
-      const colorNameToHex = {
-        'krem':'#FAF7F2','krem bej':'#FAF7F2','bej':'#F0E6D3','ekru':'#F5F0E8',
-        'siyah':'#1A1A1A','koyu kahve':'#2C2420','kahve':'#5C3D2E',
-        'beyaz':'#FFFFFF','optik beyaz':'#F8F8F8',
-        'zeytin':'#8B8670','haki':'#8B8670','ordu yeşili':'#6B7C5C',
-        'yeşil':'#4A7C59','mint':'#98D8C8','su yeşili':'#7BC8C0',
-        'lacivert':'#1B3A6B','mavi':'#4A7BBF','açık mavi':'#87CEEB',
-        'nude':'#D4C5B0','taş':'#E8E0D5','buz mavisi':'#D4E8F0',
-        'altın':'#C9A96E','gold':'#C9A96E','sarı':'#F0D060',
-        'kırmızı':'#C0392B','bordo':'#7B1F2E','şarap':'#722F37',
-        'pembe':'#F4A7B9','gül kurusu':'#C9877A','somon':'#FA8072',
-        'mor':'#8B5CF6','lila':'#C8A2C8','lavanta':'#C8B2D6',
-        'gri':'#9E9E9E','açık gri':'#D3D3D3','antrasit':'#424242',
-        'turuncu':'#E87C3E','kiremit':'#C0513A',
-      };
       const colorList = p.colors || [];
-      const colors = colorList.map(name => {
-        const key = (name||'').toLowerCase().trim();
-        return colorNameToHex[key] || '#D4C5B0';
-      });
-      const nBeden = (p.sizes||[]).length;
-      const nRenk = colorList.length;
+      const colors = colorList.map(name => colorNameToHex[(name||'').toLowerCase().trim()] || '#D4C5B0');
+      const nBeden = (p.sizes||[]).length, nRenk = colorList.length;
       const sub = [nRenk > 0 ? nRenk+' Renk' : '', nBeden > 0 ? nBeden+' Beden' : ''].filter(Boolean).join(', ');
       return {
-        id: p.id,
-        name: p.name_tr || p.name_en || 'Ürün',
-        name_en: p.name_en || '',
-        name_ar: p.name_ar || '',
-        description_tr: p.description_tr || '',
-        sub: sub,
-        cat: p.category_id || 'Genel',
-        fabric: p.fabric || '',
-        composition: p.composition || '',
-        weight: p.weight || '',
-        origin: p.origin || '',
-        care: p.care || '',
-        price: p.price || 0,
-        was: p.original_price || null,
-        badge: p.is_featured ? 'Öne Çıkan' : null,
-        b_cls: p.is_featured ? 'b-lim' : null,
-        img: (p.images && p.images[0]) ? p.images[0] : 'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=400&q=80',
-        images: p.images || [],
-        colors: colors,
-        colorNames: colorList,
-        sizes: p.sizes || [],
-        stock: p.stock || 0,
-        sale: !!(p.original_price && p.original_price > p.price),
+        id:p.id, name:p.name_tr||p.name_en||'Ürün', name_en:p.name_en||'', name_ar:p.name_ar||'',
+        description_tr:p.description_tr||'', sub:sub, cat:p.category_id||'Genel',
+        fabric:p.fabric||'', composition:p.composition||'', weight:p.weight||'', origin:p.origin||'', care:p.care||'',
+        price:p.price||0, was:p.original_price||null,
+        badge:p.is_featured?'Öne Çıkan':null, b_cls:p.is_featured?'b-lim':null,
+        img:(p.images&&p.images[0])?p.images[0]:'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=400&q=80',
+        images:p.images||[], colors:colors, colorNames:colorList, sizes:p.sizes||[], stock:p.stock||0,
+        sale:!!(p.original_price&&p.original_price>p.price),
       };
     });
   }
 
-  // Filtre sayılarını güncelle
-  const catCounts = {};
-  const fabricCounts = {};
+  const catCounts = {}, fabricCounts = {};
   PRODUCTS.forEach(p=>{
-    const catName = (window._CATMAP && window._CATMAP[p.cat]) || p.cat;
-    if(catName){ catCounts[catName] = (catCounts[catName]||0)+1; }
-    if(p.fabric){ fabricCounts[p.fabric] = (fabricCounts[p.fabric]||0)+1; }
+    const catName = (window._CATMAP&&window._CATMAP[p.cat])||p.cat;
+    if(catName){ catCounts[catName]=(catCounts[catName]||0)+1; }
+    if(p.fabric){ fabricCounts[p.fabric]=(fabricCounts[p.fabric]||0)+1; }
   });
   document.querySelectorAll('#filter-sb .f-check').forEach(label=>{
-    const text = label.textContent.trim();
-    const cats = ['Abayalar','Tunikler','Elbiseler','Paltolar','Aksesuar'];
-    const fabrics = ['İpek','Keten','Şifon','Triko'];
+    const text=label.textContent.trim();
+    const cats=['Abayalar','Tunikler','Elbiseler','Paltolar','Aksesuar'];
+    const fabrics=['İpek','Keten','Şifon','Triko'];
     [...cats,...fabrics].forEach(name=>{
-      if(text===name || text.startsWith(name+' (')){
-        const count = catCounts[name]||fabricCounts[name]||0;
-        const inp = label.querySelector('input');
-        label.innerHTML = '';
-        if(inp) label.appendChild(inp);
+      if(text===name||text.startsWith(name+' (')){
+        const count=catCounts[name]||fabricCounts[name]||0;
+        const inp=label.querySelector('input');
+        label.innerHTML='';
+        if(inp)label.appendChild(inp);
         label.append(` ${name}${count>0?' ('+count+')':''}`);
       }
     });
   });
 
-  // UI'ı güncelle
   window.PRODUCTS = PRODUCTS;
-  const hp2 = document.getElementById('home-prods');
-  const rp2 = document.getElementById('rel-prods');
-  const sp2 = document.getElementById('search-prods');
-  if(hp2) hp2.innerHTML = PRODUCTS.slice(0,4).map(p=>makeCard(p)).join('');
-  if(rp2) rp2.innerHTML = PRODUCTS.filter(p=>p.id!==Store.currentProductId).slice(0,4).map(p=>makeCard(p)).join('');
-  if(sp2) sp2.innerHTML = PRODUCTS.map(p=>makeCard(p)).join('');
+  const hp2=document.getElementById('home-prods');
+  const rp2=document.getElementById('rel-prods');
+  const sp2=document.getElementById('search-prods');
+  if(hp2) hp2.innerHTML=PRODUCTS.slice(0,4).map(p=>makeCard(p)).join('');
+  if(rp2) rp2.innerHTML=PRODUCTS.filter(p=>p.id!==Store.currentProductId).slice(0,4).map(p=>makeCard(p)).join('');
+  if(sp2) sp2.innerHTML=PRODUCTS.map(p=>makeCard(p)).join('');
   _dbLoaded = true;
-  Store.emit('filters'); // Ürün listesini de güncelle
-  renderCatGrid(true); // Kategori sayfasını da güncelle
+  Store.emit('filters');
+  renderCatGrid(true);
 }
 
 
