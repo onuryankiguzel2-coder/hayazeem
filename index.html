@@ -2287,7 +2287,26 @@ function go(name, opts){
   if(!opts || !opts.fromPopstate){
     const pid = name==='product' ? Store.currentProductId : null;
     const state = {page: name, productId: pid};
-    const url = name==='home' ? '/' : '/'+name+(pid?'/'+pid:'');
+    const urlMap = {
+      'home': '/',
+      'categories': '/urunler',
+      'collections': '/koleksiyonlar',
+      'about': '/hakkimizda',
+      'track': '/siparis-takip',
+      'cart': '/sepet',
+      'favorites': '/favoriler',
+      'account': '/hesabim',
+      'checkout': '/odeme',
+      'search': '/arama',
+      'contact': '/iletisim',
+      'returns': '/iade',
+      'privacy': '/gizlilik',
+      'distance-sales': '/mesafeli-satis',
+      'order-detail': '/siparis-detay',
+    };
+    const url = name==='product'
+      ? '/urun/'+(pid||'')
+      : (urlMap[name] || '/'+name);
     history.pushState(state, '', url);
   }
 }
@@ -2634,17 +2653,45 @@ document.addEventListener('DOMContentLoaded',()=>{
   (function initRoute(){
     const path = window.location.pathname.replace(/\/+$/,'') || '/';
     const parts = path.split('/').filter(Boolean);
-    const page = parts[0] || 'home';
-    const validPages = ['home','categories','product','cart','favorites','account','checkout','search','about','track','login','register','collections','contact','returns','privacy','distance-sales','order-detail','reset'];
-    if(page && validPages.includes(page)){
-      if(page==='product' && parts[1]){
-        // /product/UUID — ürün sayfasını aç
-        Store._d.currentProductId = parts[1];
-      }
-      go(page, {fromPopstate:true});
-    } else {
-      go('home', {fromPopstate:true});
+    const slug = parts[0] || '';
+    // Türkçe URL → page ID mapping
+    const slugToPage = {
+      '': 'home',
+      'urunler': 'categories',
+      'koleksiyonlar': 'collections',
+      'hakkimizda': 'about',
+      'siparis-takip': 'track',
+      'sepet': 'cart',
+      'favoriler': 'favorites',
+      'hesabim': 'account',
+      'odeme': 'checkout',
+      'arama': 'search',
+      'iletisim': 'contact',
+      'iade': 'returns',
+      'gizlilik': 'privacy',
+      'mesafeli-satis': 'distance-sales',
+      'siparis-detay': 'order-detail',
+      'urun': 'product',
+      // fallback: eski İngilizce URL'ler de çalışsın
+      'categories': 'categories',
+      'collections': 'collections',
+      'about': 'about',
+      'track': 'track',
+      'cart': 'cart',
+      'favorites': 'favorites',
+      'account': 'account',
+      'checkout': 'checkout',
+      'search': 'search',
+      'product': 'product',
+      'login': 'login',
+      'register': 'login',
+      'reset': 'reset',
+    };
+    const page = slugToPage[slug] || 'home';
+    if(page==='product' && parts[1]){
+      Store._d.currentProductId = parts[1];
     }
+    go(page, {fromPopstate:true});
     // İlk state'i history'e yaz
     if(!history.state){
       const pid = page==='product' ? parts[1] : null;
