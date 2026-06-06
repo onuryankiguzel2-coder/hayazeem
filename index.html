@@ -2260,7 +2260,7 @@ function renderAll(){
 }
 
 /* ─── PAGE NAV ─── */
-function go(name){
+function go(name, opts){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const el=document.getElementById('page-'+name);
   if(!el) return;
@@ -2283,7 +2283,24 @@ function go(name){
   }
   if(name==='checkout'){renderCartSummary();renderCheckoutItems();renderSavedAddresses();}
   renderNavBadge();
+  // URL güncelle (popstate ile geri tuşu için)
+  if(!opts || !opts.fromPopstate){
+    const pid = name==='product' ? Store.currentProductId : null;
+    const state = {page: name, productId: pid};
+    const url = name==='home' ? '/' : '/'+name+(pid?'/'+pid:'');
+    history.pushState(state, '', url);
+  }
 }
+
+// Geri/ileri tuşu desteği
+window.addEventListener('popstate', function(e){
+  const state = e.state;
+  if(!state){ go('home', {fromPopstate:true}); return; }
+  if(state.page==='product' && state.productId){
+    Store.openProduct(state.productId);
+  }
+  go(state.page, {fromPopstate:true});
+});
 
 function openProduct(id){
   Store.openProduct(id);
@@ -2613,6 +2630,28 @@ Store.on('filters',()=>{renderCatGrid(true);});
 
 /* ─── BOOT ─── */
 document.addEventListener('DOMContentLoaded',()=>{
+  // URL'e göre başlangıç sayfasını belirle
+  (function initRoute(){
+    const path = window.location.pathname.replace(/\/+$/,'') || '/';
+    const parts = path.split('/').filter(Boolean);
+    const page = parts[0] || 'home';
+    const validPages = ['home','categories','product','cart','favorites','account','checkout','search','about','track','login','register','collections'];
+    if(page && validPages.includes(page)){
+      if(page==='product' && parts[1]){
+        // /product/UUID — ürün sayfasını aç
+        Store._d.currentProductId = parts[1];
+      }
+      go(page, {fromPopstate:true});
+    } else {
+      go('home', {fromPopstate:true});
+    }
+    // İlk state'i history'e yaz
+    if(!history.state){
+      const pid = page==='product' ? parts[1] : null;
+      history.replaceState({page: page||'home', productId: pid||null}, '', window.location.pathname);
+    }
+  })();
+
   // Ürünleri Supabase'den yükle
   loadProductsFromDB();
 
