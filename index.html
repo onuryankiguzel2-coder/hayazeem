@@ -405,10 +405,11 @@ img{display:block;max-width:100%;object-fit:cover}
 
 /* ═══════ PRODUCT DETAIL ═══════ */
 .pd-layout{display:grid;grid-template-columns:55fr 45fr;min-height:calc(100vh - var(--nav-h))}
-.pd-gal{position:sticky;top:var(--nav-h);height:calc(100vh - var(--nav-h));overflow:hidden;display:flex;flex-direction:column;gap:4px;padding:0;background:var(--bone)}
-.pd-main{flex:1;overflow:hidden;position:relative;background:var(--stone);cursor:zoom-in}
-.pd-main img{width:100%;height:100%;object-fit:contain;transition:transform .35s ease;transform-origin:var(--zoom-x,50%) var(--zoom-y,50%)}
-.pd-main.zoomed img{transform:scale(2.5);cursor:zoom-out}
+.pd-gal{position:sticky;top:var(--nav-h);height:calc(100vh - var(--nav-h));overflow:hidden;display:flex;flex-direction:column;gap:4px;padding:8px;background:var(--bone)}
+.pd-main{flex:1;overflow:hidden;position:relative;background:var(--stone);cursor:crosshair}
+.pd-main img{width:100%;height:100%;object-fit:cover;object-position:top center;transition:transform .4s ease;transform-origin:var(--zoom-x, 50%) var(--zoom-y, 50%)}
+.pd-main.zoomed img{transform:scale(2.2)}
+.pd-main:hover{cursor:zoom-in}
 .pd-thumbs{display:flex;gap:6px;height:88px}
 .pd-thumb{flex:1;overflow:hidden;cursor:pointer;opacity:.6;transition:opacity 150ms;background:var(--warm);border:2px solid transparent}
 .pd-thumb img{width:100%;height:100%;object-fit:cover}
@@ -2365,7 +2366,6 @@ function go(name, opts){
   if(!el) return;
   el.classList.add('active');
   window.scrollTo(0,0);
-  setTimeout(initPdZoom, 50);
   const drawer=document.getElementById('drawer');
   if(drawer?.classList.contains('open')){
     drawer.classList.remove('open');
@@ -3903,26 +3903,24 @@ async function confirmOrder(){
 }
 
 /* ── Mouse Zoom ── */
-function initPdZoom(){
+(function(){
   const pdMain = document.getElementById('pd-main');
   if(!pdMain) return;
-  // Mouse pozisyonuna göre transform-origin güncelle
+  let zoomed = false;
   pdMain.addEventListener('mousemove', e => {
+    if(!zoomed) return;
     const rect = pdMain.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1) + '%';
     const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1) + '%';
     pdMain.style.setProperty('--zoom-x', x);
     pdMain.style.setProperty('--zoom-y', y);
   });
-  // Tıklayınca zoom toggle
   pdMain.addEventListener('click', e => {
-    if(pdMain.classList.contains('zoomed')){
-      pdMain.classList.remove('zoomed');
-    } else {
-      pdMain.classList.add('zoomed');
-    }
+    // Lightbox aç
+    const imgs = Store.currentProduct?.images || [pdMain.querySelector('img')?.src];
+    openLightbox(imgs, window._pdThumbIdx || 0);
   });
-}
+})();
 
 /* ── Lightbox ── */
 let _lbImgs = [], _lbIdx = 0;
@@ -3937,12 +3935,9 @@ function closeLightbox(){
   document.body.style.overflow = '';
 }
 function lbClose(e){ if(e.target === document.getElementById('lb-overlay')) closeLightbox(); }
-function lbNav(dir,e){
-  if(e) e.stopPropagation();
+function lbNav(dir){
   _lbIdx = (_lbIdx + dir + _lbImgs.length) % _lbImgs.length;
-  const img = document.getElementById('lb-img');
-  img.style.opacity = '0';
-  setTimeout(()=>{ img.src = _lbImgs[_lbIdx]; img.style.opacity = '1'; }, 150);
+  document.getElementById('lb-img').src = _lbImgs[_lbIdx];
 }
 document.addEventListener('keydown', e => {
   const lb = document.getElementById('lb-overlay');
@@ -3956,9 +3951,9 @@ document.addEventListener('keydown', e => {
 <!-- LIGHTBOX -->
 <div class="lb-overlay" id="lb-overlay" onclick="lbClose(event)">
   <button class="lb-close" onclick="closeLightbox()">×</button>
-  <button class="lb-prev" onclick="lbNav(-1,event)">‹</button>
-  <img id="lb-img" src="" alt="" style="transition:opacity .15s">
-  <button class="lb-next" onclick="lbNav(1,event)">›</button>
+  <button class="lb-prev" onclick="lbNav(-1);event.stopPropagation()">‹</button>
+  <img id="lb-img" src="" alt="">
+  <button class="lb-next" onclick="lbNav(1);event.stopPropagation()">›</button>
 </div>
 </body>
 </html>
