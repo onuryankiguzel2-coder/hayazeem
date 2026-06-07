@@ -404,12 +404,11 @@ img{display:block;max-width:100%;object-fit:cover}
 .filt-toggle{display:none;width:100%;margin-bottom:12px}
 
 /* ═══════ PRODUCT DETAIL ═══════ */
-.pd-layout{display:grid;grid-template-columns:55fr 45fr;min-height:calc(100vh - var(--nav-h))}
-.pd-gal{position:sticky;top:var(--nav-h);height:calc(100vh - var(--nav-h));overflow:hidden;display:flex;flex-direction:column;gap:4px;padding:0;background:var(--bone)}
-.pd-main{flex:1;overflow:hidden;position:relative;background:var(--stone);cursor:pointer}
-.pd-main img{width:100%;height:100%;object-fit:cover;object-position:top center;cursor:pointer}
-
-
+.pd-layout{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - var(--nav-h))}
+.pd-gal{position:sticky;top:var(--nav-h);height:calc(100vh - var(--nav-h));overflow:hidden;display:flex;flex-direction:column;gap:6px;padding:20px;background:var(--bone)}
+.pd-main{flex:1;overflow:hidden;position:relative;background:var(--stone);cursor:zoom-in}
+.pd-main img{width:100%;height:100%;object-fit:contain;transition:transform .4s var(--ease)}
+.pd-main:hover img{transform:scale(1.03)}
 .pd-thumbs{display:flex;gap:6px;height:88px}
 .pd-thumb{flex:1;overflow:hidden;cursor:pointer;opacity:.6;transition:opacity 150ms;background:var(--warm);border:2px solid transparent}
 .pd-thumb img{width:100%;height:100%;object-fit:cover}
@@ -1192,7 +1191,7 @@ img{display:block;max-width:100%;object-fit:cover}
       </div>
       <div class="cat-grid" id="coll-grid" style="margin-top:clamp(20px,3vw,36px)">
         <div class="cat-card" onclick="filterByCollection('Anahtar')">
-          <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=700&q=85&auto=format&fit=crop" alt="Anahtar" loading="lazy">
+          <img src="https://vuusgbthelegugpcbdye.supabase.co/storage/v1/object/public/products/collection_Anahtar.jpg" alt="Anahtar" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop'">
           <div class="cat-ov"></div>
           <div class="cat-info">
             <div class="cat-name">Anahtar</div>
@@ -1200,7 +1199,7 @@ img{display:block;max-width:100%;object-fit:cover}
           </div>
         </div>
         <div class="cat-card" onclick="filterByCollection('Sükun')">
-          <img src="https://images.unsplash.com/photo-1594938298603-c8148c4a8c67?w=700&q=85&auto=format&fit=crop" alt="Sükun" loading="lazy">
+          <img src="https://vuusgbthelegugpcbdye.supabase.co/storage/v1/object/public/products/collection_Sukun.jpg" alt="Sükun" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop'">
           <div class="cat-ov"></div>
           <div class="cat-info">
             <div class="cat-name">Sükun</div>
@@ -1208,7 +1207,7 @@ img{display:block;max-width:100%;object-fit:cover}
           </div>
         </div>
         <div class="cat-card" onclick="filterByCollection('İz')">
-          <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop" alt="İz" loading="lazy">
+          <img src="https://vuusgbthelegugpcbdye.supabase.co/storage/v1/object/public/products/collection_Iz.jpg" alt="İz" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop'">
           <div class="cat-ov"></div>
           <div class="cat-info">
             <div class="cat-name">İz</div>
@@ -1216,7 +1215,7 @@ img{display:block;max-width:100%;object-fit:cover}
           </div>
         </div>
         <div class="cat-card" onclick="filterByCollection('Hal')">
-          <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=700&q=85&auto=format&fit=crop" alt="Hal" loading="lazy">
+          <img src="https://vuusgbthelegugpcbdye.supabase.co/storage/v1/object/public/products/collection_Hal.jpg" alt="Hal" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop'">
           <div class="cat-ov"></div>
           <div class="cat-info">
             <div class="cat-name">Hal</div>
@@ -1224,7 +1223,7 @@ img{display:block;max-width:100%;object-fit:cover}
           </div>
         </div>
         <div class="cat-card" onclick="filterByCollection('Saye')">
-          <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=700&q=85&auto=format&fit=crop" alt="Saye" loading="lazy">
+          <img src="https://vuusgbthelegugpcbdye.supabase.co/storage/v1/object/public/products/collection_Saye.jpg" alt="Saye" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop'">
           <div class="cat-ov"></div>
           <div class="cat-info">
             <div class="cat-name">Saye</div>
@@ -1232,7 +1231,7 @@ img{display:block;max-width:100%;object-fit:cover}
           </div>
         </div>
         <div class="cat-card" onclick="filterByCollection('Zerre')">
-          <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=700&q=85&auto=format&fit=crop" alt="Zerre" loading="lazy">
+          <img src="https://vuusgbthelegugpcbdye.supabase.co/storage/v1/object/public/products/collection_Zerre.jpg" alt="Zerre" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop'">
           <div class="cat-ov"></div>
           <div class="cat-info">
             <div class="cat-name">Zerre</div>
@@ -1240,7 +1239,7 @@ img{display:block;max-width:100%;object-fit:cover}
           </div>
         </div>
         <div class="cat-card" onclick="filterByCollection('Vuslat')">
-          <img src="https://images.unsplash.com/photo-1566206091558-7f218b696731?w=700&q=85&auto=format&fit=crop" alt="Vuslat" loading="lazy">
+          <img src="https://vuusgbthelegugpcbdye.supabase.co/storage/v1/object/public/products/collection_Vuslat.jpg" alt="Vuslat" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop'">
           <div class="cat-ov"></div>
           <div class="cat-info">
             <div class="cat-name">Vuslat</div>
@@ -1248,7 +1247,7 @@ img{display:block;max-width:100%;object-fit:cover}
           </div>
         </div>
         <div class="cat-card" onclick="filterByCollection('Nefes')">
-          <img src="https://images.unsplash.com/photo-1581044777550-4cfa60707c03?w=700&q=85&auto=format&fit=crop" alt="Nefes" loading="lazy">
+          <img src="https://vuusgbthelegugpcbdye.supabase.co/storage/v1/object/public/products/collection_Nefes.jpg" alt="Nefes" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop'">
           <div class="cat-ov"></div>
           <div class="cat-info">
             <div class="cat-name">Nefes</div>
@@ -2365,10 +2364,7 @@ function go(name, opts){
   const el=document.getElementById('page-'+name);
   if(!el) return;
   el.classList.add('active');
-  window._currentPdImgs = p.images||[];
-  window._pdThumbIdx = 0;
   window.scrollTo(0,0);
-  setTimeout(initPdZoom, 100);
   const drawer=document.getElementById('drawer');
   if(drawer?.classList.contains('open')){
     drawer.classList.remove('open');
@@ -3330,15 +3326,6 @@ document.addEventListener('DOMContentLoaded',()=>{
 .legal-page p{font-size:14px;line-height:1.9;color:var(--ink2);margin-bottom:14px}
 .legal-page ul{padding-left:20px;margin-bottom:14px}
 .legal-page ul li{font-size:14px;line-height:1.9;color:var(--ink2);margin-bottom:6px}
-
-/* ═══════ LIGHTBOX ═══════ */
-.lb-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);cursor:zoom-out;align-items:center;justify-content:center}
-.lb-overlay.open{display:flex}
-.lb-overlay img{max-width:90vw;max-height:90vh;object-fit:contain;border-radius:2px;user-select:none}
-.lb-close{position:fixed;top:20px;right:24px;color:#fff;font-size:32px;cursor:pointer;line-height:1;z-index:10000;background:none;border:none;padding:4px 8px}
-.lb-prev,.lb-next{position:fixed;top:50%;transform:translateY(-50%);color:#fff;font-size:40px;cursor:pointer;background:rgba(255,255,255,.1);border:none;padding:8px 16px;border-radius:4px;z-index:10000;transition:background .2s}
-.lb-prev{left:16px}.lb-next{right:16px}
-.lb-prev:hover,.lb-next:hover{background:rgba(255,255,255,.25)}
 </style>
 <div class="container legal-page">
   <div class="eyebrow" style="margin-bottom:12px">Yasal Belgeler</div>
@@ -3904,57 +3891,6 @@ async function confirmOrder(){
   setEl('ck-delivery-date', d1str+' – '+d2str);
   renderNavBadge();window.scrollTo(0,0);
 }
-
-/* ── Lightbox ── */
-let _lbImgs = [], _lbIdx = 0;
-
-function openLightbox(imgs, startIdx){
-  _lbImgs = (imgs||[]).filter(Boolean);
-  if(!_lbImgs.length) return;
-  _lbIdx = startIdx || 0;
-  document.getElementById('lb-img').src = _lbImgs[_lbIdx];
-  document.getElementById('lb-overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeLightbox(){
-  document.getElementById('lb-overlay').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-function lbNav(dir, e){
-  if(e) e.stopPropagation();
-  _lbIdx = (_lbIdx + dir + _lbImgs.length) % _lbImgs.length;
-  const img = document.getElementById('lb-img');
-  img.style.opacity = '0';
-  setTimeout(() => { img.src = _lbImgs[_lbIdx]; img.style.opacity = '1'; }, 150);
-}
-
-document.addEventListener('keydown', e => {
-  const lb = document.getElementById('lb-overlay');
-  if(!lb || !lb.classList.contains('open')) return;
-  if(e.key === 'Escape') closeLightbox();
-  if(e.key === 'ArrowLeft') lbNav(-1, e);
-  if(e.key === 'ArrowRight') lbNav(1, e);
-});
-
-function initPdZoom(){
-  const pdMain = document.getElementById('pd-main');
-  if(!pdMain || pdMain._init) return;
-  pdMain._init = true;
-  pdMain.addEventListener('click', () => {
-    const imgs = (window._currentPdImgs || []).filter(Boolean);
-    openLightbox(imgs, window._pdThumbIdx || 0);
-  });
-}
 </script>
-
-<!-- LIGHTBOX -->
-<div class="lb-overlay" id="lb-overlay" onclick="lbClose(event)">
-  <button class="lb-close" onclick="closeLightbox()">×</button>
-  <button class="lb-prev" onclick="lbNav(-1);event.stopPropagation()">‹</button>
-  <img id="lb-img" src="" alt="">
-  <button class="lb-next" onclick="lbNav(1);event.stopPropagation()">›</button>
-</div>
 </body>
 </html>
