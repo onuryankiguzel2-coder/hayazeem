@@ -41,13 +41,26 @@ const SB = {
   async createOrder(orderData) {
     const { data, error } = await _sbClient.from('orders').insert([orderData]).select().single();
     if (error) { console.error('Sipariş hatası:', error); return null; }
-    // Stok düş
+    // Stok düş — varyant bazlı (renk + beden)
     if(data && Array.isArray(orderData.items)){
       for(const item of orderData.items){
         if(!item.product_id) continue;
-        const {data:prod} = await _sbClient.from('products').select('stock').eq('id', item.product_id).single();
-        if(prod && typeof prod.stock === 'number'){
-          const newStock = Math.max(0, prod.stock - (item.qty||1));
+        const {data:prod} = await _sbClient.from('products').select('stock,variants').eq('id', item.product_id).single();
+        if(!prod) continue;
+        const variants = prod.variants || [];
+        if(variants.length > 0 && item.color && item.size){
+          // Varyant bazlı stok düş
+          const updated = variants.map(v => {
+            if(v.color === item.color && v.size === item.size){
+              return {...v, stock: Math.max(0, (v.stock||0) - (item.qty||1))};
+            }
+            return v;
+          });
+          const totalStock = updated.reduce((s,v)=>s+(v.stock||0),0);
+          await _sbClient.from('products').update({variants: updated, stock: totalStock}).eq('id', item.product_id);
+        } else {
+          // Toplam stok düş (varyant yoksa)
+          const newStock = Math.max(0, (prod.stock||0) - (item.qty||1));
           await _sbClient.from('products').update({stock: newStock}).eq('id', item.product_id);
         }
       }
@@ -2590,6 +2603,15 @@ function addToCart(){
   if(!p) return;
   const st=Store.pdState;
   if(!st.size){toast(Store.t('no_size_warn'));return;}
+  // Varyant bazlı stok kontrolü
+  const variants = p.variants || [];
+  if(variants.length > 0){
+    const v = variants.find(v=>v.color===st.colorName && v.size===st.size);
+    const avail = v ? (v.stock||0) : 0;
+    if(avail <= 0){toast('Bu renk ve beden kombinasyonu stokta yok.');return;}
+    const inCart = Store._d.cart.filter(i=>i.id===p.id&&i.color===st.colorName&&i.size===st.size).reduce((s,i)=>s+i.qty,0);
+    if(inCart + st.qty > avail){toast('Sepetinizde zaten '+ inCart +' adet var. Stokta '+ avail +' adet mevcut.');return;}
+  }
   Store.cartAdd(p,st.colorName,st.size,st.qty);
   toast(Store.t('cart_added'));
 }
