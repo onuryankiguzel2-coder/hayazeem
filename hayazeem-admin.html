@@ -124,14 +124,6 @@ img{display:block;object-fit:cover}
 /* VARIANT CHIPS */
 .v-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
 .v-chip{display:inline-flex;align-items:center;gap:5px;background:var(--bone);border:1px solid var(--stone);padding:4px 10px;font-size:12px;color:var(--ink2)}
-.vmat-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px}
-.vmat-table th{background:var(--bone);padding:6px 10px;text-align:center;font-weight:600;border:1px solid var(--stone);font-size:11px;color:var(--ink3)}
-.vmat-table td{border:1px solid var(--stone);padding:4px 6px;text-align:center}
-.vmat-table td:first-child{background:var(--bone);font-weight:500;font-size:11px;text-align:left;padding:4px 10px;white-space:nowrap}
-.vmat-in{width:52px;border:none;background:transparent;text-align:center;font-size:13px;color:var(--ink);padding:2px;outline:none}
-.vmat-in:focus{background:var(--cream);border-radius:2px}
-.vmat-in.zero{color:var(--err)}
-.vmat-in.low{color:var(--warn)}
 .v-chip-x{cursor:pointer;color:var(--ink3);background:none;border:none;font-size:14px;line-height:1;padding:0}
 .v-chip-x:hover{color:var(--err)}
 .add-chip{border:1px dashed var(--warm);padding:4px 10px;font-size:12px;background:none;width:90px;outline:none;color:var(--ink)}
@@ -418,7 +410,7 @@ img{display:block;object-fit:cover}
       </div>
 
       <div class="af-card">
-        <div class="af-title">Varyantlar & Stok <span style="font-size:11px;font-weight:400;color:var(--ink3)">Renk × Beden bazlı stok</span></div>
+        <div class="af-title">Varyantlar <span style="font-size:11px;font-weight:400;color:var(--ink3)">Otomatik kombinasyon oluşturulur</span></div>
         <label class="afl">Bedenler</label>
         <div class="v-chips" id="size-chips">
           <span class="v-chip">38 <button class="v-chip-x" onclick="rmChip(this);buildVariantMatrix()">×</button></span>
@@ -431,14 +423,11 @@ img{display:block;object-fit:cover}
         </div>
         <label class="afl" style="margin-top:8px">Renkler</label>
         <div class="v-chips" id="color-chips">
-          <span class="v-chip">Krem <button class="v-chip-x" onclick="rmChip(this);buildVariantMatrix()">×</button></span>
-          <span class="v-chip">Bej <button class="v-chip-x" onclick="rmChip(this);buildVariantMatrix()">×</button></span>
-          <span class="v-chip">Zeytin <button class="v-chip-x" onclick="rmChip(this);buildVariantMatrix()">×</button></span>
-          <input class="add-chip" placeholder="+ Ekle" onkeydown="addChip(event,'color-chips');setTimeout(buildVariantMatrix,100)">
+          <span class="v-chip">Krem <button class="v-chip-x" onclick="rmChip(this)">×</button></span>
+          <span class="v-chip">Bej <button class="v-chip-x" onclick="rmChip(this)">×</button></span>
+          <span class="v-chip">Zeytin <button class="v-chip-x" onclick="rmChip(this)">×</button></span>
+          <input class="add-chip" placeholder="+ Ekle" onkeydown="addChip(event,'color-chips')">
         </div>
-        <!-- Stok Matrisi -->
-        <div id="variant-matrix" style="margin-top:16px"></div>
-        <div style="margin-top:10px;font-size:12px;color:var(--ink3)">Toplam stok: <strong id="variant-total-stock">0</strong> adet</div>
       </div>
 
       <div class="af-card">
@@ -1333,8 +1322,6 @@ async function saveProd(statusOverride){
   if(!price){toast('Fiyat zorunlu');return;}
   const sizes=[...document.querySelectorAll('#size-chips .v-chip')].map(c=>c.textContent.replace('×','').trim());
   const colors=[...document.querySelectorAll('#color-chips .v-chip')].map(c=>c.textContent.replace('×','').trim());
-  const variants = getVariantsFromMatrix();
-  const totalStock = variants.length > 0 ? variants.reduce((s,v)=>s+v.stock,0) : parseInt(document.getElementById('prod-stock')?.value)||0;
   const isActive=(statusOverride||document.getElementById('prod-status')?.value)==='active';
   const prodData={
     name_tr:name,
@@ -1346,8 +1333,9 @@ async function saveProd(statusOverride){
     price:price,
     original_price:parseFloat(document.getElementById('prod-orig-price')?.value)||null,
     cost_price:parseFloat(document.getElementById('prod-cost-price')?.value)||null,
-    stock:totalStock,
-    variants:variants,
+    stock:parseInt(document.getElementById('prod-stock')?.value)||0,
+    variants:getVariantsFromMatrix(),
+    stock:(()=>{const v=getVariantsFromMatrix();return v.length?v.reduce((s,x)=>s+x.stock,0):parseInt(document.getElementById('prod-stock')?.value)||0;})(),
     sizes:sizes,colors:colors,images:_imgs.slice(0,5),
     is_active:isActive,
     is_featured:document.getElementById('prod-featured')?.checked||false,
@@ -1418,8 +1406,6 @@ async function editProduct(id){
     if(document.getElementById('prod-featured'))document.getElementById('prod-featured').checked=data.is_featured||false;
     if(document.getElementById('prod-cost-price')) document.getElementById('prod-cost-price').value=data.cost_price||'';
     updateMarginPreview();
-    // Varyant matrisini doldur
-    setTimeout(()=>buildVariantMatrix(data.variants||[]), 200);
     _imgs=data.images||[];
     const prev=document.getElementById('image-previews');
     if(prev)prev.innerHTML=_imgs.map(img=>`<div class="up-img"><img src="${img}" style="width:100%;height:100%;object-fit:cover"><button class="up-del" onclick="this.closest('.up-img').remove()">×</button></div>`).join('');
@@ -1434,8 +1420,6 @@ async function updateProduct(id){
   if(!name||!price){toast('Ad ve fiyat zorunlu');return;}
   const sizes=[...document.querySelectorAll('#size-chips .v-chip')].map(c=>c.textContent.replace('×','').trim());
   const colors=[...document.querySelectorAll('#color-chips .v-chip')].map(c=>c.textContent.replace('×','').trim());
-  const variants = getVariantsFromMatrix();
-  const totalStock = variants.length > 0 ? variants.reduce((s,v)=>s+v.stock,0) : parseInt(document.getElementById('prod-stock')?.value)||0;
   const {error}=await _sb.from('products').update({
     name_tr:name,
     name_en:document.getElementById('prod-name-en')?.value?.trim()||'',
@@ -1450,8 +1434,9 @@ async function updateProduct(id){
     price:price,
     original_price:parseFloat(document.getElementById('prod-orig-price')?.value)||null,
     cost_price:parseFloat(document.getElementById('prod-cost-price')?.value)||null,
-    stock:totalStock,
-    variants:variants,
+    stock:parseInt(document.getElementById('prod-stock')?.value)||0,
+    variants:getVariantsFromMatrix(),
+    stock:(()=>{const v=getVariantsFromMatrix();return v.length?v.reduce((s,x)=>s+x.stock,0):parseInt(document.getElementById('prod-stock')?.value)||0;})(),
     sizes:sizes,colors:colors,images:_imgs,
     is_featured:document.getElementById('prod-featured')?.checked||false,
     is_active:true
@@ -1742,14 +1727,20 @@ async function saveStock(btn, productId){
   const rows = card.querySelectorAll('.stk-vrow');
   const variants = [];
   rows.forEach(row => {
+    const variantId = row.dataset.variantId;
+    const val = parseInt(row.querySelector('.stk-in')?.value || 0);
+    if(variantId) variants.push({id: variantId, stock: val});
+  });
+  const colorSizeVariants = [];
+  rows.forEach(row => {
     const color = row.dataset.color;
     const size = row.dataset.size;
     const val = parseInt(row.querySelector('.stk-in')?.value || 0);
-    if(color && size) variants.push({color, size, stock: val});
+    if(color && size) colorSizeVariants.push({color, size, stock: val});
   });
-  if(variants.length > 0){
-    const totalStock = variants.reduce((s,v)=>s+v.stock,0);
-    await _sb.from('products').update({variants: variants, stock: totalStock}).eq('id', productId);
+  if(colorSizeVariants.length > 0){
+    const totalStock = colorSizeVariants.reduce((s,v)=>s+v.stock,0);
+    await _sb.from('products').update({variants: colorSizeVariants, stock: totalStock}).eq('id', productId);
   } else {
     const val = parseInt(card.querySelector('.stk-in')?.value || 0);
     await _sb.from('products').update({stock: val}).eq('id', productId);
@@ -2624,7 +2615,6 @@ function filterTx(type,btn){
   if(btn)btn.classList.add('active');
   renderAccTransactions(type);
 }
-/* ── Varyant Stok Matrisi ── */
 function buildVariantMatrix(existingVariants){
   const sizes = [...document.querySelectorAll('#size-chips .v-chip')].map(c=>c.textContent.replace('×','').trim()).filter(Boolean);
   const colors = [...document.querySelectorAll('#color-chips .v-chip')].map(c=>c.textContent.replace('×','').trim()).filter(Boolean);
@@ -2632,19 +2622,13 @@ function buildVariantMatrix(existingVariants){
   if(!container) return;
   if(!sizes.length || !colors.length){
     container.innerHTML = '<div style="font-size:12px;color:var(--ink3);padding:8px 0">Beden ve renk ekleyince stok tablosu oluşacak.</div>';
-    document.getElementById('variant-total-stock') && (document.getElementById('variant-total-stock').textContent = '0');
+    const ts = document.getElementById('variant-total-stock'); if(ts) ts.textContent='0';
     return;
   }
-  // Mevcut değerleri koru
   const prev = {};
-  container.querySelectorAll('.vmat-in').forEach(inp => {
-    const k = inp.dataset.color + '__' + inp.dataset.size;
-    prev[k] = parseInt(inp.value)||0;
-  });
-  // existingVariants: [{color,size,stock}] — düzenleme modunda
+  container.querySelectorAll('.vmat-in').forEach(inp => { prev[inp.dataset.color+'__'+inp.dataset.size] = parseInt(inp.value)||0; });
   const varMap = {};
   if(existingVariants) existingVariants.forEach(v => { varMap[v.color+'__'+v.size] = v.stock||0; });
-
   let html = '<table class="vmat-table"><thead><tr><th>Renk \ Beden</th>';
   sizes.forEach(s => { html += `<th>${s}</th>`; });
   html += '</tr></thead><tbody>';
@@ -2662,31 +2646,18 @@ function buildVariantMatrix(existingVariants){
   container.innerHTML = html;
   updateVariantTotal();
 }
-
 function updateVariantTotal(){
-  const inputs = document.querySelectorAll('.vmat-in');
   let total = 0;
-  inputs.forEach(i => total += parseInt(i.value)||0);
-  const el = document.getElementById('variant-total-stock');
-  if(el) el.textContent = total;
-  // Toplam stoğu prod-stock alanına yaz
-  const stockEl = document.getElementById('prod-stock');
-  if(stockEl) stockEl.value = total;
+  document.querySelectorAll('.vmat-in').forEach(i => total += parseInt(i.value)||0);
+  const el = document.getElementById('variant-total-stock'); if(el) el.textContent = total;
+  const stockEl = document.getElementById('prod-stock'); if(stockEl) stockEl.value = total;
 }
-
 function getVariantsFromMatrix(){
   const inputs = document.querySelectorAll('.vmat-in');
   const variants = [];
-  inputs.forEach(inp => {
-    variants.push({
-      color: inp.dataset.color,
-      size: inp.dataset.size,
-      stock: parseInt(inp.value)||0
-    });
-  });
+  inputs.forEach(inp => { variants.push({color:inp.dataset.color, size:inp.dataset.size, stock:parseInt(inp.value)||0}); });
   return variants;
 }
-
 function updateMarginPreview(){
   const price = parseFloat(document.getElementById('prod-price')?.value)||0;
   const cost = parseFloat(document.getElementById('prod-cost-price')?.value)||0;
@@ -2873,16 +2844,13 @@ function openFaturaModal(){
 function exportAccounting(){
   const orders = window._txCache?.orders||[];
   const manual = window._txCache?.manual||[];
-  let csv = 'Tarih,Tür,Açıklama,Kategori,Tedarikçi,Fatura No,Tutar
-';
+  let csv = "Tarih,Tur,Aciklama,Kategori,Tedarikci,Fatura No,Tutar\n";
   orders.forEach(o=>{
-    csv += `${new Date(o.created_at).toLocaleDateString('tr-TR')},Gelir,Sipariş Geliri,,,,${o.total||0}
-`;
+    csv += new Date(o.created_at).toLocaleDateString('tr-TR')+',Gelir,Siparis Geliri,,,,'+( o.total||0)+'\n';
   });
   manual.forEach(t=>{
     const sign = (t.type==='gelir'||t.type==='alacak')?'':'-';
-    csv += `${new Date(t.date||t.created_at).toLocaleDateString('tr-TR')},${t.type},${t.description||''},${t.category||''},${t.vendor||''},${t.invoice_no||''},${sign}${t.amount||0}
-`;
+    csv += new Date(t.date||t.created_at).toLocaleDateString('tr-TR')+','+t.type+','+(t.description||'')+','+(t.category||'')+','+(t.vendor||'')+','+(t.invoice_no||'')+','+sign+(t.amount||0)+'\n';
   });
   const blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8'});
   const a = document.createElement('a');
