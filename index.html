@@ -829,22 +829,47 @@ img{display:block;max-width:100%;object-fit:cover}
 
   <section class="cat-sec">
     <div class="container">
-      <div class="section-h"><div class="eyebrow">Kategoriler</div><h2>Koleksiyonlarımız</h2></div>
-      <div class="cat-grid">
-        <div class="cat-card" onclick="go('categories')">
-          <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=600&q=80&auto=format&fit=crop" alt="Abayalar" loading="lazy">
+      <div class="section-h"><div class="eyebrow">Koleksiyonlar</div><h2>Koleksiyonlarımız</h2></div>
+      <div class="cat-grid" id="home-coll-grid">
+        <div class="cat-card" onclick="filterByCollection('Anahtar')">
+          <img src="https://vuusgbthelegugpcbdye.supabase.co/storage/v1/object/public/products/collection_Anahtar.jpg" alt="Anahtar" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop'">
           <div class="cat-ov"></div>
-          <div class="cat-info"><div class="cat-name">Abayalar</div><div class="cat-count">48 ürün</div></div>
+          <div class="cat-info"><div class="cat-name">Anahtar</div><div class="cat-count" id="home-coll-count-Anahtar"></div></div>
         </div>
-        <div class="cat-card" onclick="go('categories')">
-          <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=600&q=80&auto=format&fit=crop" alt="Tunikler" loading="lazy">
+        <div class="cat-card" onclick="filterByCollection('Sükun')">
+          <img src="https://vuusgbthelegugpcbdye.supabase.co/storage/v1/object/public/products/collection_Sukun.jpg" alt="Sükun" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop'">
           <div class="cat-ov"></div>
-          <div class="cat-info"><div class="cat-name">Tunik & Bluzlar</div><div class="cat-count">62 ürün</div></div>
+          <div class="cat-info"><div class="cat-name">Sükun</div><div class="cat-count" id="home-coll-count-Sükun"></div></div>
         </div>
-        <div class="cat-card" onclick="go('categories')">
-          <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=600&q=80&auto=format&fit=crop" alt="Elbiseler" loading="lazy">
+        <div class="cat-card" onclick="filterByCollection('İz')">
+          <img src="https://vuusgbthelegugpcbdye.supabase.co/storage/v1/object/public/products/collection_Iz.jpg" alt="İz" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop'">
           <div class="cat-ov"></div>
-          <div class="cat-info"><div class="cat-name">Tesettür Elbiseler</div><div class="cat-count">35 ürün</div></div>
+          <div class="cat-info"><div class="cat-name">İz</div><div class="cat-count" id="home-coll-count-İz"></div></div>
+        </div>
+        <div class="cat-card" onclick="filterByCollection('Hal')">
+          <img src="https://vuusgbthelegugpcbdye.supabase.co/storage/v1/object/public/products/collection_Hal.jpg" alt="Hal" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop'">
+          <div class="cat-ov"></div>
+          <div class="cat-info"><div class="cat-name">Hal</div><div class="cat-count" id="home-coll-count-Hal"></div></div>
+        </div>
+        <div class="cat-card" onclick="filterByCollection('Saye')">
+          <img src="https://vuusgbthelegugpcbdye.supabase.co/storage/v1/object/public/products/collection_Saye.jpg" alt="Saye" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop'">
+          <div class="cat-ov"></div>
+          <div class="cat-info"><div class="cat-name">Saye</div><div class="cat-count" id="home-coll-count-Saye"></div></div>
+        </div>
+        <div class="cat-card" onclick="filterByCollection('Zerre')">
+          <img src="https://vuusgbthelegugpcbdye.supabase.co/storage/v1/object/public/products/collection_Zerre.jpg" alt="Zerre" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop'">
+          <div class="cat-ov"></div>
+          <div class="cat-info"><div class="cat-name">Zerre</div><div class="cat-count" id="home-coll-count-Zerre"></div></div>
+        </div>
+        <div class="cat-card" onclick="filterByCollection('Vuslat')">
+          <img src="https://vuusgbthelegugpcbdye.supabase.co/storage/v1/object/public/products/collection_Vuslat.jpg" alt="Vuslat" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop'">
+          <div class="cat-ov"></div>
+          <div class="cat-info"><div class="cat-name">Vuslat</div><div class="cat-count" id="home-coll-count-Vuslat"></div></div>
+        </div>
+        <div class="cat-card" onclick="filterByCollection('Nefes')">
+          <img src="https://vuusgbthelegugpcbdye.supabase.co/storage/v1/object/public/products/collection_Nefes.jpg" alt="Nefes" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=700&q=85&auto=format&fit=crop'">
+          <div class="cat-ov"></div>
+          <div class="cat-info"><div class="cat-name">Nefes</div><div class="cat-count" id="home-coll-count-Nefes"></div></div>
         </div>
       </div>
     </div>
@@ -1827,6 +1852,12 @@ async function loadProductsFromDB(){
   _dbLoaded = true;
   Store.emit('filters');
   renderCatGrid(true);
+  const collCounts = {};
+  PRODUCTS.forEach(p=>{ if(p.collection) collCounts[p.collection]=(collCounts[p.collection]||0)+1; });
+  Object.entries(collCounts).forEach(([name,count])=>{
+    const el = document.getElementById('home-coll-count-'+name);
+    if(el) el.textContent = count + ' ürün';
+  });
 }
 
 
@@ -2021,14 +2052,9 @@ function renderGrids(){
 }
 
 function filterByCollection(name){
-  // Koleksiyona göre filtrele
+  window._activeCollection = name;
   go('categories');
-  setTimeout(()=>{
-    // Koleksiyon filtresi uygula
-    window._activeCollection = name;
-    renderCatGrid(true);
-    const countEl = document.querySelector('#cat-prods')?.closest('.prods-area')?.querySelector('p');
-  }, 100);
+  setTimeout(()=>{ renderCatGrid(true); }, 100);
 }
 
 function renderCatGrid(resetPage){
