@@ -247,6 +247,7 @@ img{display:block;object-fit:cover}
       <button class="sb-item" onclick="showAP('products',this)">👗 Ürün Listesi</button>
       <button class="sb-item" onclick="showAP('addprod',this)">➕ Ürün Ekle</button>
       <button class="sb-item" onclick="showAP('stock',this)">📋 Stok Yönetimi</button>
+      <button class="sb-item" onclick="showAP('collections',this)">✨ Koleksiyonlar</button>
     </div>
     <div class="sb-sec">
       <div class="sb-lbl">İş</div>
@@ -385,6 +386,21 @@ img{display:block;object-fit:cover}
           <div><label class="afl">Kumaş</label><input class="afi" id="prod-fabric" placeholder="%80 Medine İpeği, %20 Elastan" type="text"></div>
         </div>
       </div>
+      <div class="af-card">
+        <div class="af-title">Koleksiyon</div>
+        <label class="afl">Koleksiyon (opsiyonel)</label>
+        <select class="afs" id="prod-collection">
+          <option value="">— Koleksiyon seçin (opsiyonel)</option>
+          <option value="Anahtar">Anahtar</option>
+          <option value="Sükun">Sükun</option>
+          <option value="İz">İz</option>
+          <option value="Hal">Hal</option>
+          <option value="Saye">Saye</option>
+          <option value="Zerre">Zerre</option>
+          <option value="Vuslat">Vuslat</option>
+          <option value="Nefes">Nefes</option>
+        </select>
+      </div>
 
       <div class="af-card">
         <div class="af-title">Varyantlar <span style="font-size:11px;font-weight:400;color:var(--ink3)">Otomatik kombinasyon oluşturulur</span></div>
@@ -442,6 +458,151 @@ img{display:block;object-fit:cover}
         <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);cursor:pointer">
           <input type="checkbox" id="prod-is-new" style="accent-color:var(--gold)"> Yeni ürün etiketi göster
         </label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── COLLECTIONS ── -->
+<div id="ap-collections" class="ap">
+  <div class="topbar">
+    <div class="page-title">Koleksiyonlar</div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;padding:24px">
+    <div class="af-card" style="padding:0;overflow:hidden">
+      <div style="position:relative;aspect-ratio:3/2;background:var(--bone)">
+        <img id="coll-img-Anahtar" src="" alt="Anahtar" style="width:100%;height:100%;object-fit:cover;display:none">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px" id="coll-placeholder-Anahtar">
+          <div style="font-size:32px">🖼️</div>
+          <div style="font-size:12px;color:var(--ink3)">Fotoğraf yok</div>
+        </div>
+        <label style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;padding:6px 10px;border-radius:4px;font-size:12px;cursor:pointer">
+          📷 Değiştir
+          <input type="file" accept="image/*" style="display:none" onchange="uploadCollectionCover('Anahtar', this)">
+        </label>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-family:var(--fd);font-size:18px;margin-bottom:4px">Anahtar</div>
+        <div style="font-size:13px;color:var(--ink3)" id="coll-prod-count-Anahtar">Yükleniyor...</div>
+      </div>
+    </div>
+    <div class="af-card" style="padding:0;overflow:hidden">
+      <div style="position:relative;aspect-ratio:3/2;background:var(--bone)">
+        <img id="coll-img-Sükun" src="" alt="Sükun" style="width:100%;height:100%;object-fit:cover;display:none">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px" id="coll-placeholder-Sükun">
+          <div style="font-size:32px">🖼️</div>
+          <div style="font-size:12px;color:var(--ink3)">Fotoğraf yok</div>
+        </div>
+        <label style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;padding:6px 10px;border-radius:4px;font-size:12px;cursor:pointer">
+          📷 Değiştir
+          <input type="file" accept="image/*" style="display:none" onchange="uploadCollectionCover('Sükun', this)">
+        </label>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-family:var(--fd);font-size:18px;margin-bottom:4px">Sükun</div>
+        <div style="font-size:13px;color:var(--ink3)" id="coll-prod-count-Sükun">Yükleniyor...</div>
+      </div>
+    </div>
+    <div class="af-card" style="padding:0;overflow:hidden">
+      <div style="position:relative;aspect-ratio:3/2;background:var(--bone)">
+        <img id="coll-img-İz" src="" alt="İz" style="width:100%;height:100%;object-fit:cover;display:none">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px" id="coll-placeholder-İz">
+          <div style="font-size:32px">🖼️</div>
+          <div style="font-size:12px;color:var(--ink3)">Fotoğraf yok</div>
+        </div>
+        <label style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;padding:6px 10px;border-radius:4px;font-size:12px;cursor:pointer">
+          📷 Değiştir
+          <input type="file" accept="image/*" style="display:none" onchange="uploadCollectionCover('İz', this)">
+        </label>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-family:var(--fd);font-size:18px;margin-bottom:4px">İz</div>
+        <div style="font-size:13px;color:var(--ink3)" id="coll-prod-count-İz">Yükleniyor...</div>
+      </div>
+    </div>
+    <div class="af-card" style="padding:0;overflow:hidden">
+      <div style="position:relative;aspect-ratio:3/2;background:var(--bone)">
+        <img id="coll-img-Hal" src="" alt="Hal" style="width:100%;height:100%;object-fit:cover;display:none">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px" id="coll-placeholder-Hal">
+          <div style="font-size:32px">🖼️</div>
+          <div style="font-size:12px;color:var(--ink3)">Fotoğraf yok</div>
+        </div>
+        <label style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;padding:6px 10px;border-radius:4px;font-size:12px;cursor:pointer">
+          📷 Değiştir
+          <input type="file" accept="image/*" style="display:none" onchange="uploadCollectionCover('Hal', this)">
+        </label>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-family:var(--fd);font-size:18px;margin-bottom:4px">Hal</div>
+        <div style="font-size:13px;color:var(--ink3)" id="coll-prod-count-Hal">Yükleniyor...</div>
+      </div>
+    </div>
+    <div class="af-card" style="padding:0;overflow:hidden">
+      <div style="position:relative;aspect-ratio:3/2;background:var(--bone)">
+        <img id="coll-img-Saye" src="" alt="Saye" style="width:100%;height:100%;object-fit:cover;display:none">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px" id="coll-placeholder-Saye">
+          <div style="font-size:32px">🖼️</div>
+          <div style="font-size:12px;color:var(--ink3)">Fotoğraf yok</div>
+        </div>
+        <label style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;padding:6px 10px;border-radius:4px;font-size:12px;cursor:pointer">
+          📷 Değiştir
+          <input type="file" accept="image/*" style="display:none" onchange="uploadCollectionCover('Saye', this)">
+        </label>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-family:var(--fd);font-size:18px;margin-bottom:4px">Saye</div>
+        <div style="font-size:13px;color:var(--ink3)" id="coll-prod-count-Saye">Yükleniyor...</div>
+      </div>
+    </div>
+    <div class="af-card" style="padding:0;overflow:hidden">
+      <div style="position:relative;aspect-ratio:3/2;background:var(--bone)">
+        <img id="coll-img-Zerre" src="" alt="Zerre" style="width:100%;height:100%;object-fit:cover;display:none">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px" id="coll-placeholder-Zerre">
+          <div style="font-size:32px">🖼️</div>
+          <div style="font-size:12px;color:var(--ink3)">Fotoğraf yok</div>
+        </div>
+        <label style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;padding:6px 10px;border-radius:4px;font-size:12px;cursor:pointer">
+          📷 Değiştir
+          <input type="file" accept="image/*" style="display:none" onchange="uploadCollectionCover('Zerre', this)">
+        </label>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-family:var(--fd);font-size:18px;margin-bottom:4px">Zerre</div>
+        <div style="font-size:13px;color:var(--ink3)" id="coll-prod-count-Zerre">Yükleniyor...</div>
+      </div>
+    </div>
+    <div class="af-card" style="padding:0;overflow:hidden">
+      <div style="position:relative;aspect-ratio:3/2;background:var(--bone)">
+        <img id="coll-img-Vuslat" src="" alt="Vuslat" style="width:100%;height:100%;object-fit:cover;display:none">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px" id="coll-placeholder-Vuslat">
+          <div style="font-size:32px">🖼️</div>
+          <div style="font-size:12px;color:var(--ink3)">Fotoğraf yok</div>
+        </div>
+        <label style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;padding:6px 10px;border-radius:4px;font-size:12px;cursor:pointer">
+          📷 Değiştir
+          <input type="file" accept="image/*" style="display:none" onchange="uploadCollectionCover('Vuslat', this)">
+        </label>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-family:var(--fd);font-size:18px;margin-bottom:4px">Vuslat</div>
+        <div style="font-size:13px;color:var(--ink3)" id="coll-prod-count-Vuslat">Yükleniyor...</div>
+      </div>
+    </div>
+    <div class="af-card" style="padding:0;overflow:hidden">
+      <div style="position:relative;aspect-ratio:3/2;background:var(--bone)">
+        <img id="coll-img-Nefes" src="" alt="Nefes" style="width:100%;height:100%;object-fit:cover;display:none">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px" id="coll-placeholder-Nefes">
+          <div style="font-size:32px">🖼️</div>
+          <div style="font-size:12px;color:var(--ink3)">Fotoğraf yok</div>
+        </div>
+        <label style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;padding:6px 10px;border-radius:4px;font-size:12px;cursor:pointer">
+          📷 Değiştir
+          <input type="file" accept="image/*" style="display:none" onchange="uploadCollectionCover('Nefes', this)">
+        </label>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-family:var(--fd);font-size:18px;margin-bottom:4px">Nefes</div>
+        <div style="font-size:13px;color:var(--ink3)" id="coll-prod-count-Nefes">Yükleniyor...</div>
       </div>
     </div>
   </div>
@@ -998,6 +1159,50 @@ async function adminLogout(){
   await _sb.auth.signOut();showAdminLogin();
 }
 
+/* ── Koleksiyon Yönetimi ── */
+const COLLECTIONS = ['Anahtar','Sükun','İz','Hal','Saye','Zerre','Vuslat','Nefes'];
+const COLL_BUCKET = 'products';
+const COLL_BASE_URL = 'https://vuusgbthelegugpcbdye.supabase.co/storage/v1/object/public/' + COLL_BUCKET + '/';
+
+async function loadCollections(){
+  // Ürün sayılarını yükle
+  const {data} = await _sb.from('products').select('collection').eq('is_active', true);
+  const counts = {};
+  (data||[]).forEach(p => { if(p.collection) counts[p.collection] = (counts[p.collection]||0)+1; });
+  
+  COLLECTIONS.forEach(name => {
+    const countEl = document.getElementById('coll-prod-count-'+name);
+    if(countEl) countEl.textContent = (counts[name]||0) + ' ürün';
+    
+    // Kapak fotoğrafını yükle
+    const url = COLL_BASE_URL + 'collection_' + encodeURIComponent(name) + '.jpg';
+    const img = document.getElementById('coll-img-'+name);
+    const placeholder = document.getElementById('coll-placeholder-'+name);
+    if(img){
+      img.onload = () => { img.style.display='block'; if(placeholder) placeholder.style.display='none'; };
+      img.onerror = () => { img.style.display='none'; if(placeholder) placeholder.style.display='flex'; };
+      img.src = url + '?t=' + Date.now();
+    }
+  });
+}
+
+async function uploadCollectionCover(name, input){
+  if(!input.files[0]) return;
+  const file = input.files[0];
+  if(file.size > 5*1024*1024){ toast('Max 5MB'); return; }
+  
+  toast('Yükleniyor...');
+  const fileName = 'collection_' + name + '.jpg';
+  const {error} = await _sb.storage.from(COLL_BUCKET).upload(fileName, file, {contentType: file.type, upsert: true});
+  if(error){ toast('Hata: '+error.message); return; }
+  
+  const url = COLL_BASE_URL + fileName;
+  const img = document.getElementById('coll-img-'+name);
+  const placeholder = document.getElementById('coll-placeholder-'+name);
+  if(img){ img.src = url + '?t=' + Date.now(); img.style.display='block'; if(placeholder) placeholder.style.display='none'; }
+  toast(name + ' kapak fotoğrafı güncellendi ✓');
+}
+
 /* ── Görsel Yükleme ── */
 let _imgs=[];
 async function handleImageUpload(input){
@@ -1030,6 +1235,7 @@ async function saveProd(statusOverride){
     name_ar:document.getElementById('prod-name-ar')?.value?.trim()||'',
     description_tr:document.getElementById('prod-desc-tr')?.value?.trim()||'',
     fabric:document.getElementById('prod-fabric')?.value?.trim()||'',
+    collection:document.getElementById('prod-collection')?.value||null,
     price:price,
     original_price:parseFloat(document.getElementById('prod-orig-price')?.value)||null,
     stock:parseInt(document.getElementById('prod-stock')?.value)||0,
@@ -1089,6 +1295,7 @@ async function editProduct(id){
     document.getElementById('prod-name-tr').value=data.name_tr||'';
     document.getElementById('prod-price').value=data.price||'';
     document.getElementById('prod-stock').value=data.stock||'';
+    if(document.getElementById('prod-collection')) document.getElementById('prod-collection').value=data.collection||'';
     if(document.getElementById('prod-featured'))document.getElementById('prod-featured').checked=data.is_featured||false;
     _imgs=data.images||[];
     const prev=document.getElementById('image-previews');
@@ -1110,6 +1317,7 @@ async function updateProduct(id){
     name_ar:document.getElementById('prod-name-ar')?.value?.trim()||'',
     description_tr:document.getElementById('prod-desc-tr')?.value?.trim()||'',
     fabric:document.getElementById('prod-fabric')?.value?.trim()||'',
+    collection:document.getElementById('prod-collection')?.value||null,
     composition:document.getElementById('prod-composition')?.value?.trim()||'',
     weight:document.getElementById('prod-weight')?.value?.trim()||'',
     origin:document.getElementById('prod-origin')?.value?.trim()||'',
@@ -1343,6 +1551,7 @@ function showAP(name, btn){
   document.getElementById('sb').classList.remove('open');
   document.getElementById('sb-tog').textContent='☰';
   if(name === 'stock') loadStock();
+  if(name === 'collections') loadCollections();
   if(name === 'accounting'){ loadAccounting(); loadSuppliers(); }
   if(name === 'customers') loadCustomers();
   if(name === 'investor') loadInvestor();
