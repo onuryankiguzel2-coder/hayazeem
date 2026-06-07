@@ -426,7 +426,7 @@ img{display:block;object-fit:cover}
           <span class="v-chip">Krem <button class="v-chip-x" onclick="rmChip(this)">×</button></span>
           <span class="v-chip">Bej <button class="v-chip-x" onclick="rmChip(this)">×</button></span>
           <span class="v-chip">Zeytin <button class="v-chip-x" onclick="rmChip(this)">×</button></span>
-          <input class="add-chip" placeholder="+ Ekle" onkeydown="addChip(event,'color-chips')">
+          <input class="add-chip" placeholder="+ Ekle" onkeydown="addChip(event,'color-chips');setTimeout(buildVariantMatrix,100)">
         </div>
       </div>
 
@@ -1663,6 +1663,7 @@ function showAP(name, btn){
   document.getElementById('sb').classList.remove('open');
   document.getElementById('sb-tog').textContent='☰';
   if(name === 'stock') loadStock();
+  if(name === 'addprod') setTimeout(buildVariantMatrix, 300);
   if(name === 'collections') loadCollections();
   if(name === 'accounting'){ loadAccounting(); loadSuppliers(); }
   if(name === 'customers') loadCustomers();
