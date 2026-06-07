@@ -655,7 +655,7 @@ img{display:block;object-fit:cover}
       <button class="btn btn-o btn-sm" onclick="openTransactionModal('gider')">+ Gider Ekle</button>
       <button class="btn btn-o btn-sm" onclick="openTransactionModal('harcama')">+ Harcama</button>
       <button class="btn btn-o btn-sm" onclick="openTransactionModal('alacak')">+ Alacak</button>
-      <button class="btn btn-o btn-sm" onclick="openTransactionModal('gider');setTimeout(()=>{const el=document.getElementById('tx-cat');if(el){el.value='Tedarikçi / Fatura'||el.options[0]?.value}},200)">📎 Fatura Ekle</button>
+      <button class="btn btn-o btn-sm" onclick="openFaturaModal()">📎 Fatura Ekle</button>
       <button class="btn btn-o btn-sm" onclick="exportAccounting()">📥 Rapor İndir</button>
     </div>
   </div>
@@ -2780,6 +2780,14 @@ function confirmPayment(){
 // renderTxList kaldırıldı - loadAccounting kullanılıyor
 
 /* ── Toptancı / Tedarikçi Ekle ── */
+function openFaturaModal(){
+  openTransactionModal('gider');
+  setTimeout(()=>{
+    const el = document.getElementById('tx-cat');
+    if(el) el.value = 'Tedarikçi / Fatura';
+  }, 250);
+}
+
 function exportAccounting(){
   const orders = window._txCache?.orders||[];
   const manual = window._txCache?.manual||[];
