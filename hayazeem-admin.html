@@ -2791,16 +2791,13 @@ function openFaturaModal(){
 function exportAccounting(){
   const orders = window._txCache?.orders||[];
   const manual = window._txCache?.manual||[];
-  let csv = 'Tarih,Tür,Açıklama,Kategori,Tedarikçi,Fatura No,Tutar
-';
+  let csv = "Tarih,Tur,Aciklama,Kategori,Tedarikci,Fatura No,Tutar\n";
   orders.forEach(o=>{
-    csv += `${new Date(o.created_at).toLocaleDateString('tr-TR')},Gelir,Sipariş Geliri,,,,${o.total||0}
-`;
+    csv += new Date(o.created_at).toLocaleDateString('tr-TR')+',Gelir,Siparis Geliri,,,,'+( o.total||0)+'\n';
   });
   manual.forEach(t=>{
     const sign = (t.type==='gelir'||t.type==='alacak')?'':'-';
-    csv += `${new Date(t.date||t.created_at).toLocaleDateString('tr-TR')},${t.type},${t.description||''},${t.category||''},${t.vendor||''},${t.invoice_no||''},${sign}${t.amount||0}
-`;
+    csv += new Date(t.date||t.created_at).toLocaleDateString('tr-TR')+','+t.type+','+(t.description||'')+','+(t.category||'')+','+(t.vendor||'')+','+(t.invoice_no||'')+','+sign+(t.amount||0)+'\n';
   });
   const blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8'});
   const a = document.createElement('a');
