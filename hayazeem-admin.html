@@ -342,7 +342,7 @@ img{display:block;object-fit:cover}
   <div class="card" style="padding:0;overflow:hidden">
     <div class="tw">
       <table class="tbl">
-        <thead><tr><th>Görsel</th><th>Ürün Adı</th><th>SKU</th><th>Kategori</th><th>Fiyat</th><th>Stok</th><th>Durum</th><th></th></tr></thead>
+        <thead><tr><th>Görsel</th><th>Ürün Adı</th><th>SKU</th><th>Kategori</th><th>Fiyat / Maliyet</th><th>Kar Marjı</th><th>Stok</th><th>Durum</th><th></th></tr></thead>
         <tbody>
           <tr><td colspan="5" style="text-align:center;padding:24px;color:var(--ink3)">Yükleniyor…</td></tr>
         </tbody>
@@ -378,8 +378,15 @@ img{display:block;object-fit:cover}
           <div><label class="afl">SKU</label><input class="afi" id="prod-sku" placeholder="HYZ-XXX" type="text"></div>
         </div>
         <div class="afrow">
-          <div><label class="afl">Satış Fiyatı (₺)</label><input class="afi" id="prod-price" placeholder="0.00" type="number"></div>
+          <div><label class="afl">Satış Fiyatı (₺)</label><input class="afi" id="prod-price" placeholder="0.00" type="number" oninput="updateMarginPreview()"></div>
           <div><label class="afl">İndirimli Fiyat (₺)</label><input class="afi" id="prod-orig-price" placeholder="0.00" type="number"></div>
+        </div>
+        <div class="afrow">
+          <div><label class="afl">Geliş Fiyatı / Maliyet (₺)</label><input class="afi" id="prod-cost-price" placeholder="0.00" type="number" oninput="updateMarginPreview()"></div>
+          <div>
+            <label class="afl">Kar Marjı</label>
+            <div id="margin-preview" style="height:38px;display:flex;align-items:center;padding:0 12px;background:var(--bone);border:1px solid var(--stone);border-radius:2px;font-size:13px;color:var(--ink3)">Fiyat girin…</div>
+          </div>
         </div>
         <div class="afrow">
           <div><label class="afl">Toplam Stok</label><input class="afi" id="prod-stock" placeholder="0" type="number"></div>
@@ -648,7 +655,8 @@ img{display:block;object-fit:cover}
       <button class="btn btn-o btn-sm" onclick="openTransactionModal('gider')">+ Gider Ekle</button>
       <button class="btn btn-o btn-sm" onclick="openTransactionModal('harcama')">+ Harcama</button>
       <button class="btn btn-o btn-sm" onclick="openTransactionModal('alacak')">+ Alacak</button>
-      <button class="btn btn-o btn-sm" onclick="toast('Rapor Excel olarak indirildi ✓')">📥 Rapor İndir</button>
+      <button class="btn btn-o btn-sm" onclick="openTransactionModal('gider');setTimeout(()=>{const el=document.getElementById('tx-cat');if(el){el.value='Tedarikçi / Fatura'||el.options[0]?.value}},200)">📎 Fatura Ekle</button>
+      <button class="btn btn-o btn-sm" onclick="exportAccounting()">📥 Rapor İndir</button>
     </div>
   </div>
 
@@ -656,6 +664,8 @@ img{display:block;object-fit:cover}
   <div class="metrics">
     <div class="mc"><div class="mc-lbl">Aylık Ciro</div><div class="mc-val" id="acc-revenue">₺0</div><div class="mc-ch pos">—</div></div>
     <div class="mc"><div class="mc-lbl">Toplam Gider</div><div class="mc-val" id="acc-gider" style="color:var(--err)">₺0</div><div class="mc-ch neg">—</div></div>
+    <div class="mc"><div class="mc-lbl">Ürün Maliyeti (Satılan)</div><div class="mc-val" id="acc-cogs" style="color:var(--err)">₺0</div><div class="mc-ch" id="acc-cogs-margin">—</div></div>
+    <div class="mc"><div class="mc-lbl">Brüt Kar</div><div class="mc-val" id="acc-gross" style="color:var(--ok)">₺0</div><div class="mc-ch pos" id="acc-gross-margin">—</div></div>
     <div class="mc"><div class="mc-lbl">Alacaklar</div><div class="mc-val" id="acc-alacak" style="color:var(--gold-dk)">₺0</div></div>
     <div class="mc"><div class="mc-lbl">Net Kar</div><div class="mc-val" id="acc-kar" style="color:var(--ok)">₺0</div><div class="mc-ch pos">—</div></div>
   </div>
@@ -681,7 +691,7 @@ img{display:block;object-fit:cover}
         </div>
       </div>
       <div id="tx-list" style="max-height:420px;overflow-y:auto">
-        <table class="tbl"><tbody id="acc-transactions"><tr><td colspan="5" style="text-align:center;padding:24px;color:var(--ink3)">Yükleniyor…</td></tr></tbody></table>
+        <table class="tbl"><thead><tr><th>Tarih</th><th>Tür</th><th>Açıklama</th><th>Tutar</th><th>Fatura No</th><th>Belge</th></tr></thead><tbody id="acc-transactions"><tr><td colspan="6" style="text-align:center;padding:24px;color:var(--ink3)">Yükleniyor…</td></tr></tbody></table>
       </div>
     </div>
     <div>
@@ -719,6 +729,20 @@ img{display:block;object-fit:cover}
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Ürün Kar Analizi -->
+  <div class="card" style="margin-top:8px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div class="card-title" style="margin:0">Ürün Bazlı Kar Analizi</div>
+      <span style="font-size:12px;color:var(--ink3)">Maliyet girilen ürünler</span>
+    </div>
+    <div class="tw">
+      <table class="tbl">
+        <thead><tr><th>Ürün</th><th>Satış Fiyatı</th><th>Maliyet</th><th>Kar (₺)</th><th>Kar Marjı</th><th>Stok</th><th>Potansiyel Kar</th></tr></thead>
+        <tbody id="cost-analysis-tbody"><tr><td colspan="7" style="text-align:center;padding:24px;color:var(--ink3)">Yükleniyor…</td></tr></tbody>
+      </table>
     </div>
   </div>
 
@@ -1308,6 +1332,7 @@ async function saveProd(statusOverride){
     collection:document.getElementById('prod-collection')?.value||null,
     price:price,
     original_price:parseFloat(document.getElementById('prod-orig-price')?.value)||null,
+    cost_price:parseFloat(document.getElementById('prod-cost-price')?.value)||null,
     stock:parseInt(document.getElementById('prod-stock')?.value)||0,
     sizes:sizes,colors:colors,images:_imgs.slice(0,5),
     is_active:isActive,
@@ -1331,19 +1356,29 @@ async function loadProducts(){
   if(error||!data)return;
   const tbody=document.querySelector('#ap-products .tbl tbody');
   if(!tbody)return;
-  tbody.innerHTML=data.map(p=>`<tr>
+  tbody.innerHTML=data.map(p=>{
+    const cost=p.cost_price||0;
+    const price=p.price||0;
+    const margin=cost>0?Math.round(((price-cost)/price)*100):null;
+    const profit=cost>0?price-cost:null;
+    const marginHtml=margin!==null
+      ?`<div style="font-size:11px;color:${margin>=40?'var(--ok)':margin>=20?'var(--gold-dk)':'var(--err)'}">%${margin} · ₺${profit.toLocaleString('tr-TR')}</div>`
+      :'<div style="font-size:11px;color:var(--ink3)">Maliyet girilmedi</div>';
+    return `<tr>
     <td><div style="display:flex;align-items:center;gap:10px">
       ${p.images&&p.images[0]?`<img src="${p.images[0]}" style="width:40px;height:40px;object-fit:cover;border-radius:2px">`:'<div style="width:40px;height:40px;background:var(--bone);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:18px">👗</div>'}
       <div><div style="font-size:13px;font-weight:500">${p.name_tr||''}</div><div style="font-size:11px;color:var(--ink3)">${(p.sizes||[]).join(', ')}</div></div>
     </div></td>
-    <td style="font-family:var(--fd);font-size:16px">₺${(p.price||0).toLocaleString('tr-TR')}</td>
+    <td><div style="font-family:var(--fd);font-size:15px">₺${price.toLocaleString('tr-TR')}</div>${cost>0?`<div style="font-size:11px;color:var(--ink3)">Maliyet: ₺${cost.toLocaleString('tr-TR')}</div>`:''}</td>
+    <td>${marginHtml}</td>
     <td><span class="badge ${p.stock>10?'b-done':p.stock>0?'b-ship':'b-cancel'}">${p.stock||0}</span></td>
     <td><span class="badge ${p.is_active?'b-done':'b-pend'}">${p.is_active?'Yayında':'Taslak'}</span></td>
     <td style="display:flex;gap:6px">
       <button class="btn btn-o btn-sm" onclick="editProduct('${p.id}')">Düzenle</button>
       <button class="btn-ico" onclick="deleteProduct('${p.id}',this)">✕</button>
     </td>
-  </tr>`).join('');
+  </tr>`;
+  }).join('');
 }
 
 async function deleteProduct(id,btn){
@@ -1367,6 +1402,8 @@ async function editProduct(id){
     document.getElementById('prod-stock').value=data.stock||'';
     if(document.getElementById('prod-collection')) document.getElementById('prod-collection').value=data.collection||'';
     if(document.getElementById('prod-featured'))document.getElementById('prod-featured').checked=data.is_featured||false;
+    if(document.getElementById('prod-cost-price')) document.getElementById('prod-cost-price').value=data.cost_price||'';
+    updateMarginPreview();
     _imgs=data.images||[];
     const prev=document.getElementById('image-previews');
     if(prev)prev.innerHTML=_imgs.map(img=>`<div class="up-img"><img src="${img}" style="width:100%;height:100%;object-fit:cover"><button class="up-del" onclick="this.closest('.up-img').remove()">×</button></div>`).join('');
@@ -1394,6 +1431,7 @@ async function updateProduct(id){
     care:document.getElementById('prod-care')?.value?.trim()||'',
     price:price,
     original_price:parseFloat(document.getElementById('prod-orig-price')?.value)||null,
+    cost_price:parseFloat(document.getElementById('prod-cost-price')?.value)||null,
     stock:parseInt(document.getElementById('prod-stock')?.value)||0,
     sizes:sizes,colors:colors,images:_imgs,
     is_featured:document.getElementById('prod-featured')?.checked||false,
@@ -1766,6 +1804,54 @@ async function loadAccounting(){
       </div>`;
     }).join('');
   }
+
+  // COGS — ürün maliyeti (satılan siparişlerdeki ürünler üzerinden)
+  const {data:products} = await _sb.from('products').select('id,name_tr,price,cost_price,stock').order('name_tr');
+  const costProducts = (products||[]).filter(p => p.cost_price && p.cost_price > 0);
+
+  // Ürün kar analizi tablosunu doldur
+  const costTbody = document.getElementById('cost-analysis-tbody');
+  if(costTbody){
+    if(costProducts.length === 0){
+      costTbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--ink3)">Maliyet fiyatı girilmiş ürün yok. Ürün formundan "Geliş Fiyatı" alanını doldurun.</td></tr>';
+    } else {
+      costTbody.innerHTML = costProducts.map(p => {
+        const profit = p.price - p.cost_price;
+        const margin = Math.round((profit/p.price)*100);
+        const potential = profit * (p.stock||0);
+        const mColor = margin >= 40 ? 'var(--ok)' : margin >= 20 ? 'var(--gold-dk)' : 'var(--err)';
+        return `<tr>
+          <td style="font-size:13px;font-weight:500">${p.name_tr||''}</td>
+          <td style="font-family:var(--fd)">₺${(p.price||0).toLocaleString('tr-TR')}</td>
+          <td style="color:var(--err)">₺${(p.cost_price||0).toLocaleString('tr-TR')}</td>
+          <td style="color:var(--ok);font-family:var(--fd)">+₺${profit.toLocaleString('tr-TR')}</td>
+          <td><span style="font-weight:600;color:${mColor}">%${margin}</span></td>
+          <td>${p.stock||0}</td>
+          <td style="color:var(--ok);font-size:13px">₺${potential.toLocaleString('tr-TR')}</td>
+        </tr>`;
+      }).join('');
+    }
+  }
+
+  // Toplam COGS ve brüt kar hesapla (tüm satılan stok üzerinden)
+  const totalCogs = costProducts.reduce((s,p) => {
+    // Satılan ürün tahmini = siparişlerden gelen gelir / ortalama fiyat * maliyet
+    return s + (p.cost_price||0);
+  }, 0);
+  // Daha doğru COGS: sipariş adedi tahmin
+  const avgPrice = costProducts.length ? costProducts.reduce((s,p)=>s+p.price,0)/costProducts.length : 1;
+  const estimatedUnitsSold = totalRevenue / (avgPrice||1);
+  const avgCost = costProducts.length ? costProducts.reduce((s,p)=>s+p.cost_price,0)/costProducts.length : 0;
+  const estimatedCogs = Math.round(estimatedUnitsSold * avgCost);
+  const grossProfit = totalRevenue - estimatedCogs;
+  const grossMargin = totalRevenue > 0 ? Math.round((grossProfit/totalRevenue)*100) : 0;
+
+  el('acc-cogs', '₺'+estimatedCogs.toLocaleString('tr-TR'));
+  const cogsMarginEl = document.getElementById('acc-cogs-margin');
+  if(cogsMarginEl) cogsMarginEl.textContent = 'Tahmini (%'+grossMargin+' marj)';
+  el('acc-gross', '₺'+grossProfit.toLocaleString('tr-TR'));
+  const grossMarginEl = document.getElementById('acc-gross-margin');
+  if(grossMarginEl){ grossMarginEl.textContent = '%'+grossMargin+' brüt marj'; grossMarginEl.className = 'mc-ch '+(grossMargin>30?'pos':'neg'); }
 
   // İşlem geçmişi — cache'e yaz, renderAccTransactions ile göster
   window._txCache = { orders: orders||[], manual: txList||[] };
@@ -2458,7 +2544,7 @@ function saveCustomOrder(){
 /* ── Muhasebe - İşlem & Tedarikçi ── */
 const txTypes = {
   gelir: {label:'Gelir Ekle', color:'var(--ok)', icon:'↑', cats:['Sipariş Geliri','Toptan Satış','İade Geri Alımı','Diğer Gelir']},
-  gider: {label:'Gider Ekle', color:'var(--err)', icon:'↓', cats:['Kargo','Tedarikçi Ödemesi','İade','Pazarlama','Kira','Elektrik/Su','Personel','Diğer Gider']},
+  gider: {label:'Gider Ekle', color:'var(--err)', icon:'↓', cats:['Tedarikçi / Fatura','Kargo','Tedarikçi Ödemesi','İade','Pazarlama','Kira','Elektrik/Su','Personel','Diğer Gider']},
   harcama: {label:'Harcama Ekle', color:'var(--err)', icon:'↓', cats:['Ofis Malzemesi','Ambalaj','Bakım-Onarım','Yazılım/Abonelik','Diğer Harcama']},
   alacak: {label:'Alacak Ekle', color:'var(--gold-dk)', icon:'!', cats:['Müşteri Alacağı','Sigorta Alacağı','KDV İadesi','Diğer Alacak']}
 };
@@ -2480,20 +2566,22 @@ function renderAccTransactions(filter){
     amount: t.amount||0,
     badge: t.type==='gelir'?'b-done':t.type==='alacak'?'b-ship':'b-cancel',
     label: t.type==='gelir'?'Gelir':t.type==='alacak'?'Alacak':'Gider',
-    sign: t.type==='gelir'||t.type==='alacak'?'+':'-'
+    sign: t.type==='gelir'||t.type==='alacak'?'+':'-',
+    invoiceNo: t.invoice_no||null, vendor: t.vendor||null, invoiceUrl: t.invoice_url||null
   }));
   let allRows = [...orderRows,...manualRows].sort((a,b)=>b.date-a.date);
   if(filter && filter!=='hepsi') allRows = allRows.filter(r=>r.type===filter);
   allRows = allRows.slice(0,50);
   if(allRows.length===0){
-    txEl.innerHTML='<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--ink3)">İşlem bulunamadı</td></tr>';
+    txEl.innerHTML='<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--ink3)">İşlem bulunamadı</td></tr>';
   } else {
     txEl.innerHTML = allRows.map(r=>`<tr>
       <td style="font-size:13px">${r.date.toLocaleDateString('tr-TR')}</td>
       <td><span class="badge ${r.badge}" style="font-size:10px">${r.label}</span></td>
-      <td style="font-size:13px">${r.desc}</td>
+      <td style="font-size:13px">${r.desc}${r.vendor?`<div style="font-size:11px;color:var(--ink3)">${r.vendor}</div>`:''}</td>
       <td style="font-family:var(--fd);color:${r.sign==='+'?'var(--ok)':'var(--err)'}">${r.sign}₺${r.amount.toLocaleString('tr-TR')}</td>
-      <td></td>
+      <td style="font-size:12px;color:var(--ink3)">${r.invoiceNo||'—'}</td>
+      <td>${r.invoiceUrl?`<a href="${r.invoiceUrl}" target="_blank" style="font-size:12px;color:var(--gold);text-decoration:none">📎 Fatura</a>`:'—'}</td>
     </tr>`).join('');
   }
 }
@@ -2517,6 +2605,18 @@ function filterTx(type,btn){
   if(btn)btn.classList.add('active');
   renderAccTransactions(type);
 }
+function updateMarginPreview(){
+  const price = parseFloat(document.getElementById('prod-price')?.value)||0;
+  const cost = parseFloat(document.getElementById('prod-cost-price')?.value)||0;
+  const el = document.getElementById('margin-preview');
+  if(!el) return;
+  if(!price || !cost){ el.textContent='Fiyat girin…'; el.style.color='var(--ink3)'; return; }
+  const profit = price - cost;
+  const margin = Math.round((profit/price)*100);
+  const color = margin>=40?'var(--ok)':margin>=20?'var(--gold-dk)':'var(--err)';
+  el.innerHTML = `<span style="font-weight:600;color:${color}">%${margin}</span>&nbsp;<span style="color:var(--ink3)">· +₺${profit.toLocaleString('tr-TR')} kâr</span>`;
+}
+
 function openTransactionModal(type){
   const cfg=txTypes[type]||txTypes.gelir;
   let m=document.getElementById('tx-modal');
@@ -2532,6 +2632,11 @@ function openTransactionModal(type){
         <div><label class="afl">Tarih</label><input class="afi" id="tx-date" type="date" value="${new Date().toISOString().split('T')[0]}"></div>
       </div>
       <div><label class="afl">Not</label><textarea class="afi" id="tx-note" style="min-height:60px;resize:vertical" placeholder="Ek bilgi…"></textarea></div>
+      <div class="g2" style="gap:14px">
+        <div><label class="afl">Fatura No</label><input class="afi" id="tx-invoice-no" placeholder="FTR-2025-001"></div>
+        <div><label class="afl">Tedarikçi / Firma</label><input class="afi" id="tx-vendor" placeholder="Firma adı"></div>
+      </div>
+      <div><label class="afl">Fatura Belgesi (PDF / Görsel)</label><input type="file" id="tx-invoice-file" accept=".pdf,.jpg,.jpeg,.png" style="display:block;width:100%;font-size:13px;padding:8px 0;color:var(--ink2)"></div>
       <div style="display:flex;gap:8px;justify-content:flex-end">
         <button class="btn btn-o btn-sm" onclick="closeModal('tx-modal')">İptal</button>
         <button class="btn btn-p btn-sm" onclick="saveTx('${type}')">Kaydet</button>
@@ -2548,8 +2653,21 @@ async function saveTx(type){
   const date=document.getElementById('tx-date')?.value||new Date().toISOString().split('T')[0];
   if(!amount){toast('Tutar giriniz');return;}
   // Supabase'e kaydet
+  const invoiceNo = document.getElementById('tx-invoice-no')?.value?.trim()||null;
+  const vendor = document.getElementById('tx-vendor')?.value?.trim()||null;
+  const note = document.getElementById('tx-note')?.value?.trim()||null;
+  // Fatura dosyası — storage'a yükle
+  let invoiceUrl = null;
+  const invoiceFile = document.getElementById('tx-invoice-file')?.files?.[0];
+  if(invoiceFile){
+    const fname = 'fatura_' + Date.now() + '_' + invoiceFile.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+    const {data:upData} = await _sb.storage.from('invoices').upload(fname, invoiceFile, {upsert:true});
+    if(upData) invoiceUrl = `https://vuusgbthelegugpcbdye.supabase.co/storage/v1/object/public/invoices/${fname}`;
+  }
   const {error} = await _sb.from('transactions').insert([{
-    type, category:cat, description:desc, amount, date, created_at: new Date().toISOString()
+    type, category:cat, description:desc, amount, date,
+    invoice_no: invoiceNo, vendor: vendor, note: note, invoice_url: invoiceUrl,
+    created_at: new Date().toISOString()
   }]);
   if(error){
     // Tablo yoksa local'e ekle
@@ -2662,6 +2780,28 @@ function confirmPayment(){
 // renderTxList kaldırıldı - loadAccounting kullanılıyor
 
 /* ── Toptancı / Tedarikçi Ekle ── */
+function exportAccounting(){
+  const orders = window._txCache?.orders||[];
+  const manual = window._txCache?.manual||[];
+  let csv = 'Tarih,Tür,Açıklama,Kategori,Tedarikçi,Fatura No,Tutar
+';
+  orders.forEach(o=>{
+    csv += `${new Date(o.created_at).toLocaleDateString('tr-TR')},Gelir,Sipariş Geliri,,,,${o.total||0}
+`;
+  });
+  manual.forEach(t=>{
+    const sign = (t.type==='gelir'||t.type==='alacak')?'':'-';
+    csv += `${new Date(t.date||t.created_at).toLocaleDateString('tr-TR')},${t.type},${t.description||''},${t.category||''},${t.vendor||''},${t.invoice_no||''},${sign}${t.amount||0}
+`;
+  });
+  const blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'HAYAZEEEM_Muhasebe_'+new Date().toISOString().split('T')[0]+'.csv';
+  a.click();
+  toast('Muhasebe raporu indirildi ✓');
+}
+
 function openSupplierModal(editData){
   let m = document.getElementById('supplier-modal');
   if(!m){
