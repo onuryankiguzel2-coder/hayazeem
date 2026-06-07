@@ -407,7 +407,7 @@ img{display:block;max-width:100%;object-fit:cover}
 .pd-layout{display:grid;grid-template-columns:55fr 45fr;min-height:calc(100vh - var(--nav-h))}
 .pd-gal{position:sticky;top:var(--nav-h);height:calc(100vh - var(--nav-h));overflow:hidden;display:flex;flex-direction:column;gap:4px;padding:8px;background:var(--bone)}
 .pd-main{flex:1;overflow:hidden;position:relative;background:var(--stone);cursor:crosshair}
-.pd-main img{width:100%;height:100%;object-fit:cover;object-position:top center;transition:transform .4s ease;transform-origin:var(--zoom-x, 50%) var(--zoom-y, 50%)}
+.pd-main img{width:100%;height:100%;object-fit:contain;transition:transform .4s ease;transform-origin:var(--zoom-x, 50%) var(--zoom-y, 50%)}
 .pd-main.zoomed img{transform:scale(2.2)}
 .pd-main:hover{cursor:zoom-in}
 .pd-thumbs{display:flex;gap:6px;height:88px}
@@ -2366,6 +2366,7 @@ function go(name, opts){
   if(!el) return;
   el.classList.add('active');
   window.scrollTo(0,0);
+  setTimeout(initPdZoom, 100);
   const drawer=document.getElementById('drawer');
   if(drawer?.classList.contains('open')){
     drawer.classList.remove('open');
@@ -3902,13 +3903,14 @@ async function confirmOrder(){
   renderNavBadge();window.scrollTo(0,0);
 }
 
-/* ── Mouse Zoom ── */
-(function(){
+/* ── Zoom & Lightbox ── */
+let _lbImgs = [], _lbIdx = 0;
+
+function initPdZoom(){
   const pdMain = document.getElementById('pd-main');
-  if(!pdMain) return;
-  let zoomed = false;
+  if(!pdMain || pdMain._zoomInit) return;
+  pdMain._zoomInit = true;
   pdMain.addEventListener('mousemove', e => {
-    if(!zoomed) return;
     const rect = pdMain.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1) + '%';
     const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1) + '%';
@@ -3916,32 +3918,45 @@ async function confirmOrder(){
     pdMain.style.setProperty('--zoom-y', y);
   });
   pdMain.addEventListener('click', e => {
-    // Lightbox aç
-    const imgs = Store.currentProduct?.images || [pdMain.querySelector('img')?.src];
-    openLightbox(imgs, window._pdThumbIdx || 0);
+    pdMain.classList.toggle('zoomed');
   });
-})();
+}
 
-/* ── Lightbox ── */
-let _lbImgs = [], _lbIdx = 0;
-function openLightbox(imgs, idx){
-  _lbImgs = imgs; _lbIdx = idx;
-  document.getElementById('lb-img').src = imgs[idx];
-  document.getElementById('lb-overlay').classList.add('open');
+function openLightbox(imgs, startIdx){
+  if(!imgs || !imgs.length) return;
+  _lbImgs = imgs.filter(Boolean);
+  _lbIdx = Math.min(startIdx||0, _lbImgs.length-1);
+  const el = document.getElementById('lb-overlay');
+  const img = document.getElementById('lb-img');
+  if(!el || !img) return;
+  img.src = _lbImgs[_lbIdx];
+  el.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
+
 function closeLightbox(){
-  document.getElementById('lb-overlay').classList.remove('open');
+  const el = document.getElementById('lb-overlay');
+  if(el) el.classList.remove('open');
   document.body.style.overflow = '';
 }
-function lbClose(e){ if(e.target === document.getElementById('lb-overlay')) closeLightbox(); }
-function lbNav(dir){
-  _lbIdx = (_lbIdx + dir + _lbImgs.length) % _lbImgs.length;
-  document.getElementById('lb-img').src = _lbImgs[_lbIdx];
+
+function lbClose(e){
+  if(e.target.id === 'lb-overlay') closeLightbox();
 }
+
+function lbNav(dir, e){
+  if(e){ e.stopPropagation(); e.preventDefault(); }
+  if(!_lbImgs.length) return;
+  _lbIdx = (_lbIdx + dir + _lbImgs.length) % _lbImgs.length;
+  const img = document.getElementById('lb-img');
+  if(!img) return;
+  img.style.opacity = '0';
+  setTimeout(()=>{ img.src = _lbImgs[_lbIdx]; img.style.opacity = '1'; }, 150);
+}
+
 document.addEventListener('keydown', e => {
   const lb = document.getElementById('lb-overlay');
-  if(!lb.classList.contains('open')) return;
+  if(!lb || !lb.classList.contains('open')) return;
   if(e.key === 'Escape') closeLightbox();
   if(e.key === 'ArrowLeft') lbNav(-1);
   if(e.key === 'ArrowRight') lbNav(1);
@@ -3951,9 +3966,9 @@ document.addEventListener('keydown', e => {
 <!-- LIGHTBOX -->
 <div class="lb-overlay" id="lb-overlay" onclick="lbClose(event)">
   <button class="lb-close" onclick="closeLightbox()">×</button>
-  <button class="lb-prev" onclick="lbNav(-1);event.stopPropagation()">‹</button>
+  <button class="lb-prev" onclick="lbNav(-1,event)">‹</button>
   <img id="lb-img" src="" alt="">
-  <button class="lb-next" onclick="lbNav(1);event.stopPropagation()">›</button>
+  <button class="lb-next" onclick="lbNav(1,event)">›</button>
 </div>
 </body>
 </html>
