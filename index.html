@@ -405,11 +405,11 @@ img{display:block;max-width:100%;object-fit:cover}
 
 /* ═══════ PRODUCT DETAIL ═══════ */
 .pd-layout{display:grid;grid-template-columns:55fr 45fr;min-height:calc(100vh - var(--nav-h))}
-.pd-gal{position:sticky;top:var(--nav-h);height:calc(100vh - var(--nav-h));overflow:hidden;display:flex;flex-direction:column;gap:4px;padding:8px;background:var(--bone)}
-.pd-main{flex:1;overflow:hidden;position:relative;background:var(--stone);cursor:crosshair}
-.pd-main img{width:100%;height:100%;object-fit:contain;transition:transform .4s ease;transform-origin:var(--zoom-x, 50%) var(--zoom-y, 50%)}
-.pd-main.zoomed img{transform:scale(2.2)}
-.pd-main:hover{cursor:zoom-in}
+.pd-gal{position:sticky;top:var(--nav-h);height:calc(100vh - var(--nav-h));overflow:hidden;display:flex;flex-direction:column;gap:4px;padding:0;background:var(--bone)}
+.pd-main{flex:1;overflow:hidden;position:relative;background:var(--stone);cursor:pointer}
+.pd-main img{width:100%;height:100%;object-fit:cover;object-position:top center;cursor:pointer}
+
+
 .pd-thumbs{display:flex;gap:6px;height:88px}
 .pd-thumb{flex:1;overflow:hidden;cursor:pointer;opacity:.6;transition:opacity 150ms;background:var(--warm);border:2px solid transparent}
 .pd-thumb img{width:100%;height:100%;object-fit:cover}
@@ -2365,6 +2365,8 @@ function go(name, opts){
   const el=document.getElementById('page-'+name);
   if(!el) return;
   el.classList.add('active');
+  window._currentPdImgs = p.images||[];
+  window._pdThumbIdx = 0;
   window.scrollTo(0,0);
   setTimeout(initPdZoom, 100);
   const drawer=document.getElementById('drawer');
@@ -3903,72 +3905,56 @@ async function confirmOrder(){
   renderNavBadge();window.scrollTo(0,0);
 }
 
-/* ── Zoom & Lightbox ── */
+/* ── Lightbox ── */
 let _lbImgs = [], _lbIdx = 0;
 
-function initPdZoom(){
-  const pdMain = document.getElementById('pd-main');
-  if(!pdMain || pdMain._zoomInit) return;
-  pdMain._zoomInit = true;
-  pdMain.addEventListener('mousemove', e => {
-    const rect = pdMain.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1) + '%';
-    const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1) + '%';
-    pdMain.style.setProperty('--zoom-x', x);
-    pdMain.style.setProperty('--zoom-y', y);
-  });
-  pdMain.addEventListener('click', e => {
-    pdMain.classList.toggle('zoomed');
-  });
-}
-
 function openLightbox(imgs, startIdx){
-  if(!imgs || !imgs.length) return;
-  _lbImgs = imgs.filter(Boolean);
-  _lbIdx = Math.min(startIdx||0, _lbImgs.length-1);
-  const el = document.getElementById('lb-overlay');
-  const img = document.getElementById('lb-img');
-  if(!el || !img) return;
-  img.src = _lbImgs[_lbIdx];
-  el.classList.add('open');
+  _lbImgs = (imgs||[]).filter(Boolean);
+  if(!_lbImgs.length) return;
+  _lbIdx = startIdx || 0;
+  document.getElementById('lb-img').src = _lbImgs[_lbIdx];
+  document.getElementById('lb-overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
 function closeLightbox(){
-  const el = document.getElementById('lb-overlay');
-  if(el) el.classList.remove('open');
+  document.getElementById('lb-overlay').classList.remove('open');
   document.body.style.overflow = '';
 }
 
-function lbClose(e){
-  if(e.target.id === 'lb-overlay') closeLightbox();
-}
-
 function lbNav(dir, e){
-  if(e){ e.stopPropagation(); e.preventDefault(); }
-  if(!_lbImgs.length) return;
+  if(e) e.stopPropagation();
   _lbIdx = (_lbIdx + dir + _lbImgs.length) % _lbImgs.length;
   const img = document.getElementById('lb-img');
-  if(!img) return;
   img.style.opacity = '0';
-  setTimeout(()=>{ img.src = _lbImgs[_lbIdx]; img.style.opacity = '1'; }, 150);
+  setTimeout(() => { img.src = _lbImgs[_lbIdx]; img.style.opacity = '1'; }, 150);
 }
 
 document.addEventListener('keydown', e => {
   const lb = document.getElementById('lb-overlay');
   if(!lb || !lb.classList.contains('open')) return;
   if(e.key === 'Escape') closeLightbox();
-  if(e.key === 'ArrowLeft') lbNav(-1);
-  if(e.key === 'ArrowRight') lbNav(1);
+  if(e.key === 'ArrowLeft') lbNav(-1, e);
+  if(e.key === 'ArrowRight') lbNav(1, e);
 });
+
+function initPdZoom(){
+  const pdMain = document.getElementById('pd-main');
+  if(!pdMain || pdMain._init) return;
+  pdMain._init = true;
+  pdMain.addEventListener('click', () => {
+    const imgs = (window._currentPdImgs || []).filter(Boolean);
+    openLightbox(imgs, window._pdThumbIdx || 0);
+  });
+}
 </script>
 
 <!-- LIGHTBOX -->
 <div class="lb-overlay" id="lb-overlay" onclick="lbClose(event)">
   <button class="lb-close" onclick="closeLightbox()">×</button>
-  <button class="lb-prev" onclick="lbNav(-1,event)">‹</button>
+  <button class="lb-prev" onclick="lbNav(-1);event.stopPropagation()">‹</button>
   <img id="lb-img" src="" alt="">
-  <button class="lb-next" onclick="lbNav(1,event)">›</button>
+  <button class="lb-next" onclick="lbNav(1);event.stopPropagation()">›</button>
 </div>
 </body>
 </html>
