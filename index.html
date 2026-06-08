@@ -1833,9 +1833,13 @@ async function loadProductsFromDB(){
   }
 
   {
+    const normTR = s => (s||'').toLowerCase().trim()
+      .replace(/İ/g,'i').replace(/I/g,'ı').replace(/Ğ/g,'ğ')
+      .replace(/Ü/g,'ü').replace(/Ş/g,'ş').replace(/Ö/g,'ö').replace(/Ç/g,'ç')
+      .replace(/i̇/g,'i');
     const colorNameToHex = {
       'krem':'#FAF7F2','krem bej':'#FAF7F2','bej':'#F0E6D3','ekru':'#F5F0E8',
-      'siyah':'#1A1A1A','koyu kahve':'#2C2420','kahve':'#5C3D2E',
+      'siyah':'#1A1A1A','koyu kahve':'#2C2420','kahve':'#5C3D2E','kahverengi':'#5C3D2E',
       'beyaz':'#FFFFFF','optik beyaz':'#F8F8F8',
       'zeytin':'#8B8670','haki':'#8B8670','ordu yeşili':'#6B7C5C',
       'yeşil':'#4A7C59','mint':'#98D8C8','su yeşili':'#7BC8C0',
@@ -1850,7 +1854,7 @@ async function loadProductsFromDB(){
     };
     PRODUCTS = data.map(p => {
       const colorList = p.colors || [];
-      const colors = colorList.map(name => colorNameToHex[(name||'').toLowerCase().trim()] || '#D4C5B0');
+      const colors = colorList.map(name => colorNameToHex[normTR(name)] || '#D4C5B0');
       const nBeden = (p.sizes||[]).length, nRenk = colorList.length;
       const sub = [nRenk > 0 ? nRenk+' Renk' : '', nBeden > 0 ? nBeden+' Beden' : ''].filter(Boolean).join(', ');
       return {
