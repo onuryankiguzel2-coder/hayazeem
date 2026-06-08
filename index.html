@@ -2462,6 +2462,28 @@ window.addEventListener('popstate', function(e){
 function openProduct(id){
   Store.openProduct(id);
   go('product');
+  _sbClient.from('products').select('stock,variants').eq('id', String(id)).single()
+    .then(({data, error}) => {
+      if(error || !data) return;
+      const p = PRODUCTS.find(x => String(x.id) === String(id));
+      if(!p) return;
+      p.stock = data.stock || 0;
+      p.variants = data.variants || [];
+      const stockText = document.getElementById('pd-stock-text');
+      const stockDot  = document.getElementById('pd-stock-dot');
+      if(stockText){
+        if(p.stock <= 0){
+          stockText.innerHTML = 'Stokta yok';
+          if(stockDot) stockDot.style.background = 'var(--err)';
+        } else if(p.stock <= 5){
+          stockText.innerHTML = 'Son <strong>'+p.stock+' ürün</strong> kaldı — Hemen al!';
+          if(stockDot) stockDot.style.background = 'var(--warn)';
+        } else {
+          stockText.innerHTML = 'Stokta <strong>'+p.stock+' ürün</strong> mevcut';
+          if(stockDot) stockDot.style.background = 'var(--ok,#4CAF50)';
+        }
+      }
+    });
 }
 
 /* ─── MOBILE DRAWER ─── */
@@ -2593,17 +2615,40 @@ function addToCart(){
   if(!p) return;
   const st=Store.pdState;
   if(!st.size){toast(Store.t('no_size_warn'));return;}
-  // Varyant bazlı stok kontrolü
-  const variants = p.variants || [];
-  if(variants.length > 0){
-    const v = variants.find(v=>v.color===st.colorName && v.size===st.size);
-    const avail = v ? (v.stock||0) : 0;
-    if(avail <= 0){toast('Bu renk ve beden kombinasyonu stokta yok.');return;}
-    const inCart = Store._d.cart.filter(i=>i.id===p.id&&i.color===st.colorName&&i.size===st.size).reduce((s,i)=>s+i.qty,0);
-    if(inCart + st.qty > avail){toast('Sepetinizde zaten '+ inCart +' adet var. Stokta '+ avail +' adet mevcut.');return;}
-  }
-  Store.cartAdd(p,st.colorName,st.size,st.qty);
-  toast(Store.t('cart_added'));
+  _sbClient.from('products').select('stock,variants').eq('id', String(p.id)).single()
+    .then(({data, error}) => {
+      if(error || !data){ toast('Stok bilgisi alınamadı, lütfen tekrar deneyin.'); return; }
+      p.stock = data.stock || 0;
+      p.variants = data.variants || [];
+      const stockText = document.getElementById('pd-stock-text');
+      const stockDot  = document.getElementById('pd-stock-dot');
+      if(stockText){
+        if(p.stock <= 0){
+          stockText.innerHTML = 'Stokta yok';
+          if(stockDot) stockDot.style.background = 'var(--err)';
+        } else if(p.stock <= 5){
+          stockText.innerHTML = 'Son <strong>'+p.stock+' ürün</strong> kaldı — Hemen al!';
+          if(stockDot) stockDot.style.background = 'var(--warn)';
+        } else {
+          stockText.innerHTML = 'Stokta <strong>'+p.stock+' ürün</strong> mevcut';
+          if(stockDot) stockDot.style.background = 'var(--ok,#4CAF50)';
+        }
+      }
+      const variants = p.variants;
+      if(variants.length > 0){
+        const v = variants.find(v=>v.color===st.colorName && v.size===st.size);
+        const avail = v ? (v.stock||0) : 0;
+        if(avail <= 0){toast('Bu renk ve beden kombinasyonu stokta yok.');return;}
+        const inCart = Store._d.cart.filter(i=>i.id===p.id&&i.color===st.colorName&&i.size===st.size).reduce((s,i)=>s+i.qty,0);
+        if(inCart + st.qty > avail){toast('Sepetinizde zaten '+inCart+' adet var. Stokta '+avail+' adet mevcut.');return;}
+      } else {
+        if(p.stock <= 0){toast('Bu ürün stokta yok.');return;}
+        const inCart = Store._d.cart.filter(i=>i.id===p.id).reduce((s,i)=>s+i.qty,0);
+        if(inCart + st.qty > p.stock){toast('Stok yetersiz. Stokta '+p.stock+' adet mevcut.');return;}
+      }
+      Store.cartAdd(p,st.colorName,st.size,st.qty);
+      toast(Store.t('cart_added'));
+    });
 }
 function quickAdd(productId){
   const p=PRODUCTS.find(x=>String(x.id)===String(productId));
