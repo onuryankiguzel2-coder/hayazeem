@@ -2194,11 +2194,11 @@ function renderCart(){
         <div class="ci-var">${i.color} / ${i.size}</div>
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
           <div class="qty-wrap">
-            <button class="qty-btn" onclick="cartQty(${i.id},'${i.color}','${i.size}',-1)">−</button>
+            <button class="qty-btn" onclick="cartQty('${i.id}','${i.color}','${i.size}',-1)">−</button>
             <span class="qty-num">${i.qty}</span>
-            <button class="qty-btn" onclick="cartQty(${i.id},'${i.color}','${i.size}',1)">+</button>
+            <button class="qty-btn" onclick="cartQty('${i.id}','${i.color}','${i.size}',1)">+</button>
           </div>
-          <button class="ci-rm" onclick="cartRemove(${i.id},'${i.color}','${i.size}')">Kaldır</button>
+          <button class="ci-rm" onclick="cartRemove('${i.id}','${i.color}','${i.size}')">Kaldır</button>
         </div>
       </div>
       <div class="ci-price">${fmt(i.price*i.qty)}</div>
