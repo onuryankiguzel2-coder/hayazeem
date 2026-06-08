@@ -2334,6 +2334,7 @@ function renderPdDetail(){
   const szWrap=document.querySelector('.sz-btns');
   if(szWrap && p.sizes && p.sizes.length){
     szWrap.innerHTML=p.sizes.map(s=>`<button class="sz-btn" onclick="selSz(this,'${s}')">${s}</button>`).join('');
+    updateSizeBtns(p, Store.pdState.colorName);
   }
 
   // Renk swatches
@@ -2483,6 +2484,8 @@ function openProduct(id){
           if(stockDot) stockDot.style.background = 'var(--ok,#4CAF50)';
         }
       }
+      // Beden butonlarını stoka göre güncelle
+      updateSizeBtns(p, Store.pdState.colorName);
     });
 }
 
@@ -2582,12 +2585,35 @@ function lbOpenFromPd(){
   if(idx<0) idx = window._lbCurrentIdx || 0;
   lbOpen(imgs, idx);
 }
+function updateSizeBtns(p, colorName){
+  const variants = p.variants || [];
+  document.querySelectorAll('.sz-btn').forEach(btn => {
+    const size = btn.textContent.trim();
+    if(!variants.length){ btn.classList.remove('out'); btn.disabled=false; return; }
+    const v = variants.find(v => v.color === colorName && v.size === size);
+    const avail = v ? (v.stock||0) : 0;
+    if(avail <= 0){
+      btn.classList.add('out');
+      btn.disabled = true;
+    } else {
+      btn.classList.remove('out');
+      btn.disabled = false;
+    }
+  });
+}
 function selCol(el,name,idx){
   document.querySelectorAll('.col-sw').forEach(c=>c.classList.remove('active'));
   el.classList.add('active');
   Store.setPdColor(idx||0,name);
   const lbl=document.getElementById('sel-color');
   if(lbl) lbl.textContent=name;
+  // Seçilen renge göre beden stok durumunu güncelle
+  Store.setPdSize('');
+  document.querySelectorAll('.sz-btn').forEach(b=>b.classList.remove('active'));
+  const szLbl=document.getElementById('sel-size');
+  if(szLbl) szLbl.textContent=Store.t('select_size');
+  const p=PRODUCTS.find(x=>String(x.id)===String(Store.currentProductId));
+  if(p) updateSizeBtns(p, name);
 }
 function selSz(el,name){
   document.querySelectorAll('.sz-btn:not(.out)').forEach(b=>b.classList.remove('active'));
@@ -2634,6 +2660,7 @@ function addToCart(){
           if(stockDot) stockDot.style.background = 'var(--ok,#4CAF50)';
         }
       }
+      updateSizeBtns(p, st.colorName);
       const variants = p.variants;
       if(variants.length > 0){
         const v = variants.find(v=>v.color===st.colorName && v.size===st.size);
