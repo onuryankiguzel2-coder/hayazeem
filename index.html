@@ -1797,27 +1797,38 @@ async function loadProductsFromDB(){
 
   let cats, data;
 
-  if(cachedData) {
-    cats = cachedData.cats;
-    data = cachedData.products;
-  } else {
-    // --- Önce products.json (hızlı) ---
-    let jsonOk = false;
-    try {
-      const jsonRes = await fetch('/products.json?_=' + Math.floor(Date.now()/60000), {cache:'no-store'});
-      if(jsonRes.ok) {
-        const jsonData = await jsonRes.json();
-        if(jsonData.products && jsonData.products.length > 0) {
+  // --- Önce products.json (hızlı) - her zaman fetch et, cache'den daha yeniyse kullan ---
+  let jsonOk = false;
+  try {
+    const jsonRes = await fetch('/products.json?_=' + Math.floor(Date.now()/60000), {cache:'no-store'});
+    if(jsonRes.ok) {
+      const jsonData = await jsonRes.json();
+      if(jsonData.products && jsonData.products.length > 0) {
+        // JSON'daki updated_at cache'den daha yeniyse cache'i geç
+        const jsonTs = jsonData.updated_at ? new Date(jsonData.updated_at).getTime() : 0;
+        const cacheTs = cachedData ? cachedData.ts : 0;
+        if(!cachedData || jsonTs > cacheTs) {
           cats = jsonData.categories || [];
           data = jsonData.products;
           jsonOk = true;
           try { localStorage.setItem(CACHE_KEY, JSON.stringify({ts:Date.now(),cats,products:data,source:'json'})); } catch(e) {}
+        } else {
+          // Cache hâlâ geçerli
+          cats = cachedData.cats;
+          data = cachedData.products;
+          jsonOk = true;
         }
       }
-    } catch(e) { console.warn('[HYZ] products.json yüklenemedi, Supabase fallback...', e.message); }
+    }
+  } catch(e) { console.warn('[HYZ] products.json yüklenemedi, Supabase fallback...', e.message); }
+
+  if(false) { // eski if(cachedData) bloğunun yerini aldı
+    cats = cachedData?.cats;
+    data = cachedData?.products;
+  } else if(!jsonOk) {
 
     // --- Supabase fallback ---
-    if(!jsonOk) {
+    {
       try {
         const catsRes = await _sbClient.from('categories').select('id,name_tr');
         cats = catsRes.data;
