@@ -2203,7 +2203,7 @@ async function printCargoLabel(orderNo, orderId){
   }
   const addr = order?.shipping_address || {};
   const items = Array.isArray(order?.items) ? order.items : [];
-  const itemList = items.map(i=>`${i.name_tr||i.name||'Ürün'} x${i.qty||1}`).join('<br>');
+  const itemList = items.map(i=>`${i.name_tr||i.name||'Ürün'}${i.sku?' ['+i.sku+']':''} · ${i.color||''}/${i.size||''} x${i.qty||1}`).join('<br>');
   const alici = addr.full_name || order?.guest_email || '—';
   const adres = [addr.address, addr.district, addr.city, addr.zip].filter(Boolean).join(', ') || '—';
   const tel = addr.phone || '—';
