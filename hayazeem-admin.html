@@ -1340,9 +1340,21 @@ async function saveProd(statusOverride){
     variants:getVariantsFromMatrix(),
     stock:(()=>{const v=getVariantsFromMatrix();return v.length?v.reduce((s,x)=>s+x.stock,0):parseInt(document.getElementById('prod-stock')?.value)||0;})(),
     sizes:sizes,colors:colors,images:_imgs.slice(0,5),
+    sku:document.getElementById('prod-sku')?.value?.trim()||null,
     is_active:isActive,
     is_featured:document.getElementById('prod-featured')?.checked||false,
   };
+  // Otomatik SKU üret
+  if(!prodData.sku){
+    const {data:skuData}=await _sb.from('products').select('sku').not('sku','is',null).order('created_at',{ascending:false});
+    let nextNum=1;
+    if(skuData&&skuData.length){
+      const nums=skuData.map(r=>{const m=(r.sku||'').match(/AZM-(\d+)/i);return m?parseInt(m[1]):0;}).filter(n=>n>0);
+      if(nums.length) nextNum=Math.max(...nums)+1;
+    }
+    prodData.sku='AZM-'+String(nextNum).padStart(2,'0');
+    const skuEl=document.getElementById('prod-sku');if(skuEl)skuEl.value=prodData.sku;
+  }
   const btn=document.querySelector('#ap-addprod .btn-g');
   if(btn){btn.textContent='Kaydediliyor…';btn.disabled=true;}
   const {error}=await _sb.from('products').insert([prodData]);
@@ -1405,6 +1417,7 @@ async function editProduct(id){
     document.getElementById('prod-name-tr').value=data.name_tr||'';
     document.getElementById('prod-price').value=data.price||'';
     document.getElementById('prod-stock').value=data.stock||'';
+    if(document.getElementById('prod-sku')) document.getElementById('prod-sku').value=data.sku||'';
     if(document.getElementById('prod-collection')) document.getElementById('prod-collection').value=data.collection||'';
     if(document.getElementById('prod-featured'))document.getElementById('prod-featured').checked=data.is_featured||false;
     if(document.getElementById('prod-cost-price')) document.getElementById('prod-cost-price').value=data.cost_price||'';
@@ -1458,6 +1471,7 @@ async function updateProduct(id){
     weight:document.getElementById('prod-weight')?.value?.trim()||'',
     origin:document.getElementById('prod-origin')?.value?.trim()||'',
     care:document.getElementById('prod-care')?.value?.trim()||'',
+    sku:document.getElementById('prod-sku')?.value?.trim()||null,
     price:price,
     original_price:parseFloat(document.getElementById('prod-orig-price')?.value)||null,
     cost_price:parseFloat(document.getElementById('prod-cost-price')?.value)||null,
