@@ -1102,8 +1102,14 @@ async function loadCollections(){
     if(countEl) countEl.textContent = (counts[name]||0) + ' ürün';
     
     // Kapak fotoğrafını yükle
-    const safeName = name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ı/g,'i').replace(/İ/g,'I').replace(/ş/g,'s').replace(/Ş/g,'S').replace(/ğ/g,'g').replace(/Ğ/g,'G').replace(/ü/g,'u').replace(/Ü/g,'U').replace(/ö/g,'o').replace(/Ö/g,'O').replace(/ç/g,'c').replace(/Ç/g,'C');
-    const url = COLL_BASE_URL + 'collection_' + safeName + '.jpg';
+    const collFileMap = {
+      'Anahtar Serisi':'Anahtar','Nur Serisi':'Nefes','Hal Serisi':'Hal',
+      'Ziynet Serisi':'Saye','İz Serisi':'Iz','Zerre Serisi':'Zerre',
+      'Sukun Serisi':'Sukun','Vuslat Serisi':'Vuslat','Eşik':null
+    };
+    const fileKey = collFileMap[name];
+    if(!fileKey){ return; } // Eşik için dosya yok henüz
+    const url = COLL_BASE_URL + 'collection_' + fileKey + '.jpg';
     const img = document.getElementById('coll-img-'+name);
     const placeholder = document.getElementById('coll-placeholder-'+name);
     if(img){
@@ -1152,8 +1158,13 @@ async function uploadCollectionCover(name, input){
   if(file.size > 5*1024*1024){ toast('Max 5MB'); return; }
   
   toast('Yükleniyor...');
-  const safeName = name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ı/g,'i').replace(/İ/g,'I').replace(/ş/g,'s').replace(/Ş/g,'S').replace(/ğ/g,'g').replace(/Ğ/g,'G').replace(/ü/g,'u').replace(/Ü/g,'U').replace(/ö/g,'o').replace(/Ö/g,'O').replace(/ç/g,'c').replace(/Ç/g,'C');
-  const fileName = 'collection_' + safeName + '.jpg';
+  const collFileMap2 = {
+    'Anahtar Serisi':'Anahtar','Nur Serisi':'Nefes','Hal Serisi':'Hal',
+    'Ziynet Serisi':'Saye','İz Serisi':'Iz','Zerre Serisi':'Zerre',
+    'Sukun Serisi':'Sukun','Vuslat Serisi':'Vuslat','Eşik':'Esik'
+  };
+  const fileKey2 = collFileMap2[name] || name.replace(/ /g,'_');
+  const fileName = 'collection_' + fileKey2 + '.jpg';
   const {error} = await _sb.storage.from(COLL_BUCKET).upload(fileName, file, {contentType: file.type, upsert: true});
   if(error){ toast('Hata: '+error.message); return; }
   
