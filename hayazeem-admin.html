@@ -398,14 +398,15 @@ img{display:block;object-fit:cover}
         <label class="afl">Koleksiyon (opsiyonel)</label>
         <select class="afs" id="prod-collection">
           <option value="">— Koleksiyon seçin (opsiyonel)</option>
-          <option value="Anahtar">Anahtar</option>
-          <option value="Sükun">Sükun</option>
-          <option value="İz">İz</option>
-          <option value="Hal">Hal</option>
-          <option value="Saye">Saye</option>
-          <option value="Zerre">Zerre</option>
-          <option value="Vuslat">Vuslat</option>
-          <option value="Nefes">Nefes</option>
+          <option value="Anahtar Serisi">Anahtar Serisi</option>
+          <option value="Nur Serisi">Nur Serisi</option>
+          <option value="Hal Serisi">Hal Serisi</option>
+          <option value="Ziynet Serisi">Ziynet Serisi</option>
+          <option value="İz Serisi">İz Serisi</option>
+          <option value="Zerre Serisi">Zerre Serisi</option>
+          <option value="Sukun Serisi">Sukun Serisi</option>
+          <option value="Eşik">Eşik</option>
+          <option value="Vuslat Serisi">Vuslat Serisi</option>
         </select>
       </div>
 
@@ -487,6 +488,160 @@ img{display:block;object-fit:cover}
     </div>
   </div>
   <div id="coll-cards-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;padding:24px">
+    <div class="af-card" style="padding:0;overflow:hidden">
+      <div style="position:relative;aspect-ratio:3/2;background:var(--bone)">
+        <img id="coll-img-Anahtar_Serisi" src="" alt="Anahtar Serisi" style="width:100%;height:100%;object-fit:cover;display:none">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px" id="coll-placeholder-Anahtar_Serisi">
+          <div style="font-size:32px">🖼️</div>
+          <div style="font-size:12px;color:var(--ink3)">Fotoğraf yok</div>
+        </div>
+        <label style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;padding:6px 10px;border-radius:4px;font-size:12px;cursor:pointer">
+          📷 Değiştir
+          <input type="file" accept="image/*" style="display:none" onchange="uploadCollectionCover('Anahtar Serisi', this)">
+        </label>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-family:var(--fd);font-size:18px;margin-bottom:4px">Anahtar Serisi</div>
+        <div style="font-size:13px;color:var(--ink3)" id="coll-prod-count-Anahtar_Serisi">Yükleniyor...</div>
+      </div>
+    </div>
+    <div class="af-card" style="padding:0;overflow:hidden">
+      <div style="position:relative;aspect-ratio:3/2;background:var(--bone)">
+        <img id="coll-img-Nur_Serisi" src="" alt="Nur Serisi" style="width:100%;height:100%;object-fit:cover;display:none">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px" id="coll-placeholder-Nur_Serisi">
+          <div style="font-size:32px">🖼️</div>
+          <div style="font-size:12px;color:var(--ink3)">Fotoğraf yok</div>
+        </div>
+        <label style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;padding:6px 10px;border-radius:4px;font-size:12px;cursor:pointer">
+          📷 Değiştir
+          <input type="file" accept="image/*" style="display:none" onchange="uploadCollectionCover('Nur Serisi', this)">
+        </label>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-family:var(--fd);font-size:18px;margin-bottom:4px">Nur Serisi</div>
+        <div style="font-size:13px;color:var(--ink3)" id="coll-prod-count-Nur_Serisi">Yükleniyor...</div>
+      </div>
+    </div>
+    <div class="af-card" style="padding:0;overflow:hidden">
+      <div style="position:relative;aspect-ratio:3/2;background:var(--bone)">
+        <img id="coll-img-Hal_Serisi" src="" alt="Hal Serisi" style="width:100%;height:100%;object-fit:cover;display:none">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px" id="coll-placeholder-Hal_Serisi">
+          <div style="font-size:32px">🖼️</div>
+          <div style="font-size:12px;color:var(--ink3)">Fotoğraf yok</div>
+        </div>
+        <label style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;padding:6px 10px;border-radius:4px;font-size:12px;cursor:pointer">
+          📷 Değiştir
+          <input type="file" accept="image/*" style="display:none" onchange="uploadCollectionCover('Hal Serisi', this)">
+        </label>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-family:var(--fd);font-size:18px;margin-bottom:4px">Hal Serisi</div>
+        <div style="font-size:13px;color:var(--ink3)" id="coll-prod-count-Hal_Serisi">Yükleniyor...</div>
+      </div>
+    </div>
+    <div class="af-card" style="padding:0;overflow:hidden">
+      <div style="position:relative;aspect-ratio:3/2;background:var(--bone)">
+        <img id="coll-img-Ziynet_Serisi" src="" alt="Ziynet Serisi" style="width:100%;height:100%;object-fit:cover;display:none">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px" id="coll-placeholder-Ziynet_Serisi">
+          <div style="font-size:32px">🖼️</div>
+          <div style="font-size:12px;color:var(--ink3)">Fotoğraf yok</div>
+        </div>
+        <label style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;padding:6px 10px;border-radius:4px;font-size:12px;cursor:pointer">
+          📷 Değiştir
+          <input type="file" accept="image/*" style="display:none" onchange="uploadCollectionCover('Ziynet Serisi', this)">
+        </label>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-family:var(--fd);font-size:18px;margin-bottom:4px">Ziynet Serisi</div>
+        <div style="font-size:13px;color:var(--ink3)" id="coll-prod-count-Ziynet_Serisi">Yükleniyor...</div>
+      </div>
+    </div>
+    <div class="af-card" style="padding:0;overflow:hidden">
+      <div style="position:relative;aspect-ratio:3/2;background:var(--bone)">
+        <img id="coll-img-İz_Serisi" src="" alt="İz Serisi" style="width:100%;height:100%;object-fit:cover;display:none">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px" id="coll-placeholder-İz_Serisi">
+          <div style="font-size:32px">🖼️</div>
+          <div style="font-size:12px;color:var(--ink3)">Fotoğraf yok</div>
+        </div>
+        <label style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;padding:6px 10px;border-radius:4px;font-size:12px;cursor:pointer">
+          📷 Değiştir
+          <input type="file" accept="image/*" style="display:none" onchange="uploadCollectionCover('İz Serisi', this)">
+        </label>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-family:var(--fd);font-size:18px;margin-bottom:4px">İz Serisi</div>
+        <div style="font-size:13px;color:var(--ink3)" id="coll-prod-count-İz_Serisi">Yükleniyor...</div>
+      </div>
+    </div>
+    <div class="af-card" style="padding:0;overflow:hidden">
+      <div style="position:relative;aspect-ratio:3/2;background:var(--bone)">
+        <img id="coll-img-Zerre_Serisi" src="" alt="Zerre Serisi" style="width:100%;height:100%;object-fit:cover;display:none">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px" id="coll-placeholder-Zerre_Serisi">
+          <div style="font-size:32px">🖼️</div>
+          <div style="font-size:12px;color:var(--ink3)">Fotoğraf yok</div>
+        </div>
+        <label style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;padding:6px 10px;border-radius:4px;font-size:12px;cursor:pointer">
+          📷 Değiştir
+          <input type="file" accept="image/*" style="display:none" onchange="uploadCollectionCover('Zerre Serisi', this)">
+        </label>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-family:var(--fd);font-size:18px;margin-bottom:4px">Zerre Serisi</div>
+        <div style="font-size:13px;color:var(--ink3)" id="coll-prod-count-Zerre_Serisi">Yükleniyor...</div>
+      </div>
+    </div>
+    <div class="af-card" style="padding:0;overflow:hidden">
+      <div style="position:relative;aspect-ratio:3/2;background:var(--bone)">
+        <img id="coll-img-Sukun_Serisi" src="" alt="Sukun Serisi" style="width:100%;height:100%;object-fit:cover;display:none">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px" id="coll-placeholder-Sukun_Serisi">
+          <div style="font-size:32px">🖼️</div>
+          <div style="font-size:12px;color:var(--ink3)">Fotoğraf yok</div>
+        </div>
+        <label style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;padding:6px 10px;border-radius:4px;font-size:12px;cursor:pointer">
+          📷 Değiştir
+          <input type="file" accept="image/*" style="display:none" onchange="uploadCollectionCover('Sukun Serisi', this)">
+        </label>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-family:var(--fd);font-size:18px;margin-bottom:4px">Sukun Serisi</div>
+        <div style="font-size:13px;color:var(--ink3)" id="coll-prod-count-Sukun_Serisi">Yükleniyor...</div>
+      </div>
+    </div>
+    <div class="af-card" style="padding:0;overflow:hidden">
+      <div style="position:relative;aspect-ratio:3/2;background:var(--bone)">
+        <img id="coll-img-Eşik" src="" alt="Eşik" style="width:100%;height:100%;object-fit:cover;display:none">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px" id="coll-placeholder-Eşik">
+          <div style="font-size:32px">🖼️</div>
+          <div style="font-size:12px;color:var(--ink3)">Fotoğraf yok</div>
+        </div>
+        <label style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;padding:6px 10px;border-radius:4px;font-size:12px;cursor:pointer">
+          📷 Değiştir
+          <input type="file" accept="image/*" style="display:none" onchange="uploadCollectionCover('Eşik', this)">
+        </label>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-family:var(--fd);font-size:18px;margin-bottom:4px">Eşik</div>
+        <div style="font-size:13px;color:var(--ink3)" id="coll-prod-count-Eşik">Yükleniyor...</div>
+      </div>
+    </div>
+    <div class="af-card" style="padding:0;overflow:hidden">
+      <div style="position:relative;aspect-ratio:3/2;background:var(--bone)">
+        <img id="coll-img-Vuslat_Serisi" src="" alt="Vuslat Serisi" style="width:100%;height:100%;object-fit:cover;display:none">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px" id="coll-placeholder-Vuslat_Serisi">
+          <div style="font-size:32px">🖼️</div>
+          <div style="font-size:12px;color:var(--ink3)">Fotoğraf yok</div>
+        </div>
+        <label style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;padding:6px 10px;border-radius:4px;font-size:12px;cursor:pointer">
+          📷 Değiştir
+          <input type="file" accept="image/*" style="display:none" onchange="uploadCollectionCover('Vuslat Serisi', this)">
+        </label>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-family:var(--fd);font-size:18px;margin-bottom:4px">Vuslat Serisi</div>
+        <div style="font-size:13px;color:var(--ink3)" id="coll-prod-count-Vuslat_Serisi">Yükleniyor...</div>
+      </div>
+    </div>
+  </div><div id="coll-cards-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;padding:24px">
     <div class="af-card" style="padding:0;overflow:hidden">
       <div style="position:relative;aspect-ratio:3/2;background:var(--bone)">
         <img id="coll-img-Anahtar" src="" alt="Anahtar" style="width:100%;height:100%;object-fit:cover;display:none">
@@ -1196,7 +1351,7 @@ async function adminLogout(){
 
 /* ── Koleksiyon Yönetimi ── */
 function getCollections(){
-  try { return JSON.parse(localStorage.getItem('hyz_admin_collections')||'null') || ['Anahtar Serisi','Sukun Serisi','İz Serisi','Hal Serisi','Ziynet Serisi','Vuslat Serisi','Nur Serisi']; } catch(e) { return ['Anahtar Serisi','Sukun Serisi','İz Serisi','Hal Serisi','Ziynet Serisi','Vuslat Serisi','Nur Serisi']; }
+  try { return JSON.parse(localStorage.getItem('hyz_admin_collections')||'null') || ['Anahtar Serisi','Nur Serisi','Hal Serisi','Ziynet Serisi','İz Serisi','Zerre Serisi','Sukun Serisi','Eşik','Vuslat Serisi']; } catch(e) { return ['Anahtar Serisi','Nur Serisi','Hal Serisi','Ziynet Serisi','İz Serisi','Zerre Serisi','Sukun Serisi','Eşik','Vuslat Serisi']; }
 }
 function saveCollections(arr){ localStorage.setItem('hyz_admin_collections', JSON.stringify(arr)); }
 const COLL_BUCKET = 'products';
