@@ -1583,7 +1583,7 @@ function showAP(name, btn){
   if(name === 'stock') loadStock();
   if(name === 'addprod') setTimeout(buildVariantMatrix, 300);
   if(name === 'collections') loadCollections();
-  if(name === 'accounting'){ loadAccounting(); loadSuppliers(); }
+  if(name === 'accounting'){ loadAccounting(); loadSuppliers().catch(()=>{}); }
   if(name === 'customers') loadCustomers();
   if(name === 'investor') loadInvestor();
 }
@@ -1593,7 +1593,7 @@ async function loadStock(){
   const container = document.getElementById('stk-grid-container');
   if(!container) return;
   container.innerHTML = '<div style="color:var(--ink3);font-size:13px;padding:20px">Yükleniyor…</div>';
-  const {data:products, error} = await _sb.from('products').select('*').order('created_at',{ascending:true});
+  const {data:products, error} = await _sb.from('products').select('id,name_tr,name,sku,stock,variants,images').order('created_at',{ascending:true});
   if(error || !products || products.length === 0){
     container.innerHTML = '<div style="color:var(--ink3);font-size:13px;padding:20px">Ürün bulunamadı</div>';
     return;
