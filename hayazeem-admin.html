@@ -407,6 +407,8 @@ img{display:block;object-fit:cover}
           <option value="Sukun Serisi">Sukun Serisi</option>
           <option value="Eşik">Eşik</option>
           <option value="Vuslat Serisi">Vuslat Serisi</option>
+          <option value="Hayazeeem Select">Hayazeeem Select</option>
+          <option value="Aksesuar">Aksesuar</option>
         </select>
       </div>
 
@@ -1060,7 +1062,7 @@ async function adminLogout(){
 
 /* ── Koleksiyon Yönetimi ── */
 function getCollections(){
-  try { return JSON.parse(localStorage.getItem('hyz_admin_collections')||'null') || ['Anahtar Serisi','Nur Serisi','Hal Serisi','Ziynet Serisi','İz Serisi','Zerre Serisi','Sukun Serisi','Eşik','Vuslat Serisi']; } catch(e) { return ['Anahtar Serisi','Nur Serisi','Hal Serisi','Ziynet Serisi','İz Serisi','Zerre Serisi','Sukun Serisi','Eşik','Vuslat Serisi']; }
+  try { return JSON.parse(localStorage.getItem('hyz_admin_collections')||'null') || ['Anahtar Serisi','Nur Serisi','Hal Serisi','Ziynet Serisi','İz Serisi','Zerre Serisi','Sukun Serisi','Eşik','Vuslat Serisi','Hayazeeem Select','Aksesuar']; } catch(e) { return ['Anahtar Serisi','Nur Serisi','Hal Serisi','Ziynet Serisi','İz Serisi','Zerre Serisi','Sukun Serisi','Eşik','Vuslat Serisi','Hayazeeem Select','Aksesuar']; }
 }
 function saveCollections(arr){ localStorage.setItem('hyz_admin_collections', JSON.stringify(arr)); }
 const COLL_BUCKET = 'products';
@@ -1105,7 +1107,7 @@ async function loadCollections(){
     const collFileMap = {
       'Anahtar Serisi':'Anahtar','Nur Serisi':'Nefes','Hal Serisi':'Hal',
       'Ziynet Serisi':'Saye','İz Serisi':'Iz','Zerre Serisi':'Zerre',
-      'Sukun Serisi':'Sukun','Vuslat Serisi':'Vuslat','Eşik':null
+      'Sukun Serisi':'Sukun','Vuslat Serisi':'Vuslat','Eşik':null,'Hayazeeem Select':null,'Aksesuar':null
     };
     const fileKey = collFileMap[name];
     if(!fileKey){ return; } // Eşik için dosya yok henüz
