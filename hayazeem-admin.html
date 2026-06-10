@@ -1346,13 +1346,13 @@ async function saveProd(statusOverride){
   };
   // Otomatik SKU üret
   if(!prodData.sku){
-    const {data:skuData}=await _sb.from('products').select('sku').not('sku','is',null).order('created_at',{ascending:false});
+    const {data:allProds}=await _sb.from('products').select('sku');
     let nextNum=1;
-    if(skuData&&skuData.length){
-      const nums=skuData.map(r=>{const m=(r.sku||'').match(/AZM-(\d+)/i);return m?parseInt(m[1]):0;}).filter(n=>n>0);
+    if(allProds&&allProds.length){
+      const nums=allProds.map(r=>{const m=(r.sku||'').match(/(?:HYZ|AZM)-(\d+)/i);return m?parseInt(m[1]):0;}).filter(n=>n>0);
       if(nums.length) nextNum=Math.max(...nums)+1;
     }
-    prodData.sku='AZM-'+String(nextNum).padStart(2,'0');
+    prodData.sku='HYZ-'+String(nextNum).padStart(3,'0');
     const skuEl=document.getElementById('prod-sku');if(skuEl)skuEl.value=prodData.sku;
   }
   const btn=document.querySelector('#ap-addprod .btn-g');
