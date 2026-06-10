@@ -1108,10 +1108,9 @@ async function loadCollections(){
     const collFileMap = {
       'Anahtar Serisi':'Anahtar','Nur Serisi':'Nefes','Hal Serisi':'Hal',
       'Ziynet Serisi':'Saye','İz Serisi':'Iz','Zerre Serisi':'Zerre',
-      'Sukun Serisi':'Sukun','Vuslat Serisi':'Vuslat','Eşik':null,'Hayazeeem Select':null,'Aksesuar':null
+      'Sukun Serisi':'Sukun','Vuslat Serisi':'Vuslat','Eşik':'Esik'
     };
-    const fileKey = collFileMap[name];
-    if(!fileKey){ return; } // Eşik için dosya yok henüz
+    const fileKey = collFileMap[name] || name.replace(/ /g,'_');
     const url = COLL_BASE_URL + 'collection_' + fileKey + '.jpg';
     const img = document.getElementById('coll-img-'+name);
     const placeholder = document.getElementById('coll-placeholder-'+name);
