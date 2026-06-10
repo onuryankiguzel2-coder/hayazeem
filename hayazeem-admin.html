@@ -2656,7 +2656,7 @@ function buildVariantMatrix(existingVariants){
   const prev = {};
   container.querySelectorAll('.vmat-in').forEach(inp => { prev[inp.dataset.color+'__'+inp.dataset.size] = parseInt(inp.value)||0; });
   const varMap = {};
-  if(existingVariants) existingVariants.forEach(v => { varMap[v.color+'__'+v.size] = v.stock||0; });
+  if(existingVariants) existingVariants.forEach(v => { varMap[v.color.toUpperCase()+'__'+v.size.toUpperCase()] = v.stock||0; });
   let html = '<table class="vmat-table"><thead><tr><th>Renk \ Beden</th>';
   sizes.forEach(s => { html += `<th>${s}</th>`; });
   html += '</tr></thead><tbody>';
@@ -2664,7 +2664,8 @@ function buildVariantMatrix(existingVariants){
     html += `<tr><td>${color}</td>`;
     sizes.forEach(size => {
       const k = color+'__'+size;
-      const val = varMap[k] ?? prev[k] ?? 0;
+      const kUp = color.toUpperCase()+'__'+size.toUpperCase();
+      const val = varMap[kUp] ?? prev[k] ?? 0;
       const cls = val===0?'zero':val<=3?'low':'';
       html += `<td><input class="vmat-in ${cls}" data-color="${color}" data-size="${size}" value="${val}" type="number" min="0" oninput="updateVariantTotal();this.className='vmat-in '+(parseInt(this.value)===0?'zero':parseInt(this.value)<=3?'low':'')"></td>`;
     });
