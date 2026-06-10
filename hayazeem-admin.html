@@ -1196,7 +1196,7 @@ async function adminLogout(){
 
 /* ── Koleksiyon Yönetimi ── */
 function getCollections(){
-  try { return JSON.parse(localStorage.getItem('hyz_admin_collections')||'null') || ['Anahtar','Sükun','İz','Hal','Saye','Zerre','Vuslat','Nefes']; } catch(e) { return ['Anahtar','Sükun','İz','Hal','Saye','Zerre','Vuslat','Nefes']; }
+  try { return JSON.parse(localStorage.getItem('hyz_admin_collections')||'null') || ['Anahtar Serisi','Sukun Serisi','İz Serisi','Hal Serisi','Ziynet Serisi','Vuslat Serisi','Nur Serisi']; } catch(e) { return ['Anahtar Serisi','Sukun Serisi','İz Serisi','Hal Serisi','Ziynet Serisi','Vuslat Serisi','Nur Serisi']; }
 }
 function saveCollections(arr){ localStorage.setItem('hyz_admin_collections', JSON.stringify(arr)); }
 const COLL_BUCKET = 'products';
@@ -1412,6 +1412,30 @@ async function editProduct(id){
     _imgs=data.images||[];
     const prev=document.getElementById('image-previews');
     if(prev)prev.innerHTML=_imgs.map(img=>`<div class="up-img"><img src="${img}" style="width:100%;height:100%;object-fit:cover"><button class="up-del" onclick="this.closest('.up-img').remove()">×</button></div>`).join('');
+    // Renk ve beden chip'lerini doldur
+    const sizeChipsEl = document.getElementById('size-chips');
+    const colorChipsEl = document.getElementById('color-chips');
+    if(sizeChipsEl && colorChipsEl){
+      // Mevcut chip'leri temizle (input hariç)
+      [...sizeChipsEl.querySelectorAll('.v-chip')].forEach(c=>c.remove());
+      [...colorChipsEl.querySelectorAll('.v-chip')].forEach(c=>c.remove());
+      const existingSizes = data.sizes||[];
+      const existingColors = data.colors||[];
+      existingSizes.forEach(s=>{
+        const chip=document.createElement('span');
+        chip.className='v-chip';
+        chip.innerHTML=`${s} <button class="v-chip-x" onclick="rmChip(this);buildVariantMatrix()">×</button>`;
+        sizeChipsEl.insertBefore(chip, sizeChipsEl.querySelector('.add-chip'));
+      });
+      existingColors.forEach(c=>{
+        const chip=document.createElement('span');
+        chip.className='v-chip';
+        chip.innerHTML=`${c} <button class="v-chip-x" onclick="rmChip(this);buildVariantMatrix()">×</button>`;
+        colorChipsEl.insertBefore(chip, colorChipsEl.querySelector('.add-chip'));
+      });
+      // Variant matrisini mevcut stok verileriyle oluştur
+      setTimeout(()=>buildVariantMatrix(data.variants||[]), 50);
+    }
     const saveBtn=document.querySelector('#ap-addprod .btn-g');
     if(saveBtn){saveBtn.textContent='Güncelle';saveBtn.onclick=()=>updateProduct(id);}
   },150);
