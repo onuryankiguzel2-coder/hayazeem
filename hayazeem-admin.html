@@ -1369,7 +1369,7 @@ async function updateProduct(id){
 
 /* ── Siparişler ── */
 async function loadOrders(){
-  const {data,error}=await _sb.from('orders').select('*').order('created_at',{ascending:false});
+  const {data,error}=await _sb.from('orders').select('*').neq('status','pending_payment').order('created_at',{ascending:false});
   if(error||!data)return;
   const tbody=document.querySelector('#ap-orders .tbl tbody');
   if(!tbody)return;
@@ -1513,7 +1513,7 @@ async function loadCampaigns(){
 
 /* ── Yatırımcı Paneli ── */
 async function loadInvestor(){
-  const {data:orders} = await _sb.from('orders').select('total,created_at,status,items,shipping_address').neq('status','cancelled');
+  const {data:orders} = await _sb.from('orders').select('total,created_at,status,items,shipping_address').neq('status','cancelled').neq('status','pending_payment');
   if(!orders) return;
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
@@ -1676,7 +1676,7 @@ async function loadAccounting(){
   const monthEnd = new Date(now.getFullYear(), now.getMonth()+1, 1).toISOString();
 
   // Sipariş geliri
-  const {data:orders} = await _sb.from('orders').select('id,total,created_at,status').neq('status','cancelled');
+  const {data:orders} = await _sb.from('orders').select('id,total,created_at,status').neq('status','cancelled').neq('status','pending_payment');
   // Manuel işlemler
   const {data:txList} = await _sb.from('transactions').select('*').order('created_at',{ascending:false});
   const monthOrders = (orders||[]).filter(o => o.created_at >= monthStart && o.created_at <= monthEnd);
@@ -1819,7 +1819,7 @@ async function loadCustomers(){
   // Profilleri ve siparişleri çek
   const [{data:profiles},{data:orders}] = await Promise.all([
     _sb.from('profiles').select('id,full_name,created_at').order('created_at',{ascending:false}),
-    _sb.from('orders').select('user_id,total,created_at,status').neq('status','cancelled')
+    _sb.from('orders').select('user_id,total,created_at,status').neq('status','cancelled').neq('status','pending_payment')
   ]);
 
   if(!profiles || profiles.length === 0){
@@ -2023,7 +2023,7 @@ async function loadDashboard(){
   const todayISO = today.toISOString();
 
   // Tüm siparişler
-  const {data:allOrders} = await _sb.from('orders').select('total,status,created_at');
+  const {data:allOrders} = await _sb.from('orders').select('total,status,created_at').neq('status','pending_payment');
   if(!allOrders) return;
 
   const todayOrders = allOrders.filter(o => new Date(o.created_at) >= today);
@@ -2036,7 +2036,7 @@ async function loadDashboard(){
   el('dash-pending', pendingOrders.length);
 
   // Son siparişler
-  const {data:recentOrders} = await _sb.from('orders').select('*').order('created_at',{ascending:false}).limit(5);
+  const {data:recentOrders} = await _sb.from('orders').select('*').neq('status','pending_payment').order('created_at',{ascending:false}).limit(5);
   const recentEl = document.getElementById('dash-recent-orders');
   if(recentEl && recentOrders){
     if(recentOrders.length === 0){
