@@ -1996,7 +1996,7 @@ function toast(msg){
         <textarea class="afta" placeholder="Operasyon notu ekleyin…" style="min-height:72px;margin-bottom:12px"></textarea>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <button class="btn btn-p btn-sm" onclick="toast('Durum güncellendi ✓');closeModal('order-detail-modal')">Kaydet & Kapat</button>
-          <button class="btn btn-o btn-sm" onclick="printCargoLabel(document.querySelector('.odm-title').textContent)">🖨 Kargo Etiketi</button>
+          <button class="btn btn-o btn-sm" onclick="printCargoLabel(document.querySelector('.odm-title').textContent, document.getElementById('order-detail-modal').dataset.orderId)">🖨 Kargo Etiketi</button>
           <button class="btn btn-o btn-sm" onclick="sendInvoice(document.querySelector('.odm-title').textContent)">📧 Fatura Gönder</button>
         </div>
       </div>
@@ -3001,17 +3001,7 @@ if(rolesPage){
   });
 }
 
-/* ── Sipariş detay modalında kargo/fatura butonları ── */
-const odModal = document.getElementById('order-detail-modal');
-if(odModal){
-  const actionBar = odModal.querySelector('.od-actions') || odModal.querySelector('[style*="gap"]');
-  if(actionBar){
-    const kargoBtn = actionBar.querySelector('[onclick*="Kargo"]') || actionBar.querySelector('[onclick*="kargo"]');
-    const fBtn = actionBar.querySelector('[onclick*="Fatura"]') || actionBar.querySelector('[onclick*="fatura"]');
-    if(kargoBtn) kargoBtn.onclick=()=>printCargoLabel(document.getElementById('od-num')?.textContent);
-    if(fBtn) fBtn.onclick=()=>sendInvoice(document.getElementById('od-num')?.textContent);
-  }
-}
+/* ── Sipariş detay modalında kargo/fatura butonları — orderId modal.dataset'ten alınır ── */
 
 /* ── Kategoriler sayfası sidebar'da yoksa ekle ── */
 if(sbNav && !document.querySelector('[onclick*="categories"]')){
