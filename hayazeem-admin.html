@@ -537,7 +537,6 @@ img{display:block;object-fit:cover}
     <div class="mc"><div class="mc-lbl">Ürün Maliyeti (Satılan)</div><div class="mc-val" id="acc-cogs" style="color:var(--err)">₺0</div><div class="mc-ch" id="acc-cogs-margin">—</div></div>
     <div class="mc"><div class="mc-lbl">Brüt Kar</div><div class="mc-val" id="acc-gross" style="color:var(--ok)">₺0</div><div class="mc-ch pos" id="acc-gross-margin">—</div></div>
     <div class="mc"><div class="mc-lbl">Alacaklar</div><div class="mc-val" id="acc-alacak" style="color:var(--gold-dk)">₺0</div></div>
-    <div class="mc"><div class="mc-lbl">iyzico Komisyonu</div><div class="mc-val" id="acc-iyzico" style="color:var(--err)">₺0</div><div class="mc-ch neg" id="acc-iyzico-detail">%4,29 + ₺0,25/sipariş</div></div>
     <div class="mc"><div class="mc-lbl">Net Kar</div><div class="mc-val" id="acc-kar" style="color:var(--ok)">₺0</div><div class="mc-ch pos">—</div></div>
   </div>
 
@@ -1369,7 +1368,7 @@ async function updateProduct(id){
 
 /* ── Siparişler ── */
 async function loadOrders(){
-  const {data,error}=await _sb.from('orders').select('*').neq('status','pending_payment').order('created_at',{ascending:false});
+  const {data,error}=await _sb.from('orders').select('*').order('created_at',{ascending:false});
   if(error||!data)return;
   const tbody=document.querySelector('#ap-orders .tbl tbody');
   if(!tbody)return;
@@ -1513,7 +1512,7 @@ async function loadCampaigns(){
 
 /* ── Yatırımcı Paneli ── */
 async function loadInvestor(){
-  const {data:orders} = await _sb.from('orders').select('total,created_at,status,items,shipping_address').neq('status','cancelled').neq('status','pending_payment');
+  const {data:orders} = await _sb.from('orders').select('total,created_at,status,items,shipping_address').neq('status','cancelled');
   if(!orders) return;
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
@@ -1676,7 +1675,7 @@ async function loadAccounting(){
   const monthEnd = new Date(now.getFullYear(), now.getMonth()+1, 1).toISOString();
 
   // Sipariş geliri
-  const {data:orders} = await _sb.from('orders').select('id,total,created_at,status').neq('status','cancelled').neq('status','pending_payment');
+  const {data:orders} = await _sb.from('orders').select('id,total,created_at,status').neq('status','cancelled');
   // Manuel işlemler
   const {data:txList} = await _sb.from('transactions').select('*').order('created_at',{ascending:false});
   const monthOrders = (orders||[]).filter(o => o.created_at >= monthStart && o.created_at <= monthEnd);
@@ -1689,18 +1688,8 @@ async function loadAccounting(){
     .filter(t => { const d=t.date||t.created_at; return d >= monthStart && d <= monthEnd; })
     .reduce((s,t) => s+(parseFloat(t.amount)||0), 0);
   const totalGider = giderler.reduce((s,t) => s+(parseFloat(t.amount)||0), 0);
-  // iyzico komisyonu: %4.29 + 0.25₺ / sipariş (yalnızca online ödenen siparişler)
-  const IYZICO_RATE = 0.0429;
-  const IYZICO_FIXED = 0.25;
-  const monthOrderCount = monthOrders.length;
-  const totalOrderCount = (orders||[]).length;
-  const monthIyzico = monthOrders.reduce((s,o) => s + (o.total||0)*IYZICO_RATE + IYZICO_FIXED, 0);
-  const totalIyzico = (orders||[]).reduce((s,o) => s + (o.total||0)*IYZICO_RATE + IYZICO_FIXED, 0);
-  const monthNetRevenue = monthRevenue - monthIyzico;
-  const totalNetRevenue = totalRevenue - totalIyzico;
-
-  const monthNet = monthNetRevenue - monthGider;
-  const totalNet = totalNetRevenue - totalGider;
+  const monthNet = monthRevenue - monthGider;
+  const totalNet = totalRevenue - totalGider;
 
   // Alacaklar
   const alacaklar = (txList||[]).filter(t => t.type==='alacak');
@@ -1711,11 +1700,6 @@ async function loadAccounting(){
   el('acc-revenue', '₺'+monthRevenue.toLocaleString('tr-TR'));
   el('acc-total-revenue', '₺'+totalRevenue.toLocaleString('tr-TR'));
   el('acc-gider', '₺'+totalGider.toLocaleString('tr-TR'));
-  // iyzico komisyon göster
-  const iyzicoEl = document.getElementById('acc-iyzico');
-  if(iyzicoEl) iyzicoEl.textContent = '-₺'+totalIyzico.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
-  const iyzicoDetailEl = document.getElementById('acc-iyzico-detail');
-  if(iyzicoDetailEl) iyzicoDetailEl.textContent = totalOrderCount+' sipariş · ₺'+totalIyzico.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
   if(document.getElementById('acc-ciro')) document.getElementById('acc-ciro').textContent = '₺'+monthRevenue.toLocaleString('tr-TR');
   if(document.getElementById('acc-kar')) document.getElementById('acc-kar').textContent = '₺'+monthNet.toLocaleString('tr-TR');
 
@@ -1819,7 +1803,7 @@ async function loadCustomers(){
   // Profilleri ve siparişleri çek
   const [{data:profiles},{data:orders}] = await Promise.all([
     _sb.from('profiles').select('id,full_name,created_at').order('created_at',{ascending:false}),
-    _sb.from('orders').select('user_id,total,created_at,status').neq('status','cancelled').neq('status','pending_payment')
+    _sb.from('orders').select('user_id,total,created_at,status').neq('status','cancelled')
   ]);
 
   if(!profiles || profiles.length === 0){
@@ -2023,11 +2007,11 @@ async function loadDashboard(){
   const todayISO = today.toISOString();
 
   // Tüm siparişler
-  const {data:allOrders} = await _sb.from('orders').select('total,status,created_at').neq('status','pending_payment');
+  const {data:allOrders} = await _sb.from('orders').select('total,status,created_at');
   if(!allOrders) return;
 
-  const todayOrders = allOrders.filter(o => new Date(o.created_at) >= today);
-  const pendingOrders = allOrders.filter(o => !['delivered','cancelled'].includes(o.status||'pending'));
+  const todayOrders = allOrders.filter(o => new Date(o.created_at) >= today && !['cancelled','pending_payment'].includes(o.status||''));
+  const pendingOrders = allOrders.filter(o => !['delivered','cancelled','pending_payment'].includes(o.status||'pending'));
   const todayRevenue = todayOrders.reduce((s,o) => s + (o.total||0), 0);
 
   const el = (id, val) => { const e = document.getElementById(id); if(e) e.textContent = val; };
@@ -2036,7 +2020,7 @@ async function loadDashboard(){
   el('dash-pending', pendingOrders.length);
 
   // Son siparişler
-  const {data:recentOrders} = await _sb.from('orders').select('*').neq('status','pending_payment').order('created_at',{ascending:false}).limit(5);
+  const {data:recentOrders} = await _sb.from('orders').select('*').order('created_at',{ascending:false}).limit(5);
   const recentEl = document.getElementById('dash-recent-orders');
   if(recentEl && recentOrders){
     if(recentOrders.length === 0){
@@ -2503,18 +2487,11 @@ function renderAccTransactions(filter){
   if(!txEl) return;
   const orders = window._txCache.orders || [];
   const manual = window._txCache.manual || [];
-  const IYZICO_RATE = 0.0429, IYZICO_FIXED = 0.25;
-  const orderRows = orders.map(o => {
-    const gross = o.total||0;
-    const commission = gross*IYZICO_RATE + IYZICO_FIXED;
-    const net = gross - commission;
-    return {
-      id: o.id||null, isOrder: true,
-      date: new Date(o.created_at), type:'gelir',
-      desc:'Sipariş Geliri · Net (iyzico komisyonu: -₺'+commission.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})+')',
-      amount: net, badge:'b-done', label:'Gelir', sign:'+'
-    };
-  });
+  const orderRows = orders.map(o => ({
+    id: o.id||null, isOrder: true,
+    date: new Date(o.created_at), type:'gelir', desc:'Sipariş Geliri',
+    amount: o.total||0, badge:'b-done', label:'Gelir', sign:'+'
+  }));
   const manualRows = manual.map(t => ({
     id: t.id||null,
     date: new Date(t.date||t.created_at), type:t.type, desc:t.description||t.category||'İşlem',
@@ -2693,12 +2670,12 @@ async function deleteTx(id){
 }
 
 async function deleteOrder(id){
-  if(!confirm("Bu sipariş kaydını silmek istediğinize emin misiniz?\n(Sadece test/hatalı kayıtları silin)")) return;
-  const {error} = await _sb.from("orders").delete().eq("id", id);
-  if(error){ toast("Silinemedi: " + error.message); return; }
+  if(!confirm("Bu sipariş kaydını işlem geçmişinden kaldırmak istediğinize emin misiniz?\n(Sipariş iptal olarak işaretlenecek)")) return;
+  const {error} = await _sb.from("orders").update({status:'cancelled'}).eq("id", id);
+  if(error){ toast("İşlem yapılamadı: " + error.message); return; }
   window._txCache.orders = (window._txCache.orders||[]).filter(o => o.id !== id);
   renderAccTransactions(window._activeTxFilter||"hepsi");
-  toast("Sipariş kaydı silindi ✓");
+  toast("Sipariş iptal edildi ve geçmişten kaldırıldı ✓");
 }
 
 const supplierHistory={
