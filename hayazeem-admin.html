@@ -306,7 +306,7 @@ img{display:block;object-fit:cover}
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <input class="afi" placeholder="Sipariş no / müşteri…" style="width:200px;margin:0;padding:9px 12px" type="search">
       <select class="afs" style="width:160px;margin:0;padding:9px 12px">
-        <option>Tüm Durumlar</option><option>Yeni</option><option>Hazırlanıyor</option><option>Kargoda</option><option>Teslim Edildi</option><option>İptal</option>
+        <option>Tüm Durumlar</option><option>Ödeme Bekliyor</option><option>Yeni</option><option>Hazırlanıyor</option><option>Kargoda</option><option>Teslim Edildi</option><option>İptal</option>
       </select>
       <button class="btn btn-sm btn-p" onclick="toast('CSV indirildi')">İndir CSV</button>
     </div>
@@ -1369,19 +1369,20 @@ async function updateProduct(id){
 
 /* ── Siparişler ── */
 async function loadOrders(){
-  const {data,error}=await _sb.from('orders').select('*').neq('status','pending_payment').order('created_at',{ascending:false});
+  const {data,error}=await _sb.from('orders').select('*').order('created_at',{ascending:false});
   if(error||!data)return;
   const tbody=document.querySelector('#ap-orders .tbl tbody');
   if(!tbody)return;
-  const sm={pending:'Bekliyor',confirmed:'Onaylandı',shipped:'Kargoda',delivered:'Teslim',cancelled:'İptal'};
-  const bm={pending:'b-pend',confirmed:'b-ship',shipped:'b-ship',delivered:'b-done',cancelled:'b-cancel'};
+  const sm={pending:'Bekliyor',pending_payment:'Ödeme Bekliyor',confirmed:'Onaylandı',shipped:'Kargoda',delivered:'Teslim',cancelled:'İptal'};
+  const bm={pending:'b-pend',pending_payment:'b-pend',confirmed:'b-ship',shipped:'b-ship',delivered:'b-done',cancelled:'b-cancel'};
   tbody.innerHTML=data.map(o=>{
     const items=Array.isArray(o.items)?o.items:[];
     const sum=items.map(i=>i.name_tr||i.name||'Ürün').join(', ').slice(0,35)||'—';
     const dt=new Date(o.created_at).toLocaleDateString('tr-TR');
     const st=o.status||'pending';
-    return `<tr>
-      <td style="font-weight:500">#HYZ-${o.id.slice(0,8).toUpperCase()}</td>
+    const rowStyle=st==='pending_payment'?'background:rgba(201,169,110,.08);border-left:3px solid var(--gold)':'';
+    return `<tr style="${rowStyle}">
+      <td style="font-weight:500">#HYZ-${o.id.slice(0,8).toUpperCase()}${st==='pending_payment'?' <span title="Ödeme bekliyor" style="color:var(--gold)">⚠</span>':''}</td>
       <td>${(o.shipping_address?.full_name)||o.guest_email||'—'}</td>
       <td style="color:var(--ink3);font-size:12px">${sum}</td>
       <td style="font-family:var(--fd);font-size:16px">₺${(o.total||0).toLocaleString('tr-TR')}</td>
@@ -1392,7 +1393,7 @@ async function loadOrders(){
         <button class="btn btn-o btn-sm" onclick="printCargoLabel('#HYZ-${o.id.slice(0,8).toUpperCase()}','${o.id}')">🖨</button>
         <select class="afs" style="padding:6px 8px;font-size:11px;margin:0;height:32px" onchange="updateOrderStatus('${o.id}',this.value,this)">
           <option value="">Durum ▾</option>
-          <option value="confirmed">Onayla</option><option value="shipped">Kargoya Ver</option>
+          <option value="confirmed">Onayla (Ödendi)</option><option value="shipped">Kargoya Ver</option>
           <option value="delivered">Teslim Edildi</option><option value="cancelled">İptal Et</option>
         </select>
       </td>
@@ -1938,7 +1939,7 @@ function toast(msg){
   <div class="odm">
     <div class="odm-head">
       <div>
-        <div class="odm-title" id="odm-order-no">#HYZ---------</div>
+        <div class="odm-title">#HYZ---------</div>
         <div style="font-size:12px;color:var(--ink3);margin-top:2px" id="odm-date">—</div>
       </div>
       <button class="odm-close" onclick="closeModal('order-detail-modal')">✕</button>
@@ -1996,7 +1997,7 @@ function toast(msg){
         <textarea class="afta" placeholder="Operasyon notu ekleyin…" style="min-height:72px;margin-bottom:12px"></textarea>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <button class="btn btn-p btn-sm" onclick="toast('Durum güncellendi ✓');closeModal('order-detail-modal')">Kaydet & Kapat</button>
-          <button class="btn btn-o btn-sm" onclick="printCargoLabel(document.getElementById('odm-order-no').textContent, document.getElementById('order-detail-modal').dataset.orderId)">🖨 Kargo Etiketi</button>
+          <button class="btn btn-o btn-sm" onclick="printCargoLabel(document.querySelector('.odm-title').textContent)">🖨 Kargo Etiketi</button>
           <button class="btn btn-o btn-sm" onclick="sendInvoice(document.querySelector('.odm-title').textContent)">📧 Fatura Gönder</button>
         </div>
       </div>
@@ -2125,7 +2126,7 @@ async function openOrderDetail(orderNo, orderId){
     if(allOrders) order = allOrders.find(o => '#HYZ-'+o.id.slice(0,8).toUpperCase() === orderNo);
   }
 
-  const title = m.querySelector('#odm-order-no') || m.querySelector('.odm-title');
+  const title = m.querySelector('.odm-title');
   if(title) title.textContent = orderNo;
   const dateEl = document.getElementById('odm-date');
   if(dateEl && order?.created_at){
