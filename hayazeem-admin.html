@@ -1823,44 +1823,61 @@ async function loadCustomers(){
     return;
   }
 
-  // Siparişleri kullanıcıya göre grupla
-  const orderMap = {};
+  // Siparişleri kullanıcı ve misafir emaile göre grupla
+  const orderMap = {}; // key: user_id veya email
   (orders||[]).forEach(o => {
-    if(!o.user_id) return;
-    if(!orderMap[o.user_id]) orderMap[o.user_id] = {count:0, total:0, last:null, email:null};
-    orderMap[o.user_id].count++;
-    orderMap[o.user_id].total += (o.total||0);
-    if(!orderMap[o.user_id].last || o.created_at > orderMap[o.user_id].last)
-      orderMap[o.user_id].last = o.created_at;
-    if(!orderMap[o.user_id].email)
-      orderMap[o.user_id].email = o.guest_email || o.shipping_address?.email || null;
+    const email = o.guest_email || o.shipping_address?.email || null;
+    const key = o.user_id || email;
+    if(!key) return;
+    if(!orderMap[key]) orderMap[key] = {count:0, total:0, last:null, email:email, name: o.shipping_address?.full_name||null, isGuest: !o.user_id};
+    orderMap[key].count++;
+    orderMap[key].total += (o.total||0);
+    if(!orderMap[key].last || o.created_at > orderMap[key].last)
+      orderMap[key].last = o.created_at;
+    if(!orderMap[key].email && email) orderMap[key].email = email;
+    if(!orderMap[key].name && o.shipping_address?.full_name) orderMap[key].name = o.shipping_address.full_name;
   });
+
+  // Kayıtlı kullanıcıları profiles'tan al, misafir siparişleri de ekle
+  const profileMap = {};
+  (profiles||[]).forEach(p => profileMap[p.id] = p);
+
+  // Misafir müşterileri (user_id olmayan sipariş emailler) bul
+  const guestEntries = Object.entries(orderMap).filter(([k,v])=>v.isGuest).map(([k,v])=>({
+    id: k, full_name: v.name, created_at: v.last, isGuest: true, _ord: v
+  }));
+
+  // Tüm müşteri listesi: kayıtlılar + misafirler
+  const allCustomers = [...(profiles||[]).map(p=>({...p, isGuest:false})), ...guestEntries];
 
   // Metrikleri hesapla
   const thirtyDaysAgo = new Date(); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate()-30);
-  const newCustomers = profiles.filter(p => new Date(p.created_at) >= thirtyDaysAgo).length;
-  const orderedCount = profiles.filter(p => orderMap[p.id]?.count > 0).length;
+  const newCustomers = allCustomers.filter(p => new Date(p.created_at) >= thirtyDaysAgo).length;
+  const orderedCount = allCustomers.filter(p => orderMap[p.id]?.count > 0).length;
   const totalSpend = (orders||[]).reduce((s,o)=>s+(o.total||0),0);
   const avgOrder = orderedCount > 0 ? Math.round(totalSpend / orderedCount) : 0;
 
   const el = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
-  el('cust-total', profiles.length);
+  el('cust-total', allCustomers.length);
   el('cust-new', newCustomers);
   el('cust-ordered', orderedCount);
   el('cust-avg', '₺'+avgOrder.toLocaleString('tr-TR'));
 
-  tbody.innerHTML = profiles.map(p => {
-    const ord = orderMap[p.id] || {count:0, total:0, last:null};
+  tbody.innerHTML = allCustomers.map(p => {
+    const ord = p.isGuest ? p._ord : (orderMap[p.id] || {count:0, total:0, last:null, email:null});
+    const displayName = p.full_name || ord?.name || (p.isGuest ? 'Misafir' : '—');
+    const displayEmail = ord?.email || '—';
     const lastDate = ord.last ? new Date(ord.last).toLocaleDateString('tr-TR') : '—';
     const segment = ord.total > 10000 ? 'VIP' : ord.count > 1 ? 'Tekrar' : ord.count === 1 ? 'Yeni' : 'Pasif';
     const segColor = segment==='VIP'?'b-ship':segment==='Tekrar'?'b-done':segment==='Yeni'?'b-pend':'b-cancel';
-    const initials = (p.full_name||'?').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+    const initials = displayName.split(' ').map(n=>n[0]||'').join('').slice(0,2).toUpperCase()||'?';
+    const guestBadge = p.isGuest ? ' <span style="font-size:10px;color:var(--ink3);background:var(--bg2);padding:1px 5px;border-radius:3px">misafir</span>' : '';
     return `<tr>
       <td><div style="display:flex;align-items:center;gap:10px">
         <div class="av" style="width:32px;height:32px;font-size:12px;background:#e8d5a3;flex-shrink:0">${initials}</div>
-        <span style="font-size:13px;font-weight:500">${p.full_name||'—'}</span>
+        <span style="font-size:13px;font-weight:500">${displayName}${guestBadge}</span>
       </div></td>
-      <td style="font-size:12px;color:var(--ink3)">${ord.email||'—'}</td>
+      <td style="font-size:12px;color:var(--ink3)">${displayEmail}</td>
       <td style="font-size:13px">${ord.count}</td>
       <td style="font-family:var(--fd)">₺${ord.total.toLocaleString('tr-TR')}</td>
       <td style="font-size:12px;color:var(--ink3)">${lastDate}</td>
