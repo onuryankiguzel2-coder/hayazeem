@@ -2020,7 +2020,7 @@ async function loadDashboard(){
   el('dash-pending', pendingOrders.length);
 
   // Son siparişler
-  const {data:recentOrders} = await _sb.from('orders').select('*').order('created_at',{ascending:false}).limit(5);
+  const {data:recentOrders} = await _sb.from('orders').select('*').neq('status','pending_payment').order('created_at',{ascending:false}).limit(5);
   const recentEl = document.getElementById('dash-recent-orders');
   if(recentEl && recentOrders){
     if(recentOrders.length === 0){
