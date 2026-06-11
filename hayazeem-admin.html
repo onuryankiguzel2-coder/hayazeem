@@ -2488,6 +2488,7 @@ function renderAccTransactions(filter){
   const orders = window._txCache.orders || [];
   const manual = window._txCache.manual || [];
   const orderRows = orders.map(o => ({
+    id: o.id||null, isOrder: true,
     date: new Date(o.created_at), type:'gelir', desc:'Sipariş Geliri',
     amount: o.total||0, badge:'b-done', label:'Gelir', sign:'+'
   }));
@@ -2514,7 +2515,7 @@ function renderAccTransactions(filter){
       <td style="font-family:var(--fd);color:${r.sign==='+'?'var(--ok)':'var(--err)'}">${r.sign}₺${r.amount.toLocaleString('tr-TR')}</td>
       <td style="font-size:12px;color:var(--ink3)">${r.invoiceNo||'—'}</td>
       <td>${r.invoiceUrl?`<a href="${r.invoiceUrl}" target="_blank" style="font-size:12px;color:var(--gold);text-decoration:none">📎 Fatura</a>`:'—'}</td>
-      <td>${r.id ? `<button onclick="deleteTx('${r.id}')" style="background:none;border:1px solid var(--err);color:var(--err);cursor:pointer;font-size:11px;padding:3px 8px;border-radius:4px" title="İşlemi sil">Sil</button>` : ''}</td>
+      <td>${r.id ? `<button onclick="${r.isOrder ? `deleteOrder('${r.id}')` : `deleteTx('${r.id}')`}" style="background:none;border:1px solid var(--err);color:var(--err);cursor:pointer;font-size:11px;padding:3px 8px;border-radius:4px" title="İşlemi sil">Sil</button>` : ''}</td>
     </tr>`).join('');
   }
 }
@@ -2667,6 +2668,16 @@ async function deleteTx(id){
   renderAccTransactions(window._activeTxFilter||"hepsi");
   toast("İşlem silindi ✓");
 }
+
+async function deleteOrder(id){
+  if(!confirm("Bu sipariş kaydını silmek istediğinize emin misiniz?\n(Sadece test/hatalı kayıtları silin)")) return;
+  const {error} = await _sb.from("orders").delete().eq("id", id);
+  if(error){ toast("Silinemedi: " + error.message); return; }
+  window._txCache.orders = (window._txCache.orders||[]).filter(o => o.id !== id);
+  renderAccTransactions(window._activeTxFilter||"hepsi");
+  toast("Sipariş kaydı silindi ✓");
+}
+
 
 const supplierHistory={
   'Örnek Tekstil A.Ş.':[
