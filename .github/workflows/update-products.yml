@@ -38,3 +38,7 @@ jobs:
             git commit -m "chore: update products.json [skip ci]"
             git push
           fi
+      - name: Trigger Render deploy
+        run: |
+          curl -sf -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+          echo "Render deploy triggered."
