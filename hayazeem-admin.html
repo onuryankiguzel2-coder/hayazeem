@@ -537,6 +537,7 @@ img{display:block;object-fit:cover}
     <div class="mc"><div class="mc-lbl">Ürün Maliyeti (Satılan)</div><div class="mc-val" id="acc-cogs" style="color:var(--err)">₺0</div><div class="mc-ch" id="acc-cogs-margin">—</div></div>
     <div class="mc"><div class="mc-lbl">Brüt Kar</div><div class="mc-val" id="acc-gross" style="color:var(--ok)">₺0</div><div class="mc-ch pos" id="acc-gross-margin">—</div></div>
     <div class="mc"><div class="mc-lbl">Alacaklar</div><div class="mc-val" id="acc-alacak" style="color:var(--gold-dk)">₺0</div></div>
+    <div class="mc"><div class="mc-lbl">iyzico Komisyonu</div><div class="mc-val" id="acc-iyzico" style="color:var(--err)">₺0</div><div class="mc-ch neg" id="acc-iyzico-detail">%4,29 + ₺0,25/sipariş</div></div>
     <div class="mc"><div class="mc-lbl">Net Kar</div><div class="mc-val" id="acc-kar" style="color:var(--ok)">₺0</div><div class="mc-ch pos">—</div></div>
   </div>
 
@@ -1688,8 +1689,18 @@ async function loadAccounting(){
     .filter(t => { const d=t.date||t.created_at; return d >= monthStart && d <= monthEnd; })
     .reduce((s,t) => s+(parseFloat(t.amount)||0), 0);
   const totalGider = giderler.reduce((s,t) => s+(parseFloat(t.amount)||0), 0);
-  const monthNet = monthRevenue - monthGider;
-  const totalNet = totalRevenue - totalGider;
+  // iyzico komisyonu: %4.29 + 0.25₺ / sipariş (yalnızca online ödenen siparişler)
+  const IYZICO_RATE = 0.0429;
+  const IYZICO_FIXED = 0.25;
+  const monthOrderCount = monthOrders.length;
+  const totalOrderCount = (orders||[]).length;
+  const monthIyzico = monthOrders.reduce((s,o) => s + (o.total||0)*IYZICO_RATE + IYZICO_FIXED, 0);
+  const totalIyzico = (orders||[]).reduce((s,o) => s + (o.total||0)*IYZICO_RATE + IYZICO_FIXED, 0);
+  const monthNetRevenue = monthRevenue - monthIyzico;
+  const totalNetRevenue = totalRevenue - totalIyzico;
+
+  const monthNet = monthNetRevenue - monthGider;
+  const totalNet = totalNetRevenue - totalGider;
 
   // Alacaklar
   const alacaklar = (txList||[]).filter(t => t.type==='alacak');
@@ -1700,6 +1711,11 @@ async function loadAccounting(){
   el('acc-revenue', '₺'+monthRevenue.toLocaleString('tr-TR'));
   el('acc-total-revenue', '₺'+totalRevenue.toLocaleString('tr-TR'));
   el('acc-gider', '₺'+totalGider.toLocaleString('tr-TR'));
+  // iyzico komisyon göster
+  const iyzicoEl = document.getElementById('acc-iyzico');
+  if(iyzicoEl) iyzicoEl.textContent = '-₺'+totalIyzico.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const iyzicoDetailEl = document.getElementById('acc-iyzico-detail');
+  if(iyzicoDetailEl) iyzicoDetailEl.textContent = totalOrderCount+' sipariş · ₺'+totalIyzico.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
   if(document.getElementById('acc-ciro')) document.getElementById('acc-ciro').textContent = '₺'+monthRevenue.toLocaleString('tr-TR');
   if(document.getElementById('acc-kar')) document.getElementById('acc-kar').textContent = '₺'+monthNet.toLocaleString('tr-TR');
 
@@ -2487,11 +2503,18 @@ function renderAccTransactions(filter){
   if(!txEl) return;
   const orders = window._txCache.orders || [];
   const manual = window._txCache.manual || [];
-  const orderRows = orders.map(o => ({
-    id: o.id||null, isOrder: true,
-    date: new Date(o.created_at), type:'gelir', desc:'Sipariş Geliri',
-    amount: o.total||0, badge:'b-done', label:'Gelir', sign:'+'
-  }));
+  const IYZICO_RATE = 0.0429, IYZICO_FIXED = 0.25;
+  const orderRows = orders.map(o => {
+    const gross = o.total||0;
+    const commission = gross*IYZICO_RATE + IYZICO_FIXED;
+    const net = gross - commission;
+    return {
+      id: o.id||null, isOrder: true,
+      date: new Date(o.created_at), type:'gelir',
+      desc:'Sipariş Geliri · Net (iyzico komisyonu: -₺'+commission.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})+')',
+      amount: net, badge:'b-done', label:'Gelir', sign:'+'
+    };
+  });
   const manualRows = manual.map(t => ({
     id: t.id||null,
     date: new Date(t.date||t.created_at), type:t.type, desc:t.description||t.category||'İşlem',
