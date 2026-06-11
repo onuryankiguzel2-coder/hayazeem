@@ -2482,6 +2482,7 @@ const txData = [];
 window._txCache = { orders: [], manual: [] };
 
 function renderAccTransactions(filter){
+  window._activeTxFilter = filter||"hepsi";
   const txEl = document.getElementById('acc-transactions');
   if(!txEl) return;
   const orders = window._txCache.orders || [];
@@ -2491,12 +2492,14 @@ function renderAccTransactions(filter){
     amount: o.total||0, badge:'b-done', label:'Gelir', sign:'+'
   }));
   const manualRows = manual.map(t => ({
+    id: t.id||null,
     date: new Date(t.date||t.created_at), type:t.type, desc:t.description||t.category||'İşlem',
     amount: t.amount||0,
     badge: t.type==='gelir'?'b-done':t.type==='alacak'?'b-ship':'b-cancel',
     label: t.type==='gelir'?'Gelir':t.type==='alacak'?'Alacak':'Gider',
     sign: t.type==='gelir'||t.type==='alacak'?'+':'-',
-    invoiceNo: t.invoice_no||null, vendor: t.vendor||null, invoiceUrl: t.invoice_url||null
+    invoiceNo: t.invoice_no||null, vendor: t.vendor||null, invoiceUrl: t.invoice_url||null,
+    isManual: true
   }));
   let allRows = [...orderRows,...manualRows].sort((a,b)=>b.date-a.date);
   if(filter && filter!=='hepsi') allRows = allRows.filter(r=>r.type===filter);
@@ -2511,6 +2514,7 @@ function renderAccTransactions(filter){
       <td style="font-family:var(--fd);color:${r.sign==='+'?'var(--ok)':'var(--err)'}">${r.sign}₺${r.amount.toLocaleString('tr-TR')}</td>
       <td style="font-size:12px;color:var(--ink3)">${r.invoiceNo||'—'}</td>
       <td>${r.invoiceUrl?`<a href="${r.invoiceUrl}" target="_blank" style="font-size:12px;color:var(--gold);text-decoration:none">📎 Fatura</a>`:'—'}</td>
+      <td>${r.isManual && r.id ? `<button onclick="deleteTx('${r.id}')" style="background:none;border:1px solid var(--err);color:var(--err);cursor:pointer;font-size:11px;padding:3px 8px;border-radius:4px" title="İşlemi sil">Sil</button>` : ''}</td>
     </tr>`).join('');
   }
 }
@@ -2652,6 +2656,16 @@ async function saveTx(type){
   }
   closeModal('tx-modal');
   toast(`Kaydedildi: ${type==='gelir'?'+':'-'}₺${amount.toLocaleString('tr-TR')} ✓`);
+}
+
+
+async function deleteTx(id){
+  if(!confirm("Bu işlemi silmek istediğinize emin misiniz?")) return;
+  const {error} = await _sb.from("transactions").delete().eq("id", id);
+  if(error){ toast("Silinemedi: " + error.message); return; }
+  window._txCache.manual = (window._txCache.manual||[]).filter(t => t.id !== id);
+  renderAccTransactions(window._activeTxFilter||"hepsi");
+  toast("İşlem silindi ✓");
 }
 
 const supplierHistory={
