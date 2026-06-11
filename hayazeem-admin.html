@@ -1675,7 +1675,7 @@ async function loadAccounting(){
   const monthEnd = new Date(now.getFullYear(), now.getMonth()+1, 1).toISOString();
 
   // Sipariş geliri
-  const {data:orders} = await _sb.from('orders').select('total,created_at,status').neq('status','cancelled');
+  const {data:orders} = await _sb.from('orders').select('id,total,created_at,status').neq('status','cancelled');
   // Manuel işlemler
   const {data:txList} = await _sb.from('transactions').select('*').order('created_at',{ascending:false});
   const monthOrders = (orders||[]).filter(o => o.created_at >= monthStart && o.created_at <= monthEnd);
@@ -2677,7 +2677,6 @@ async function deleteOrder(id){
   renderAccTransactions(window._activeTxFilter||"hepsi");
   toast("Sipariş kaydı silindi ✓");
 }
-
 
 const supplierHistory={
   'Örnek Tekstil A.Ş.':[
