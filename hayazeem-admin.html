@@ -1931,7 +1931,7 @@ async function loadSuppliers(){
   tbody.innerHTML = suppliers.map(s => {
     const kalan = (s.total_debt||0) - (s.paid||0);
     return `<tr>
-      <td style="font-weight:600;color:var(--ink)">${s.name||'—'}</td>
+      <td><button onclick="openSupplierDetail('${s.id}')" style="background:none;border:none;cursor:pointer;font-weight:600;color:var(--gold-dk);text-decoration:underline;padding:0;font-size:13px;text-align:left">${s.name||'—'}</button></td>
       <td style="font-size:13px;color:var(--ink3)">${s.contact_person||'—'}</td>
       <td style="font-size:13px;color:var(--ink3)">${s.phone||'—'}</td>
       <td style="font-family:var(--fd)">₺${(s.total_debt||0).toLocaleString('tr-TR')}</td>
@@ -2799,50 +2799,132 @@ const supplierHistory={
     {date:'15.04.25',desc:'Ödeme yapıldı',amount:-26500,type:'odeme'},
   ]
 };
-function openSupplierDetail(name){
-  const hist=supplierHistory[name]||[];
-  const totalBorc=hist.filter(h=>h.type==='borc').reduce((s,h)=>s+h.amount,0);
-  const totalOdeme=hist.filter(h=>h.type==='odeme').reduce((s,h)=>s+Math.abs(h.amount),0);
-  const kalan=totalBorc-totalOdeme;
-  let m=document.getElementById('sup-detail-modal');
-  if(m)m.remove();
-  m=document.createElement('div');m.id='sup-detail-modal';m.className='modal-backdrop';
-  m.innerHTML=`<div class="modal" style="max-width:560px">
+async function openSupplierDetail(supplierId){
+  // Supabase'den supplier'ı çek
+  const {data:s} = await _sb.from('suppliers').select('*').eq('id', supplierId).single();
+  if(!s){ toast('Tedarikçi bulunamadı'); return; }
+  const kalan = (s.total_debt||0) - (s.paid||0);
+
+  // Modal iskeletini hemen göster, işlem geçmişi sonra yüklenecek
+  let m = document.getElementById('sup-detail-modal');
+  if(m) m.remove();
+  m = document.createElement('div');
+  m.id = 'sup-detail-modal';
+  m.className = 'modal-backdrop';
+  m.innerHTML = `<div class="modal" style="max-width:600px">
     <div class="modal-header">
-      <div><div class="modal-title">${name}</div><div style="font-size:12px;color:var(--ink3)">Tedarikçi Detayı</div></div>
+      <div>
+        <div class="modal-title">${s.name||'—'}</div>
+        <div style="font-size:12px;color:var(--ink3);margin-top:2px">
+          ${s.phone||''} ${s.phone&&s.email?' · ':''} ${s.email||''}
+          ${s.contact_person?' · Yetkili: '+s.contact_person:''}
+        </div>
+      </div>
       <button class="modal-close" onclick="closeModal('sup-detail-modal')">×</button>
     </div>
     <div style="padding:20px 24px">
+      <!-- Özet kartlar -->
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
         <div style="background:var(--bone);padding:14px;text-align:center">
           <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px">Toplam Borç</div>
-          <div style="font-family:var(--fd);font-size:20px">₺${totalBorc.toLocaleString('tr-TR')}</div>
+          <div style="font-family:var(--fd);font-size:20px">₺${(s.total_debt||0).toLocaleString('tr-TR')}</div>
+          ${s.vat_rate>0?'<div style="font-size:10px;color:var(--ink3);margin-top:2px">KDV %'+s.vat_rate+' dahil</div>':''}
         </div>
         <div style="background:#e8f5e8;padding:14px;text-align:center">
           <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px">Ödenen</div>
-          <div style="font-family:var(--fd);font-size:20px;color:var(--ok)">₺${totalOdeme.toLocaleString('tr-TR')}</div>
+          <div style="font-family:var(--fd);font-size:20px;color:var(--ok)">₺${(s.paid||0).toLocaleString('tr-TR')}</div>
         </div>
         <div style="background:${kalan>0?'#fde8e8':'#e8f5e8'};padding:14px;text-align:center">
           <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px">Kalan</div>
           <div style="font-family:var(--fd);font-size:20px;color:${kalan>0?'var(--err)':'var(--ok)'}">₺${kalan.toLocaleString('tr-TR')}</div>
         </div>
       </div>
+      <!-- Fatura bilgisi -->
+      ${s.invoice_no||s.invoice_url?`<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bone);margin-bottom:16px;font-size:13px">
+        <span style="color:var(--ink3)">📄</span>
+        ${s.invoice_no?'<span>Fatura No: <strong>'+s.invoice_no+'</strong></span>':''}
+        ${s.invoice_url?'<a href="'+s.invoice_url+'" target="_blank" style="color:var(--gold);text-decoration:none;margin-left:auto">📎 Faturayı Gör</a>':''}
+      </div>`:''}
+      <!-- Notlar -->
+      ${s.notes?`<div style="padding:10px 14px;background:rgba(201,169,110,.08);border-left:2px solid var(--gold);font-size:13px;color:var(--ink2);margin-bottom:16px">${s.notes}</div>`:''}
+      <!-- İşlem geçmişi -->
       <div style="border-top:1px solid var(--stone);padding-top:16px">
         <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:12px">İşlem Geçmişi</div>
-        ${hist.map(h=>`<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--stone)">
-          <div style="width:28px;height:28px;border-radius:50%;background:${h.type==='borc'?'rgba(239,68,68,.1)':'rgba(34,197,94,.1)'};display:flex;align-items:center;justify-content:center;color:${h.type==='borc'?'var(--err)':'var(--ok)'};font-weight:700;flex-shrink:0">${h.type==='borc'?'↑':'↓'}</div>
-          <div style="flex:1"><div style="font-size:13px">${h.desc}</div><div style="font-size:11px;color:var(--ink3)">${h.date}</div></div>
-          <div style="font-family:var(--fd);font-size:15px;color:${h.type==='borc'?'var(--err)':'var(--ok)'}">${h.type==='borc'?'+':'-'}₺${Math.abs(h.amount).toLocaleString('tr-TR')}</div>
-        </div>`).join('')}
+        <div id="sup-tx-list" style="max-height:280px;overflow-y:auto">
+          <div style="text-align:center;padding:20px;color:var(--ink3);font-size:13px">Yükleniyor…</div>
+        </div>
       </div>
+      <!-- Aksiyonlar -->
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
-        <button class="btn btn-o btn-sm" onclick="openSupplierModal()">Düzenle</button>
-        <button class="btn btn-p btn-sm" onclick="closeModal('sup-detail-modal');openPaymentModal(null,'${name}')">Ödeme Yap</button>
+        <button class="btn btn-o btn-sm" onclick="closeModal('sup-detail-modal')">Kapat</button>
+        <button class="btn btn-p btn-sm" onclick="closeModal('sup-detail-modal');openSupplierPaymentModal('${s.id}','${(s.name||'').replace(/'/g,"\'")}',${kalan})">Ödeme Yap</button>
       </div>
     </div>
   </div>`;
   document.body.appendChild(m);
-  m.addEventListener('click',e=>{if(e.target===m)closeModal('sup-detail-modal');});
+  m.addEventListener('click', e=>{ if(e.target===m) closeModal('sup-detail-modal'); });
+
+  // İşlem geçmişini Supabase'den çek (vendor adı eşleşmesi)
+  const txListEl = document.getElementById('sup-tx-list');
+  const {data:txs} = await _sb.from('transactions')
+    .select('*')
+    .eq('vendor', s.name)
+    .order('date', {ascending:false})
+    .limit(50);
+
+  // Ayrıca başlangıç borç kaydını da göster (suppliers tablosundaki)
+  const allRows = [];
+  // İlk fatura kaydı (borç)
+  allRows.push({
+    isBorc: true,
+    date: s.created_at ? new Date(s.created_at).toLocaleDateString('tr-TR') : '—',
+    desc: 'Tedarikçi borcu eklendi' + (s.invoice_no ? ' · ' + s.invoice_no : ''),
+    amount: s.total_debt||0,
+    invoice_url: s.invoice_url||null,
+    vat_rate: s.vat_rate||0,
+    vat_amount: s.vat_amount||0
+  });
+  // Transactions'dan ödemeler
+  if(txs && txs.length){
+    txs.forEach(t => {
+      allRows.push({
+        isBorc: t.type !== 'gider' && t.type !== 'harcama',
+        date: t.date ? new Date(t.date).toLocaleDateString('tr-TR') : '—',
+        desc: t.description || t.category || '—',
+        amount: t.amount||0,
+        invoice_url: t.invoice_url||null,
+        invoice_no: t.invoice_no||null,
+        vat_rate: t.vat_rate||0,
+        vat_amount: t.vat_amount||0,
+        category: t.category||''
+      });
+    });
+  }
+
+  if(!txListEl) return;
+  if(allRows.length === 0){
+    txListEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--ink3);font-size:13px">Henüz işlem kaydı yok.</div>';
+    return;
+  }
+
+  txListEl.innerHTML = allRows.map(r => `
+    <div style="display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--stone)">
+      <div style="width:30px;height:30px;border-radius:50%;background:${r.isBorc?'rgba(204,119,119,.12)':'rgba(122,170,122,.12)'};display:flex;align-items:center;justify-content:center;color:${r.isBorc?'var(--err)':'var(--ok)'};font-weight:700;flex-shrink:0;font-size:14px">${r.isBorc?'↑':'↓'}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500">${r.desc}</div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap">
+          <span>${r.date}</span>
+          ${r.category?'<span>'+r.category+'</span>':''}
+          ${r.vat_rate>0?'<span style="color:var(--gold-dk)">KDV %'+r.vat_rate+' · ₺'+parseFloat(r.vat_amount||0).toLocaleString('tr-TR')+'</span>':''}
+          ${r.invoice_no?'<span>No: '+r.invoice_no+'</span>':''}
+        </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-family:var(--fd);font-size:15px;color:${r.isBorc?'var(--err)':'var(--ok)'}">${r.isBorc?'+':'-'}₺${parseFloat(r.amount||0).toLocaleString('tr-TR')}</div>
+        ${r.invoice_url?'<a href="'+r.invoice_url+'" target="_blank" style="font-size:11px;color:var(--gold);text-decoration:none">📎 Belge</a>':''}
+      </div>
+    </div>
+  `).join('');
 }
 function openPaymentModal(btn,supplierName){
   let m=document.getElementById('pay-modal');
