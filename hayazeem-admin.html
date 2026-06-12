@@ -540,6 +540,24 @@ img{display:block;object-fit:cover}
     <div class="mc"><div class="mc-lbl">iyzico Komisyonu</div><div class="mc-val" id="acc-iyzico" style="color:var(--err)">₺0</div><div class="mc-ch neg" id="acc-iyzico-detail">%4,29 + ₺0,25/sipariş</div></div>
     <div class="mc"><div class="mc-lbl">Net Kar</div><div class="mc-val" id="acc-kar" style="color:var(--ok)">₺0</div><div class="mc-ch pos">—</div></div>
   </div>
+  <!-- Tedarikçi borç özet bandı (satıştan bağımsız) -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px">
+    <div class="mc" style="border-left:3px solid var(--err)">
+      <div class="mc-lbl">Toplam Tedarikçi Borcu</div>
+      <div class="mc-val" id="acc-sup-debt" style="color:var(--err)">₺0</div>
+      <div class="mc-ch neg">Toptancı bakiyesi</div>
+    </div>
+    <div class="mc" style="border-left:3px solid var(--ok)">
+      <div class="mc-lbl">Ödenen (Tedarikçi)</div>
+      <div class="mc-val" id="acc-sup-paid" style="color:var(--ok)">₺0</div>
+      <div class="mc-ch pos">—</div>
+    </div>
+    <div class="mc" style="border-left:3px solid var(--gold)">
+      <div class="mc-lbl">Kalan Tedarikçi Borcu</div>
+      <div class="mc-val" id="acc-sup-kalan" style="color:var(--gold-dk)">₺0</div>
+      <div class="mc-ch">Net kara dahil değil</div>
+    </div>
+  </div>
 
   <!-- Gelir grafiği -->
   <div class="card">
@@ -1897,20 +1915,32 @@ async function loadSuppliers(){
   const {data:suppliers} = await _sb.from('suppliers').select('*').order('name');
   if(!suppliers || suppliers.length === 0){
     tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--ink3)">Tedarikçi bulunamadı. + Tedarikçi Ekle ile ekleyin.</td></tr>';
+    // Metrikleri sıfırla
+    ['acc-sup-debt','acc-sup-paid','acc-sup-kalan'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='₺0';});
     return;
   }
+  // Metrik toplamları
+  const totalDebt = suppliers.reduce((s,x)=>s+(parseFloat(x.total_debt)||0),0);
+  const totalPaid = suppliers.reduce((s,x)=>s+(parseFloat(x.paid)||0),0);
+  const totalKalan = totalDebt - totalPaid;
+  const setEl = (id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  setEl('acc-sup-debt','₺'+totalDebt.toLocaleString('tr-TR'));
+  setEl('acc-sup-paid','₺'+totalPaid.toLocaleString('tr-TR'));
+  setEl('acc-sup-kalan','₺'+totalKalan.toLocaleString('tr-TR'));
+
   tbody.innerHTML = suppliers.map(s => {
     const kalan = (s.total_debt||0) - (s.paid||0);
     return `<tr>
-      <td><button onclick="toast('Tedarikçi detayı')" style="background:none;border:none;cursor:pointer;font-weight:600;color:var(--gold-dk);text-decoration:underline;padding:0;font-size:13px">${s.name||'—'}</button></td>
-      <td style="font-size:13px">${s.contact||'—'}</td>
-      <td style="font-size:13px">${s.phone||'—'}</td>
+      <td style="font-weight:600;color:var(--ink)">${s.name||'—'}</td>
+      <td style="font-size:13px;color:var(--ink3)">${s.contact_person||'—'}</td>
+      <td style="font-size:13px;color:var(--ink3)">${s.phone||'—'}</td>
       <td style="font-family:var(--fd)">₺${(s.total_debt||0).toLocaleString('tr-TR')}</td>
       <td style="color:var(--ok);font-family:var(--fd)">₺${(s.paid||0).toLocaleString('tr-TR')}</td>
-      <td style="color:${kalan>0?'var(--err)':'var(--ok)'};font-family:var(--fd)">₺${kalan.toLocaleString('tr-TR')}</td>
+      <td style="color:${kalan>0?'var(--err)':'var(--ok)'};font-family:var(--fd);font-weight:600">₺${kalan.toLocaleString('tr-TR')}</td>
       <td style="font-size:12px;color:var(--ink3)">${s.due_date||'—'}</td>
       <td style="display:flex;gap:6px">
-        <button class="btn btn-sm" style="background:var(--ok);color:#fff;border:none;padding:7px 12px;font-size:11px;cursor:pointer" onclick="toast('Ödeme kaydedildi ✓')">Ödeme Yap</button>
+        <button class="btn btn-sm" style="background:var(--ok);color:#fff;border:none;padding:7px 12px;font-size:11px;cursor:pointer" onclick="openSupplierPaymentModal('${s.id}','${(s.name||'').replace(/'/g,"\'")}',${kalan})">Ödeme Yap</button>
+        <button class="btn btn-sm" style="background:var(--err);color:#fff;border:none;padding:7px 12px;font-size:11px;cursor:pointer" onclick="deleteSupplier('${s.id}','${(s.name||'').replace(/'/g,"\'")}')">Sil</button>
       </td>
     </tr>`;
   }).join('');
@@ -2836,21 +2866,86 @@ function openPaymentModal(btn,supplierName){
   m.addEventListener('click',e=>{if(e.target===m)closeModal('pay-modal');});
 }
 function confirmPayment(){
-  const amount=parseFloat(document.getElementById('pay-amount')?.value)||0;
-  const sup=document.getElementById('pay-sup')?.value;
-  if(!amount){toast('Tutar giriniz');return;}
-  if(sup&&supplierHistory[sup]){
-    const d=new Date().toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit',year:'2-digit'});
-    supplierHistory[sup].unshift({date:d,desc:document.getElementById('pay-desc')?.value||'Ödeme yapıldı',amount:-amount,type:'odeme'});
-  }
-  document.querySelectorAll('#supplier-table tbody tr').forEach(row=>{
-    if(row.cells[0]?.textContent?.trim()===sup){
-      const cell=row.cells[5];
-      if(cell){const cur=parseFloat(cell.textContent.replace(/[^\d]/g,''))||0;const rem=Math.max(0,cur-amount);cell.textContent='₺'+rem.toLocaleString('tr-TR');cell.style.color=rem>0?'var(--err)':'var(--ok)';}
-    }
-  });
+  // eski fonksiyon - artık kullanılmıyor, openSupplierPaymentModal kullanılıyor
   closeModal('pay-modal');
-  toast('Ödeme kaydedildi: ₺'+amount.toLocaleString('tr-TR')+' ✓');
+}
+
+function openSupplierPaymentModal(supplierId, supplierName, kalanBakg){
+  let m = document.getElementById('sup-pay-modal');
+  if(m) m.remove();
+  m = document.createElement('div');
+  m.id = 'sup-pay-modal';
+  m.className = 'modal-backdrop';
+  m.innerHTML = `<div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <div class="modal-title">Ödeme Yap — ${supplierName}</div>
+      <button class="modal-close" onclick="closeModal('sup-pay-modal')">×</button>
+    </div>
+    <div style="padding:0 24px 24px;display:flex;flex-direction:column;gap:14px">
+      <div style="background:var(--bone);padding:10px 14px;font-size:13px;color:var(--err);font-family:var(--fd)">
+        Kalan Borç: ₺${kalanBakg.toLocaleString('tr-TR')}
+      </div>
+      <div class="g2" style="gap:14px">
+        <div><label class="afl">Ödeme Tutarı (₺)</label><input class="afi" id="spay-amount" type="number" placeholder="0"></div>
+        <div><label class="afl">Tarih</label><input class="afi" id="spay-date" type="date" value="${new Date().toISOString().split('T')[0]}"></div>
+      </div>
+      <div><label class="afl">Yöntem</label><select class="afs" id="spay-method">
+        <option>Havale / EFT</option><option>Nakit</option><option>Çek</option><option>Kredi Kartı</option>
+      </select></div>
+      <div><label class="afl">Açıklama</label><input class="afi" id="spay-desc" placeholder="Mayıs ödemesi…"></div>
+      <div><label class="afl">Makbuz / Dekont (PDF / Görsel)</label><input type="file" id="spay-file" accept=".pdf,.jpg,.jpeg,.png" style="display:block;width:100%;font-size:13px;padding:8px 0;color:var(--ink2)"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn btn-o btn-sm" onclick="closeModal('sup-pay-modal')">İptal</button>
+        <button class="btn btn-p btn-sm" onclick="confirmSupplierPayment('${supplierId}','${supplierName.replace(/'/g,"\'")}')">Kaydet</button>
+      </div>
+    </div>
+  </div>`;
+  document.body.appendChild(m);
+  m.addEventListener('click', e=>{ if(e.target===m) closeModal('sup-pay-modal'); });
+}
+
+async function confirmSupplierPayment(supplierId, supplierName){
+  const amount = parseFloat(document.getElementById('spay-amount')?.value)||0;
+  if(!amount){ toast('Tutar giriniz'); return; }
+
+  // Dekont yükle
+  let receiptUrl = null;
+  const file = document.getElementById('spay-file')?.files?.[0];
+  if(file){
+    const fname = 'odeme_' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+    const {data:upData} = await _sb.storage.from('invoices').upload(fname, file, {upsert:true});
+    if(upData) receiptUrl = `https://vuusgbthelegugpcbdye.supabase.co/storage/v1/object/public/invoices/${fname}`;
+  }
+
+  // Supabase: paid alanını artır (increment)
+  const {data:sup} = await _sb.from('suppliers').select('paid').eq('id', supplierId).single();
+  const newPaid = (parseFloat(sup?.paid)||0) + amount;
+  const {error} = await _sb.from('suppliers').update({ paid: newPaid }).eq('id', supplierId);
+  if(error){ toast('Hata: ' + error.message); return; }
+
+  // Transactions tablosuna da gider olarak kaydet (takip için)
+  await _sb.from('transactions').insert([{
+    type: 'gider',
+    category: 'Tedarikçi Ödemesi',
+    description: (document.getElementById('spay-desc')?.value?.trim()) || (supplierName + ' ödemesi'),
+    amount: amount,
+    vendor: supplierName,
+    date: document.getElementById('spay-date')?.value || new Date().toISOString().split('T')[0],
+    invoice_url: receiptUrl,
+    created_at: new Date().toISOString()
+  }]);
+
+  closeModal('sup-pay-modal');
+  await loadSuppliers();
+  toast('Ödeme kaydedildi: ₺' + amount.toLocaleString('tr-TR') + ' ✓');
+}
+
+async function deleteSupplier(supplierId, supplierName){
+  if(!confirm(supplierName + ' tedarikçisini silmek istediğinize emin misiniz?')) return;
+  const {error} = await _sb.from('suppliers').delete().eq('id', supplierId);
+  if(error){ toast('Silinemedi: ' + error.message); return; }
+  await loadSuppliers();
+  toast(supplierName + ' silindi ✓');
 }
 // renderTxList kaldırıldı - loadAccounting kullanılıyor
 
@@ -2884,36 +2979,70 @@ function exportAccounting(){
 
 function openSupplierModal(editData){
   let m = document.getElementById('supplier-modal');
-  if(!m){
-    m = document.createElement('div');
-    m.id = 'supplier-modal';
-    m.className = 'modal-backdrop';
-    m.innerHTML = `
-    <div class="modal" style="max-width:500px">
-      <div class="modal-header"><div class="modal-title">Tedarikçi Ekle</div><button class="modal-close" onclick="closeModal('supplier-modal')">×</button></div>
-      <div style="padding:0 24px 24px;display:flex;flex-direction:column;gap:14px">
-        <div><label class="afl">Firma Adı</label><input class="afi" id="sup-name" placeholder="Firma adı"></div>
-        <div class="g2" style="gap:14px">
-          <div><label class="afl">Yetkili Kişi</label><input class="afi" id="sup-contact" placeholder="Ad Soyad"></div>
-          <div><label class="afl">Telefon</label><input class="afi" id="sup-phone" placeholder="05xx xxx xxxx"></div>
-        </div>
-        <div><label class="afl">E-posta</label><input class="afi" id="sup-email" type="email" placeholder="firma@email.com"></div>
-        <div class="g2" style="gap:14px">
-          <div><label class="afl">Toplam Borç (₺)</label><input class="afi" id="sup-debt" type="number" placeholder="0"></div>
-          <div><label class="afl">Vade Tarihi</label><input class="afi" id="sup-due" type="date"></div>
-        </div>
-        <div><label class="afl">Notlar</label><textarea class="afi" id="sup-notes" style="min-height:60px;resize:vertical" placeholder="Ödeme koşulları, notlar…"></textarea></div>
-        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-          <button class="btn btn-o btn-sm" onclick="closeModal('supplier-modal')">İptal</button>
-          <button class="btn btn-p btn-sm" onclick="saveSupplier()">Kaydet</button>
-        </div>
+  if(m) m.remove();
+  m = document.createElement('div');
+  m.id = 'supplier-modal';
+  m.className = 'modal-backdrop';
+  m.innerHTML = `
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header"><div class="modal-title">Tedarikçi Ekle</div><button class="modal-close" onclick="closeModal('supplier-modal')">×</button></div>
+    <div style="padding:0 24px 24px;display:flex;flex-direction:column;gap:14px">
+      <div><label class="afl">Firma Adı</label><input class="afi" id="sup-name" placeholder="Firma adı"></div>
+      <div class="g2" style="gap:14px">
+        <div><label class="afl">Yetkili Kişi</label><input class="afi" id="sup-contact" placeholder="Ad Soyad"></div>
+        <div><label class="afl">Telefon</label><input class="afi" id="sup-phone" placeholder="05xx xxx xxxx"></div>
       </div>
-    </div>`;
-    document.body.appendChild(m);
-    m.addEventListener('click', e=>{ if(e.target===m) closeModal('supplier-modal'); });
-  }
-  m.style.display='flex';
-  document.body.style.overflow='hidden';
+      <div><label class="afl">E-posta</label><input class="afi" id="sup-email" type="email" placeholder="firma@email.com"></div>
+      <div style="background:var(--bone);border:1px solid var(--stone);padding:12px 14px;font-size:12px;color:var(--ink2);border-radius:2px">
+        💡 Fatura tutarını KDV hariç girin, KDV oranını seçin — toplam borç otomatik hesaplanır.
+      </div>
+      <div class="g2" style="gap:14px">
+        <div><label class="afl">Fatura Tutarı (KDV Hariç) (₺)</label><input class="afi" id="sup-debt-net" type="number" placeholder="0" oninput="calcSupVat()"></div>
+        <div><label class="afl">KDV Oranı</label><select class="afs" id="sup-vat-rate" onchange="calcSupVat()">
+          <option value="0">KDV Yok (%0)</option>
+          <option value="1">%1</option>
+          <option value="8">%8</option>
+          <option value="10">%10</option>
+          <option value="20" selected>%20</option>
+        </select></div>
+      </div>
+      <div class="g2" style="gap:14px">
+        <div><label class="afl">KDV Tutarı (₺)</label><input class="afi" id="sup-vat-amount" type="number" placeholder="0.00" readonly style="background:var(--bone);color:var(--ink3)"></div>
+        <div><label class="afl">Toplam Borç (KDV Dahil) (₺)</label><input class="afi" id="sup-debt" type="number" placeholder="0" oninput="calcSupVatFromTotal()"></div>
+      </div>
+      <div class="g2" style="gap:14px">
+        <div><label class="afl">Fatura No</label><input class="afi" id="sup-invoice-no" placeholder="FTR-2025-001"></div>
+        <div><label class="afl">Vade Tarihi</label><input class="afi" id="sup-due" type="date"></div>
+      </div>
+      <div><label class="afl">Fatura Belgesi (PDF / Görsel)</label><input type="file" id="sup-invoice-file" accept=".pdf,.jpg,.jpeg,.png" style="display:block;width:100%;font-size:13px;padding:8px 0;color:var(--ink2)"></div>
+      <div><label class="afl">Notlar</label><textarea class="afi" id="sup-notes" style="min-height:50px;resize:vertical" placeholder="Ödeme koşulları, notlar…"></textarea></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+        <button class="btn btn-o btn-sm" onclick="closeModal('supplier-modal')">İptal</button>
+        <button class="btn btn-p btn-sm" onclick="saveSupplier()">Kaydet</button>
+      </div>
+    </div>
+  </div>`;
+  document.body.appendChild(m);
+  m.addEventListener('click', e=>{ if(e.target===m) closeModal('supplier-modal'); });
+}
+
+function calcSupVat(){
+  const net = parseFloat(document.getElementById('sup-debt-net')?.value)||0;
+  const rate = parseFloat(document.getElementById('sup-vat-rate')?.value)||0;
+  const vat = Math.round(net * rate / 100 * 100) / 100;
+  const total = net + vat;
+  const vatEl = document.getElementById('sup-vat-amount');
+  const totalEl = document.getElementById('sup-debt');
+  if(vatEl) vatEl.value = vat.toFixed(2);
+  if(totalEl) totalEl.value = total.toFixed(2);
+}
+
+function calcSupVatFromTotal(){
+  // Toplam elle girilirse KDV tutarını güncelle
+  const net = parseFloat(document.getElementById('sup-debt-net')?.value)||0;
+  const total = parseFloat(document.getElementById('sup-debt')?.value)||0;
+  const vatEl = document.getElementById('sup-vat-amount');
+  if(vatEl) vatEl.value = Math.max(0, total - net).toFixed(2);
 }
 
 async function saveSupplier(){
@@ -2921,20 +3050,43 @@ async function saveSupplier(){
   const contact = document.getElementById('sup-contact')?.value?.trim()||null;
   const phone = document.getElementById('sup-phone')?.value?.trim()||null;
   const email = document.getElementById('sup-email')?.value?.trim()||null;
-  const debt = parseFloat(document.getElementById('sup-debt')?.value)||0;
+  const netAmount = parseFloat(document.getElementById('sup-debt-net')?.value)||0;
+  const vatRate = parseFloat(document.getElementById('sup-vat-rate')?.value)||0;
+  const vatAmount = parseFloat(document.getElementById('sup-vat-amount')?.value)||0;
+  const totalDebt = parseFloat(document.getElementById('sup-debt')?.value)||0;
   const due = document.getElementById('sup-due')?.value||null;
+  const invoiceNo = document.getElementById('sup-invoice-no')?.value?.trim()||null;
+  const notes = document.getElementById('sup-notes')?.value?.trim()||null;
   if(!name){ toast('Firma adı zorunlu'); return; }
+  if(!totalDebt){ toast('Toplam borç giriniz'); return; }
+
+  // Fatura dosyası yükle
+  let invoiceUrl = null;
+  const invoiceFile = document.getElementById('sup-invoice-file')?.files?.[0];
+  if(invoiceFile){
+    const fname = 'tedarkci_' + Date.now() + '_' + invoiceFile.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+    const {data:upData} = await _sb.storage.from('invoices').upload(fname, invoiceFile, {upsert:true});
+    if(upData) invoiceUrl = `https://vuusgbthelegugpcbdye.supabase.co/storage/v1/object/public/invoices/${fname}`;
+  }
 
   const {error} = await _sb.from('suppliers').insert([{
     name, contact_person: contact, phone, email,
-    total_debt: debt, paid: 0, due_date: due,
+    total_debt: totalDebt,
+    net_amount: netAmount||null,
+    vat_rate: vatRate||null,
+    vat_amount: vatAmount||null,
+    paid: 0, due_date: due,
+    invoice_no: invoiceNo,
+    invoice_url: invoiceUrl,
+    notes: notes,
     created_at: new Date().toISOString()
   }]);
-  if(error) console.warn('Supplier insert error:', error.message);
+  if(error){ toast('Hata: ' + error.message); return; }
 
   await loadSuppliers();
   closeModal('supplier-modal');
-  toast('Tedarikçi eklendi: ' + name + (error ? ' (yerel, veritabanına kaydedilemedi)' : ' ✓'));
+  const vatInfo = vatRate > 0 ? ` (KDV %${vatRate} dahil)` : '';
+  toast('Tedarikçi eklendi: ' + name + ' — ₺' + totalDebt.toLocaleString('tr-TR') + vatInfo + ' ✓');
 }
 
 function recordPayment(btn){
