@@ -1904,7 +1904,7 @@ async function loadCustomers(){
       <td style="font-family:var(--fd)">₺${ord.total.toLocaleString('tr-TR')}</td>
       <td style="font-size:12px;color:var(--ink3)">${lastDate}</td>
       <td><span class="badge ${segColor}">${segment}</span></td>
-      <td><button class="btn btn-o btn-sm" onclick="toast('Müşteri detayı')">Detay</button></td>
+      <td><button class="btn btn-o btn-sm" onclick="showCustomerDetail('${displayName.replace(/'/g,"\\'")}','${displayEmail.replace(/'/g,"\\'")}')">Detay</button></td>
     </tr>`;
   }).join('');
 }
@@ -2050,7 +2050,7 @@ function toast(msg){
         <textarea class="afta" placeholder="Operasyon notu ekleyin…" style="min-height:72px;margin-bottom:12px"></textarea>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <button class="btn btn-p btn-sm" onclick="toast('Durum güncellendi ✓');closeModal('order-detail-modal')">Kaydet & Kapat</button>
-          <button class="btn btn-o btn-sm" onclick="printCargoLabel(document.querySelector('.odm-title').textContent)">🖨 Kargo Etiketi</button>
+          <button class="btn btn-o btn-sm" onclick="const _om=document.getElementById('order-detail-modal');printCargoLabel(_om.querySelector('.odm-title').textContent,_om.dataset.orderId)">🖨 Kargo Etiketi</button>
           <button class="btn btn-o btn-sm" onclick="sendInvoice(document.querySelector('.odm-title').textContent)">📧 Fatura Gönder</button>
         </div>
       </div>
@@ -2236,11 +2236,55 @@ async function openOrderDetail(orderNo, orderId){
   // orderId'yi modal'a kaydet
   m.dataset.orderId = order.id;
 }
-function showCustomerDetail(name, email){
+async function showCustomerDetail(name, email){
   const m = document.getElementById('customer-detail-modal');
   if(!m) return;
   m.style.display = 'flex';
   document.body.style.overflow='hidden';
+
+  // Başlık güncelle
+  const titleEl = m.querySelector('.odm-title');
+  const subtitleEl = titleEl?.nextElementSibling;
+  const avEl = m.querySelector('.av');
+  const initials = name.split(' ').map(n=>n[0]||'').join('').slice(0,2).toUpperCase()||'?';
+  if(avEl) avEl.textContent = initials;
+  if(titleEl) titleEl.textContent = name;
+  if(subtitleEl) subtitleEl.textContent = email||'Misafir';
+
+  // Siparişleri çek
+  let orders = [];
+  if(email && email !== '—'){
+    const {data} = await _sb.from('orders').select('*').or(`guest_email.eq.${email},shipping_address->>email.eq.${email}`).order('created_at',{ascending:false});
+    if(data) orders = data;
+  }
+
+  // İletişim ve adres
+  const allVals = m.querySelectorAll('.odm-val');
+  const firstOrder = orders[0];
+  const addr = firstOrder?.shipping_address || {};
+  if(allVals[0]) allVals[0].innerHTML = `${email||'—'}<br>${addr.phone||'—'}`;
+  if(allVals[1]) allVals[1].innerHTML = addr.address ? `${addr.address}<br>${addr.district||''} ${addr.city||''}`.trim() : '—';
+
+  // İstatistikler
+  const totalSpend = orders.reduce((s,o)=>s+(o.total||0),0);
+  const avgOrder = orders.length > 0 ? Math.round(totalSpend/orders.length) : 0;
+  const statEls = m.querySelectorAll('[style*="font-family:var(--fd)"][style*="font-size:24px"]');
+  if(statEls[0]) statEls[0].textContent = orders.length;
+  if(statEls[1]) statEls[1].textContent = '\u20ba'+totalSpend.toLocaleString('tr-TR');
+  if(statEls[2]) statEls[2].textContent = '\u20ba'+avgOrder.toLocaleString('tr-TR');
+
+  // Sipariş geçmişi
+  const histContainer = m.querySelector('[style*="border-top:1px solid var(--stone)"]');
+  if(histContainer){
+    const statusMap = {pending_payment:'b-pend',pending:'b-pend',processing:'b-ship',shipped:'b-ship',delivered:'b-done',cancelled:'b-cancel'};
+    const statusLabel = {pending_payment:'Bekliyor',pending:'Bekliyor',processing:'Hazırlanıyor',shipped:'Kargoda',delivered:'Teslim',cancelled:'İptal'};
+    histContainer.innerHTML = '<div class="odm-section-title" style="margin-bottom:12px">Sipariş Geçmişi</div>' + (orders.length === 0 ? '<div style="font-size:13px;color:var(--ink3)">Sipariş bulunamadı.</div>' : orders.map(o=>{
+      const d = new Date(o.created_at).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
+      const no = '#HYZ-'+o.id.slice(0,8).toUpperCase();
+      const st = o.status||'pending';
+      return '<div class="arow"><div><div style="font-size:13px;font-weight:500">'+no+'</div><div style="font-size:12px;color:var(--ink3)">'+d+'</div></div><span class="badge '+(statusMap[st]||'b-pend')+'">'+(statusLabel[st]||st)+'</span><div style="font-family:var(--fd)">\u20ba'+(o.total||0).toLocaleString('tr-TR')+'</div></div>';
+    }).join(''));
+  }
 }
 function closeModal(id){
   const m = document.getElementById(id);
