@@ -4314,7 +4314,7 @@ function showWireConfirmation(order, finalTotal, wireDisc, items){
   const confirmBox = document.getElementById('ck-confirm');
   if(confirmBox) confirmBox.style.display='block';
   if(!confirmBox) return;
-  const orderNum = order.order_number || order.id;
+  const orderNum = order.order_number || ('HYZ-' + (order.id||'').toUpperCase().replace(/-/g,'').slice(0,8));
   confirmBox.innerHTML = `
     <div style="font-size:48px;margin-bottom:16px">✦</div>
     <h2 class="d" style="font-size:28px;margin-bottom:8px">Siparişiniz Alındı</h2>
