@@ -1470,16 +1470,60 @@ img{display:block;max-width:100%;object-fit:cover}
 
         <!-- STEP 3: Payment -->
         <div id="ck-payment" style="display:none">
-          <h2 class="fst">Ödeme</h2>
-          <div style="padding:24px;background:var(--bone);border:1px solid var(--stone);margin-bottom:20px;text-align:center">
-            <div style="font-size:40px;margin-bottom:12px">🔒</div>
-            <p style="font-size:15px;color:var(--ink);margin-bottom:6px;font-weight:500">Güvenli Ödeme Sayfasına Yönlendiriliyorsunuz</p>
-            <p style="font-size:13px;color:var(--ink3);margin-bottom:0">Kredi kartı, banka kartı ve taksit seçenekleri iyzico güvencesiyle sunulmaktadır. Kart bilgileriniz hiçbir şekilde sitemizde saklanmaz.</p>
+          <h2 class="fst">Ödeme Yöntemi</h2>
+
+          <!-- Kredi/Banka Kartı seçeneği -->
+          <label id="pay-opt-card" onclick="selectPayMethod('card')" style="display:flex;align-items:flex-start;gap:14px;padding:18px 20px;border:2px solid var(--gold);border-radius:4px;cursor:pointer;margin-bottom:12px;background:rgba(201,169,110,.06);transition:all 200ms">
+            <span style="margin-top:2px;width:18px;height:18px;border-radius:50%;border:2px solid var(--gold);flex-shrink:0;display:flex;align-items:center;justify-content:center" id="pay-radio-card">
+              <span style="width:8px;height:8px;border-radius:50%;background:var(--gold);display:block"></span>
+            </span>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:600;letter-spacing:.04em;margin-bottom:4px">Kredi / Banka Kartı</div>
+              <div style="font-size:12px;color:var(--ink3)">2, 3, 6, 9, 12 taksit &nbsp;·&nbsp; iyzico güvencesi &nbsp;·&nbsp; 256-bit SSL</div>
+            </div>
+            <div style="font-size:22px;opacity:.7">💳</div>
+          </label>
+
+          <!-- Havale/EFT seçeneği -->
+          <label id="pay-opt-wire" onclick="selectPayMethod('wire')" style="display:flex;align-items:flex-start;gap:14px;padding:18px 20px;border:2px solid var(--stone);border-radius:4px;cursor:pointer;margin-bottom:20px;background:var(--bone);transition:all 200ms">
+            <span style="margin-top:2px;width:18px;height:18px;border-radius:50%;border:2px solid var(--ink3);flex-shrink:0;display:flex;align-items:center;justify-content:center" id="pay-radio-wire">
+              <span style="width:8px;height:8px;border-radius:50%;background:transparent;display:block"></span>
+            </span>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:600;letter-spacing:.04em;margin-bottom:4px">Havale / EFT
+                <span style="margin-left:8px;font-size:11px;font-weight:700;letter-spacing:.06em;background:var(--gold);color:#fff;padding:2px 7px;border-radius:20px;vertical-align:middle">%1 İNDİRİM</span>
+              </div>
+              <div style="font-size:12px;color:var(--ink3)">Banka havalesi ile ödeyin, ekstra %1 indirim kazanın</div>
+            </div>
+            <div style="font-size:22px;opacity:.7">🏦</div>
+          </label>
+
+          <!-- Havale bilgileri (gizli, seçilince açılır) -->
+          <div id="ck-wire-info" style="display:none;padding:20px;background:var(--bone);border:1px solid var(--stone);border-radius:4px;margin-bottom:20px">
+            <div style="font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:14px">Banka Bilgileri</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;justify-content:space-between;font-size:13px;border-bottom:1px solid var(--stone);padding-bottom:8px"><span style="color:var(--ink3)">Banka</span><span style="font-weight:500">Garanti Bankası</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;border-bottom:1px solid var(--stone);padding-bottom:8px"><span style="color:var(--ink3)">Hesap Adı</span><span style="font-weight:500">Elmas Bayır</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;border-bottom:1px solid var(--stone);padding-bottom:8px"><span style="color:var(--ink3)">IBAN</span><span style="font-weight:500;letter-spacing:.04em" id="wire-iban-text">TR40 0006 2000 5030 0006 2886 15</span></div>
+            </div>
+            <div style="margin-top:14px;padding:12px;background:rgba(201,169,110,.08);border-left:3px solid var(--gold);font-size:12px;color:var(--ink2);line-height:1.7">
+              Havale açıklamasına <strong>sipariş numaranızı</strong> yazmayı unutmayın. Ödeme onaylandıktan sonra siparişiniz işleme alınır.
+            </div>
           </div>
-          <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(122,170,122,.06);border:1px solid rgba(122,170,122,.2);margin-bottom:24px;flex-wrap:wrap">
-            <span style="color:var(--ok);font-size:20px">✓</span>
-            <span style="font-size:13px;color:var(--ink2)">256-bit SSL şifreleme &nbsp;·&nbsp; 2, 3, 6, 9, 12 taksit &nbsp;·&nbsp; iyzico güvencesi</span>
+
+          <!-- Kart seçilince iyzico bilgi kutusu -->
+          <div id="ck-card-info" style="padding:20px;background:var(--bone);border:1px solid var(--stone);margin-bottom:20px;text-align:center">
+            <div style="font-size:36px;margin-bottom:10px">🔒</div>
+            <p style="font-size:14px;color:var(--ink);margin-bottom:4px;font-weight:500">Güvenli Ödeme Sayfasına Yönlendiriliyorsunuz</p>
+            <p style="font-size:12px;color:var(--ink3);margin-bottom:0">Kart bilgileriniz hiçbir şekilde sitemizde saklanmaz.</p>
           </div>
+
+          <!-- Havale indirim satırı (order summary'de gösterim için) -->
+          <div id="ck-wire-disc-row" style="display:none;display:none;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--stone);margin-bottom:12px">
+            <span style="font-size:13px;color:var(--ink2)">Havale İndirimi (%1)</span>
+            <span id="ck-wire-disc-val" style="color:var(--gold);font-size:13px">−₺0</span>
+          </div>
+
           <div id="ck-pay-error" style="display:none;padding:12px 16px;background:rgba(200,80,80,.08);border:1px solid rgba(200,80,80,.2);color:#c85050;font-size:13px;margin-bottom:16px"></div>
           <button class="btn btn-g btn-full btn-lg" id="ck-pay-btn" onclick="confirmOrder()">Ödemeye Geç — <span id="ck-pay-total">₺0</span></button>
         </div>
@@ -1522,6 +1566,7 @@ img{display:block;max-width:100%;object-fit:cover}
           <div class="cs-row"><span>Ara Toplam</span><span id="om-subtotal">₺0</span></div>
           <div class="cs-row"><span>Kargo</span><span id="om-shipping"><span style="color:var(--ok)">Ücretsiz</span></span></div>
           <div class="cs-row"><span>İndirim</span><span id="om-disc" style="color:var(--gold)">−₺0</span></div>
+          <div class="cs-row" id="om-wire-disc-row" style="display:none"><span>Havale İndirimi (%1)</span><span id="om-wire-disc" style="color:var(--gold)">−₺0</span></div>
           <div class="cs-row tot"><span>Toplam</span><span id="om-total" class="d" style="font-size:21px">₺0</span></div>
           <div style="text-align:right;font-size:11px;color:var(--ink3);margin-top:-4px;letter-spacing:.06em">KDV Dahil</div>
         </div>
@@ -2274,7 +2319,7 @@ function renderCartSummary(){
   if(s('om-disc')) s('om-disc').textContent='−'+fmt(disc);
   if(s('om-shipping')) s('om-shipping').innerHTML=ship===0?`<span style="color:var(--ok)">Ücretsiz</span>`:fmt(ship);
   if(s('om-total')) s('om-total').textContent=fmt(total);
-  if(s('ck-pay-btn')) s('ck-pay-btn').innerHTML='Ödemeye Geç — <span id="ck-pay-total">'+fmt(total)+'</span>';
+  if(s('ck-pay-btn')) s('ck-pay-btn').innerHTML=(_selectedPayMethod==='wire'?'Sipariş Ver — ':'Ödemeye Geç — ')+'<span id="ck-pay-total">'+fmt(total)+'</span>';
   const cartSub=document.querySelector('.cart-sub');
   if(cartSub) cartSub.textContent=Store.cartCount()+' ürün · '+fmt(sub);
 }
@@ -2828,6 +2873,8 @@ function goPayment(){
   s2.classList.remove('active');s2.classList.add('done');
   s2.querySelector('.ck-num').textContent='✓';
   document.getElementById('ck-s3').classList.add('active');
+  _selectedPayMethod='card'; // reset to card on each open
+  selectPayMethod('card');
   window.scrollTo(0,0);
 }
 
@@ -4084,17 +4131,84 @@ async function trackOrder(){
 }
 
 
+/* ─── Ödeme Yöntemi Seçimi ─── */
+let _selectedPayMethod = 'card'; // default: kart
+
+function selectPayMethod(method){
+  _selectedPayMethod = method;
+  const cardOpt = document.getElementById('pay-opt-card');
+  const wireOpt = document.getElementById('pay-opt-wire');
+  const cardRadio = document.getElementById('pay-radio-card');
+  const wireRadio = document.getElementById('pay-radio-wire');
+  const cardInfo = document.getElementById('ck-card-info');
+  const wireInfo = document.getElementById('ck-wire-info');
+  const wireDiscRow = document.getElementById('ck-wire-disc-row');
+
+  if(method === 'card'){
+    if(cardOpt){ cardOpt.style.border='2px solid var(--gold)'; cardOpt.style.background='rgba(201,169,110,.06)'; }
+    if(wireOpt){ wireOpt.style.border='2px solid var(--stone)'; wireOpt.style.background='var(--bone)'; }
+    if(cardRadio) cardRadio.innerHTML='<span style="width:8px;height:8px;border-radius:50%;background:var(--gold);display:block"></span>';
+    if(wireRadio){ wireRadio.style.border='2px solid var(--ink3)'; wireRadio.innerHTML='<span style="width:8px;height:8px;border-radius:50%;background:transparent;display:block"></span>'; }
+    if(cardInfo) cardInfo.style.display='block';
+    if(wireInfo) wireInfo.style.display='none';
+    if(wireDiscRow) wireDiscRow.style.display='none';
+  } else {
+    if(wireOpt){ wireOpt.style.border='2px solid var(--gold)'; wireOpt.style.background='rgba(201,169,110,.06)'; }
+    if(cardOpt){ cardOpt.style.border='2px solid var(--stone)'; cardOpt.style.background='var(--bone)'; }
+    if(wireRadio){ wireRadio.style.border='2px solid var(--gold)'; wireRadio.innerHTML='<span style="width:8px;height:8px;border-radius:50%;background:var(--gold);display:block"></span>'; }
+    if(cardRadio) cardRadio.innerHTML='<span style="width:8px;height:8px;border-radius:50%;background:transparent;display:block"></span>';
+    if(cardInfo) cardInfo.style.display='none';
+    if(wireInfo) wireInfo.style.display='block';
+    if(wireDiscRow) wireDiscRow.style.display='flex';
+  }
+  // Tutar güncelle
+  updatePayTotal();
+}
+
+function getWireDiscount(baseTotal){
+  return _selectedPayMethod === 'wire' ? Math.round(baseTotal * 0.01) : 0;
+}
+
+function updatePayTotal(){
+  const cartItems = Store._d?.cart || [];
+  const sub = cartItems.reduce((s,i)=>s+(i.price*i.qty),0);
+  const promoDisc = Store.cartTotals().disc;
+  const afterPromo = sub - promoDisc;
+  const selectedShip = document.querySelector('input[name="ship"]:checked');
+  const shipping = selectedShip ? parseFloat(selectedShip.value) : (sub >= 500 ? 0 : 49.90);
+  const wireDisc = getWireDiscount(afterPromo + shipping);
+  const finalTotal = afterPromo + shipping - wireDisc;
+
+  const discEl = document.getElementById('ck-wire-disc-val');
+  if(discEl) discEl.textContent = '−'+fmt(wireDisc);
+
+  // Order summary aside
+  const omWireRow = document.getElementById('om-wire-disc-row');
+  const omWireDisc = document.getElementById('om-wire-disc');
+  const omTotal = document.getElementById('om-total');
+  if(omWireRow) omWireRow.style.display = wireDisc > 0 ? 'flex' : 'none';
+  if(omWireDisc) omWireDisc.textContent = '−'+fmt(wireDisc);
+  if(omTotal) omTotal.textContent = fmt(finalTotal);
+
+  const payBtn = document.getElementById('ck-pay-btn');
+  if(payBtn) payBtn.innerHTML = (_selectedPayMethod === 'wire' ? 'Sipariş Ver — ' : 'Ödemeye Geç — ') + '<span id="ck-pay-total">'+fmt(finalTotal)+'</span>';
+}
+
 async function confirmOrder(){
   const btn = document.getElementById('ck-pay-btn');
   const errDiv = document.getElementById('ck-pay-error');
-  if(btn){ btn.disabled=true; btn.textContent='Yönlendiriliyor…'; }
+  if(btn){ btn.disabled=true; btn.textContent=_selectedPayMethod==='wire'?'İşleniyor…':'Yönlendiriliyor…'; }
   if(errDiv) errDiv.style.display='none';
 
   const cartItems = Store._d?.cart || [];
-  const total = cartItems.reduce((s,i)=>s+(i.price*i.qty),0);
+  const sub = cartItems.reduce((s,i)=>s+(i.price*i.qty),0);
+  const promoDisc = Store.cartTotals().disc;
+  const afterPromo = sub - promoDisc;
   const selectedShip = document.querySelector('input[name="ship"]:checked');
-  const shipping = selectedShip ? parseFloat(selectedShip.value) : (total >= 500 ? 0 : 49.90);
-  const finalTotal = total + shipping;
+  const shipping = selectedShip ? parseFloat(selectedShip.value) : (sub >= 500 ? 0 : 49.90);
+  const wireDisc = getWireDiscount(afterPromo + shipping);
+  const finalTotal = afterPromo + shipping - wireDisc;
+  const total = afterPromo; // backward compat
 
   const addrInputs = document.querySelectorAll('#ck-delivery input[name], #ck-delivery select[name]');
   const address = {};
@@ -4105,11 +4219,15 @@ async function confirmOrder(){
 
   // Önce siparişi pending olarak oluştur
   const enrichedItems = cartItems.map(item => ({...item, product_id: item.id||item.product_id||null}));
+  const payMethod = _selectedPayMethod || 'card';
   const orderData = {
     user_id: SB.user?.id||null,
     guest_email: !SB.user?(document.getElementById('ck-email')?.value||null):null,
-    items: enrichedItems, subtotal: total, shipping: shipping,
-    total: finalTotal, status: 'pending_payment', shipping_address: address
+    items: enrichedItems, subtotal: sub, shipping: shipping,
+    total: finalTotal, status: payMethod==='wire'?'pending_wire':'pending_payment',
+    shipping_address: address,
+    payment_method: payMethod,
+    wire_discount: wireDisc
   };
   const order = await SB.createOrder(orderData);
   if(!order || !order.id){
@@ -4125,6 +4243,14 @@ async function confirmOrder(){
     shipping: shipping,
     items: enrichedItems
   }));
+
+  // Havale seçildiyse: doğrudan onay ekranına geç
+  if(payMethod === 'wire'){
+    Store.cartClear();
+    // Onay ekranını havale bilgileriyle doldur
+    showWireConfirmation(order, finalTotal, wireDisc, enrichedItems);
+    return;
+  }
 
   // iyzico Edge Function'ı çağır
   try {
@@ -4165,8 +4291,46 @@ async function confirmOrder(){
     }
   } catch(e) {
     if(errDiv){ errDiv.textContent='Ödeme başlatılamadı: '+e.message; errDiv.style.display='block'; }
-    if(btn){ btn.disabled=false; btn.innerHTML='Ödemeye Geç — <span id="ck-pay-total">₺'+finalTotal.toLocaleString('tr-TR')+'</span>'; }
+    if(btn){ btn.disabled=false; btn.innerHTML='Ödemeye Geç — <span id="ck-pay-total">'+fmt(finalTotal)+'</span>'; }
   }
+}
+
+/* ─── Havale Onay Ekranı ─── */
+function showWireConfirmation(order, finalTotal, wireDisc, items){
+  const ibanEl = document.getElementById('wire-iban-text');
+  const iban = ibanEl ? ibanEl.textContent.trim() : 'TR40 0006 2000 5030 0006 2886 15';
+
+  // STEP 4 onay kutusunu doldur ve göster
+  goCheckoutStep(4);
+  const confirmBox = document.getElementById('ck-confirm');
+  if(!confirmBox) return;
+  const orderNum = order.order_number || order.id;
+  confirmBox.innerHTML = `
+    <div style="font-size:48px;margin-bottom:16px">✦</div>
+    <h2 class="d" style="font-size:28px;margin-bottom:8px">Siparişiniz Alındı</h2>
+    <p style="font-size:14px;color:var(--ink3);margin-bottom:28px">Havale/EFT ile ödeme adımını tamamlayın.</p>
+
+    <div style="background:var(--bone);border:1px solid var(--stone);padding:20px;text-align:left;margin-bottom:20px;border-radius:4px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px">Sipariş Bilgisi</div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--ink3)">Sipariş No</span><span style="font-weight:600">#${orderNum}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--ink3)">Havale İndirimi</span><span style="color:var(--gold)">−${fmt(wireDisc)}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:600;margin-top:10px;padding-top:10px;border-top:1px solid var(--stone)"><span>Ödenecek Tutar</span><span style="font-family:var(--fd)">${fmt(finalTotal)}</span></div>
+    </div>
+
+    <div style="background:rgba(201,169,110,.08);border:1px solid rgba(201,169,110,.3);padding:20px;text-align:left;margin-bottom:20px;border-radius:4px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px">Banka Bilgileri</div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;border-bottom:1px solid rgba(201,169,110,.2);padding-bottom:8px"><span style="color:var(--ink3)">Banka</span><span style="font-weight:500">Garanti Bankası</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;border-bottom:1px solid rgba(201,169,110,.2);padding-bottom:8px"><span style="color:var(--ink3)">Hesap Adı</span><span style="font-weight:500">Elmas Bayır</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--ink3)">IBAN</span><span style="font-weight:600;letter-spacing:.03em">${iban}</span></div>
+    </div>
+
+    <div style="padding:14px 16px;background:rgba(122,170,122,.06);border:1px solid rgba(122,170,122,.2);font-size:12px;color:var(--ink2);line-height:1.8;text-align:left;margin-bottom:24px">
+      ⚠️ Havale açıklamasına <strong>#${orderNum}</strong> sipariş numarasını yazmayı unutmayın.<br>
+      Ödemeniz onaylandıktan sonra siparişiniz kargoya verilecektir.
+    </div>
+
+    <button class="btn btn-g" onclick="go('home')" style="width:100%">Ana Sayfaya Dön</button>
+  `;
 }
 
 /* ─── iyzico Callback Handler ─── */
