@@ -4300,9 +4300,19 @@ function showWireConfirmation(order, finalTotal, wireDisc, items){
   const ibanEl = document.getElementById('wire-iban-text');
   const iban = ibanEl ? ibanEl.textContent.trim() : 'TR40 0006 2000 5030 0006 2886 15';
 
-  // STEP 4 onay kutusunu doldur ve göster
-  goCheckoutStep(4);
+  // STEP 4'e geç: delivery ve payment gizle, confirm göster
+  const _ckDel = document.getElementById('ck-delivery');
+  const _ckPay = document.getElementById('ck-payment');
+  const _ckS3  = document.getElementById('ck-s3');
+  const _ckS4  = document.getElementById('ck-s4');
+  if(_ckDel) _ckDel.style.display='none';
+  if(_ckPay) _ckPay.style.display='none';
+  if(_ckS3){ _ckS3.classList.remove('active'); _ckS3.classList.add('done'); _ckS3.querySelector('.ck-num').textContent='✓'; }
+  if(_ckS4){ _ckS4.classList.add('active'); }
+  window.scrollTo(0,0);
+
   const confirmBox = document.getElementById('ck-confirm');
+  if(confirmBox) confirmBox.style.display='block';
   if(!confirmBox) return;
   const orderNum = order.order_number || order.id;
   confirmBox.innerHTML = `
