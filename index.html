@@ -1480,6 +1480,11 @@ img{display:block;max-width:100%;object-fit:cover}
             <div style="flex:1">
               <div style="font-size:14px;font-weight:600;letter-spacing:.04em;margin-bottom:4px">Kredi / Banka Kartı</div>
               <div style="font-size:12px;color:var(--ink3)">2, 3, 6, 9, 12 taksit &nbsp;·&nbsp; iyzico güvencesi &nbsp;·&nbsp; 256-bit SSL</div>
+              <div style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(201,169,110,.15),rgba(201,169,110,.08));border:1px solid rgba(201,169,110,.4);border-radius:3px;padding:5px 10px">
+                <span style="font-size:13px">✦</span>
+                <span style="font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--gold)">ANLAŞMALI BANKALARA 3 TAKSİT VADE FARKSIZ</span>
+              </div>
+              <div style="margin-top:5px;font-size:11px;color:var(--ink3)">Maximum · Axess · World · Paraf · QNB · BanKart</div>
             </div>
             <div style="font-size:22px;opacity:.7">💳</div>
           </label>
@@ -4424,5 +4429,56 @@ async function handlePaymentCallback(){
   }
 }
 </script>
+
+<!-- ─── Taksit Kampanya Popup ─── -->
+<div id="taksit-popup" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(42,31,16,.65);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--cream);max-width:420px;width:100%;border-radius:4px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.35);position:relative">
+    <!-- Üst dekoratif şerit -->
+    <div style="background:linear-gradient(135deg,var(--gold),#a8823a);padding:28px 28px 22px;text-align:center;position:relative">
+      <div style="font-size:13px;font-weight:700;letter-spacing:.2em;color:rgba(255,255,255,.75);text-transform:uppercase;margin-bottom:8px">Özel Kampanya</div>
+      <div style="font-size:28px;font-weight:800;color:#fff;letter-spacing:.04em;line-height:1.15">3 TAKSİT<br>VADE FARKSIZ</div>
+      <div style="margin-top:10px;font-size:13px;color:rgba(255,255,255,.85)">Anlaşmalı banka kartlarında geçerlidir</div>
+      <button onclick="document.getElementById('taksit-popup').style.display='none'" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+    <!-- Banka logoları -->
+    <div style="padding:22px 28px 10px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px;text-align:center">Anlaşmalı Bankalar</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+        <div style="padding:10px 8px;border:1px solid var(--stone);border-radius:3px;text-align:center;font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.04em;background:#fff">MAXIMUM<br><span style="font-size:9px;font-weight:400;color:var(--ink3)">İş Bankası</span></div>
+        <div style="padding:10px 8px;border:1px solid var(--stone);border-radius:3px;text-align:center;font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.04em;background:#fff">AXESS<br><span style="font-size:9px;font-weight:400;color:var(--ink3)">Akbank</span></div>
+        <div style="padding:10px 8px;border:1px solid var(--stone);border-radius:3px;text-align:center;font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.04em;background:#fff">WORLD<br><span style="font-size:9px;font-weight:400;color:var(--ink3)">Yapı Kredi</span></div>
+        <div style="padding:10px 8px;border:1px solid var(--stone);border-radius:3px;text-align:center;font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.04em;background:#fff">PARAF<br><span style="font-size:9px;font-weight:400;color:var(--ink3)">Halkbank</span></div>
+        <div style="padding:10px 8px;border:1px solid var(--stone);border-radius:3px;text-align:center;font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.04em;background:#fff">QNB<br><span style="font-size:9px;font-weight:400;color:var(--ink3)">QNB Finansbank</span></div>
+        <div style="padding:10px 8px;border:1px solid var(--stone);border-radius:3px;text-align:center;font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.04em;background:#fff">BANKART<br><span style="font-size:9px;font-weight:400;color:var(--ink3)">Ziraat</span></div>
+      </div>
+    </div>
+    <!-- Alt kısım -->
+    <div style="padding:18px 28px 24px;text-align:center">
+      <div style="font-size:12px;color:var(--ink3);margin-bottom:16px">Kampanya tüm ürünlerde, sınırsız tutarda geçerlidir.</div>
+      <button onclick="document.getElementById('taksit-popup').style.display='none'" style="background:var(--gold);color:#fff;border:none;padding:13px 32px;font-size:13px;font-weight:700;letter-spacing:.1em;border-radius:3px;cursor:pointer;width:100%">ALIŞVERİŞE BAŞLA →</button>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  // Popup: session başına bir kez göster (sekme yenilenince tekrar göster)
+  if(!sessionStorage.getItem('taksit_popup_shown')){
+    setTimeout(function(){
+      var p = document.getElementById('taksit-popup');
+      if(p){ p.style.display='flex'; }
+      sessionStorage.setItem('taksit_popup_shown','1');
+    }, 1200);
+  }
+  // ESC ile kapat
+  document.addEventListener('keydown', function(e){
+    if(e.key==='Escape') document.getElementById('taksit-popup').style.display='none';
+  });
+  // Overlay click ile kapat
+  document.getElementById('taksit-popup').addEventListener('click', function(e){
+    if(e.target===this) this.style.display='none';
+  });
+})();
+</script>
+
 </body>
 </html>
