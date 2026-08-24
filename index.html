@@ -13,6 +13,20 @@ const _SB_URL = 'https://vuusgbthelegugpcbdye.supabase.co';
 const _SB_KEY = 'sb_publishable_AEgf5P40juSWSFyGGTtOrQ_3gfL9Anl';
 const _sbClient = window.supabase.createClient(_SB_URL, _SB_KEY);
 
+// ── KATALOG PDF ──
+// PDF'i Supabase Storage'a yükledikten sonra public URL'i buraya yapıştırın.
+// Not: link tarayıcıda görüntülenir. İndirilsin isterseniz sonuna ?download=HAYAZEEEM-Katalog.pdf ekleyin.
+const KATALOG_PDF = 'https://vuusgbthelegugpcbdye.supabase.co/storage/v1/object/public/products/hayazeeem-katalog.pdf';
+
+function openKatalog(){
+  if(!KATALOG_PDF || KATALOG_PDF.indexOf('http') !== 0){
+    if(typeof toast==='function') toast('Katalog çok yakında');
+    else alert('Katalog çok yakında');
+    return;
+  }
+  window.open(KATALOG_PDF, '_blank', 'noopener');
+}
+
 // ── GLOBAL STATE ──
 const SB = {
   user: null,
@@ -373,6 +387,17 @@ img{display:block;max-width:100%;object-fit:cover}
 .hero-num{position:absolute;bottom:24px;right:24px;background:rgba(250,247,242,.92);padding:14px 18px;text-align:center;backdrop-filter:blur(8px)}
 .hero-num-val{font-family:var(--fd);font-size:30px;display:block}
 .hero-num-lbl{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3)}
+/* ── KATALOG ŞERİDİ ── */
+.kat-band{background:var(--ink);color:var(--cream);border-bottom:1px solid var(--stone)}
+.kat-in{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:22px 0}
+.kat-txt{display:flex;align-items:center;gap:16px;min-width:0}
+.kat-ic{flex:0 0 auto;width:42px;height:42px;border:1px solid rgba(201,169,110,.55);display:flex;align-items:center;justify-content:center;color:var(--gold)}
+.kat-h{font-family:var(--fd);font-size:22px;font-weight:300;line-height:1.25;margin:0}
+.kat-h em{font-style:italic;color:var(--gold)}
+.kat-p{font-size:12px;letter-spacing:.06em;color:rgba(250,247,242,.62);margin:3px 0 0}
+.kat-btn{display:inline-flex;align-items:center;gap:10px;background:var(--gold);color:#fff;border:1px solid var(--gold);padding:13px 26px;font-family:var(--fb);font-size:12px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .3s;white-space:nowrap}
+.kat-btn:hover{background:transparent;color:var(--gold)}
+.kat-btn svg{flex:0 0 auto}
 .scroll-hint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px}
 .scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,var(--gold),transparent);animation:scrollPulse 2.2s infinite}
 .scroll-txt{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink4)}
@@ -653,6 +678,9 @@ img{display:block;max-width:100%;object-fit:cover}
   .cat-grid{grid-template-columns:1fr}
   .hero-cta{flex-direction:column}
   .hero-cta .btn{width:100%;justify-content:center}
+  .kat-in{padding:20px 0}
+  .kat-h{font-size:19px}
+  .kat-btn{width:100%;justify-content:center}
   .ck-steps{gap:0}
   .ck-step{padding:10px 8px;font-size:10px;gap:5px}
   .ord-row{grid-template-columns:1fr auto}
@@ -808,6 +836,32 @@ img{display:block;max-width:100%;object-fit:cover}
       <div class="hero-num"><span class="hero-num-val">200+</span><span class="hero-num-lbl">Premium Ürün</span></div>
     </div>
 
+  </section>
+
+  <!-- ── KATALOG ŞERİDİ ── -->
+  <section class="kat-band">
+    <div class="container">
+      <div class="kat-in">
+        <div class="kat-txt">
+          <div class="kat-ic" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+              <path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H11v18H5.5A1.5 1.5 0 0 1 4 19.5v-15Z"/>
+              <path d="M20 4.5A1.5 1.5 0 0 0 18.5 3H13v18h5.5a1.5 1.5 0 0 0 1.5-1.5v-15Z"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="kat-h">Katalogumuzu <em>inceleyin</em></h2>
+            <p class="kat-p">Bahar — Yaz 2026 koleksiyonunun tamamı tek dosyada</p>
+          </div>
+        </div>
+        <button class="kat-btn" type="button" onclick="openKatalog()" aria-label="Katalogu yeni sekmede görüntüle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/>
+          </svg>
+          Katalogu İncele
+        </button>
+      </div>
+    </div>
   </section>
 
   <!-- ── ANA SAYFA ARAMA ŞERİDİ ── -->
